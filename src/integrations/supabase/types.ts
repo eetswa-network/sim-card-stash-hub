@@ -43,7 +43,9 @@ export type Database = {
           carrier: string | null
           created_at: string
           id: string
+          login: string | null
           notes: string | null
+          password: string | null
           phone_number: string
           sim_number: string
           status: string | null
@@ -54,7 +56,9 @@ export type Database = {
           carrier?: string | null
           created_at?: string
           id?: string
+          login?: string | null
           notes?: string | null
+          password?: string | null
           phone_number: string
           sim_number: string
           status?: string | null
@@ -65,7 +69,9 @@ export type Database = {
           carrier?: string | null
           created_at?: string
           id?: string
+          login?: string | null
           notes?: string | null
+          password?: string | null
           phone_number?: string
           sim_number?: string
           status?: string | null

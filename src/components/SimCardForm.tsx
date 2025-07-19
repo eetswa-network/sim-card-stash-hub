@@ -21,6 +21,8 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
     carrier: editingCard?.carrier || "",
     status: editingCard?.status || "active",
     notes: editingCard?.notes || "",
+    login: editingCard?.login || "",
+    password: editingCard?.password || "",
   });
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
@@ -71,6 +73,8 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         carrier: "",
         status: "active",
         notes: "",
+        login: "",
+        password: "",
       });
       onSuccess();
     } catch (error) {
@@ -137,6 +141,29 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                   <SelectItem value="suspended">Suspended</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="login">Login</Label>
+              <Input
+                id="login"
+                type="text"
+                value={formData.login}
+                onChange={(e) => setFormData({ ...formData, login: e.target.value })}
+                placeholder="Account login/username"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Account password"
+              />
             </div>
           </div>
 

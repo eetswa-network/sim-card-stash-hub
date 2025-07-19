@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, CreditCard } from "lucide-react";
+import { Edit, Trash2, Phone, CreditCard, User, Lock } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface SimCard {
@@ -14,6 +14,8 @@ interface SimCard {
   carrier?: string;
   status: string;
   notes?: string;
+  login?: string;
+  password?: string;
   created_at: string;
   updated_at: string;
 }
@@ -142,6 +144,20 @@ export function SimCardList({ onEdit, refreshTrigger }: SimCardListProps) {
             {card.carrier && (
               <div className="text-sm text-muted-foreground">
                 <strong>Carrier:</strong> {card.carrier}
+              </div>
+            )}
+
+            {card.login && (
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <span className="font-mono text-sm">{card.login}</span>
+              </div>
+            )}
+
+            {card.password && (
+              <div className="flex items-center gap-2">
+                <Lock className="h-4 w-4 text-muted-foreground" />
+                <span className="font-mono text-sm">••••••••</span>
               </div>
             )}
             
