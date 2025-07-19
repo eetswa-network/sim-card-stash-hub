@@ -90,9 +90,6 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
         </div>
 
         <div className="space-y-8">
-          <ESimIconDemo />
-          <PhysicalSimIconDemo />
-          
           {showForm && (
             <SimCardForm
               onSuccess={handleFormSuccess}
