@@ -30,6 +30,7 @@ interface SimCardListProps {
 }
 
 export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange, searchQuery }: SimCardListProps) {
+  console.log("SimCardList component rendered - IdCard should be available");
   const [simCards, setSimCards] = useState<SimCard[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
