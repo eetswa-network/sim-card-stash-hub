@@ -3,13 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SimCardForm } from "@/components/SimCardForm";
 import { SimCardList } from "@/components/SimCardList";
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const Index = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+interface IndexProps {
+  searchQuery?: string;
+}
+
+const Index = ({ searchQuery = "" }: IndexProps) => {
   const [showForm, setShowForm] = useState(false);
   const [editingCard, setEditingCard] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -63,17 +65,12 @@ const Index = () => {
     setEditingCard(null);
   };
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
-
   if (!user) {
     return null; // Will redirect to auth
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onSearch={handleSearch} />
       <div className="container mx-auto py-8 px-4">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
