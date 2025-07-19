@@ -14,6 +14,7 @@ const Index = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -138,7 +139,12 @@ const Index = () => {
 
           <div>
             <h2 className="text-xl font-semibold mb-4 text-foreground">Your SIM Cards</h2>
-            <SimCardList onEdit={handleEdit} refreshTrigger={refreshTrigger} />
+            <SimCardList 
+              onEdit={handleEdit} 
+              refreshTrigger={refreshTrigger}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+            />
           </div>
         </div>
       </div>
