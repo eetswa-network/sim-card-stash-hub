@@ -26,9 +26,10 @@ interface SimCardListProps {
   refreshTrigger: number;
   viewMode: 'grid' | 'list';
   onViewModeChange: (mode: 'grid' | 'list') => void;
+  searchQuery?: string;
 }
 
-export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange }: SimCardListProps) {
+export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange, searchQuery }: SimCardListProps) {
   const [simCards, setSimCards] = useState<SimCard[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -92,6 +93,18 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     }
   };
 
+  // Filter SIM cards based on search query
+  const filteredSimCards = searchQuery 
+    ? simCards.filter(card => 
+        card.sim_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        card.phone_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        card.carrier?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        card.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        card.sim_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        card.notes?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : simCards;
+
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -109,6 +122,20 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
           </Card>
         ))}
       </div>
+    );
+  }
+
+  if (filteredSimCards.length === 0 && searchQuery) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center py-8">
+            <CreditCard className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium text-foreground">No SIM cards found</h3>
+            <p className="text-muted-foreground">No SIM cards match your search criteria.</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -155,7 +182,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       {/* Grid View */}
       {viewMode === 'grid' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {simCards.map((card) => (
+          {filteredSimCards.map((card) => (
             <Card key={card.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -267,7 +294,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               </div>
             </div>
             <div className="divide-y">
-              {simCards.map((card) => (
+              {filteredSimCards.map((card) => (
                 <div key={card.id} className="p-4 hover:bg-muted/50 transition-colors">
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2 text-sm flex-1 px-2 border-r border-border">

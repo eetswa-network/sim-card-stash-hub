@@ -6,8 +6,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { SearchBar } from "@/components/SearchBar";
 
-export function Header() {
+interface HeaderProps {
+  onSearch?: (query: string) => void;
+}
+
+export function Header({ onSearch }: HeaderProps) {
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const navigate = useNavigate();
@@ -68,6 +73,10 @@ export function Header() {
         </div>
         
         <nav className="flex items-center gap-4">
+          {onSearch && (
+            <SearchBar onSearch={onSearch} />
+          )}
+          
           <Button variant="ghost" asChild>
             <Link to="/">Dashboard</Link>
           </Button>
