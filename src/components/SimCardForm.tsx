@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -28,6 +29,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -184,11 +186,21 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="Account password"
               />
+              <div className="flex items-center space-x-2 mt-2">
+                <Checkbox
+                  id="show-password"
+                  checked={showPassword}
+                  onCheckedChange={(checked) => setShowPassword(checked === true)}
+                />
+                <Label htmlFor="show-password" className="text-sm font-normal">
+                  Show password
+                </Label>
+              </div>
             </div>
           </div>
 

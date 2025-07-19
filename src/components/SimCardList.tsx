@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone } from "lucide-react";
@@ -34,6 +36,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   const [simCards, setSimCards] = useState<SimCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
   const { toast } = useToast();
 
   const fetchSimCards = async () => {
@@ -103,6 +106,13 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       newExpandedRows.add(cardId);
     }
     setExpandedRows(newExpandedRows);
+  };
+
+  const togglePasswordVisibility = (cardId: string) => {
+    setShowPasswords(prev => ({
+      ...prev,
+      [cardId]: !prev[cardId]
+    }));
   };
 
   // Filter SIM cards based on search query
@@ -233,9 +243,23 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 )}
 
                 {card.password && (
-                  <div className="flex items-center gap-2">
-                    <Lock className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-mono text-sm">••••••••</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Lock className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-mono text-sm">
+                        {showPasswords[card.id] ? card.password : "••••••••"}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`show-password-grid-${card.id}`}
+                        checked={showPasswords[card.id] || false}
+                        onCheckedChange={() => togglePasswordVisibility(card.id)}
+                      />
+                      <Label htmlFor={`show-password-grid-${card.id}`} className="text-xs font-normal">
+                        Show password
+                      </Label>
+                    </div>
                   </div>
                 )}
                 
@@ -394,10 +418,24 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         )}
                         
                         {card.password && (
-                          <div className="flex items-center gap-2">
-                            <Lock className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Password:</span>
-                            <span className="font-mono text-sm">••••••••</span>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Lock className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">Password:</span>
+                              <span className="font-mono text-sm">
+                                {showPasswords[card.id] ? card.password : "••••••••"}
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`show-password-list-${card.id}`}
+                                checked={showPasswords[card.id] || false}
+                                onCheckedChange={() => togglePasswordVisibility(card.id)}
+                              />
+                              <Label htmlFor={`show-password-list-${card.id}`} className="text-xs font-normal">
+                                Show password
+                              </Label>
+                            </div>
                           </div>
                         )}
                         
