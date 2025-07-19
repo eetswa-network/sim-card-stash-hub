@@ -244,6 +244,20 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       {viewMode === 'list' && (
         <Card>
           <CardContent className="p-0">
+            {/* Header */}
+            <div className="p-4 border-b bg-muted/30">
+              <div className="flex items-center justify-between w-full font-medium text-sm text-muted-foreground">
+                <div className="flex-1">Phone Number</div>
+                <div className="flex-1 text-center">SIM Number</div>
+                <div className="flex-1 text-center">Status</div>
+                <div className="flex-1 text-center">Carrier</div>
+                <div className="flex-1 text-center">Login</div>
+                <div className="flex-1 text-center">Password</div>
+                <div className="flex-1 text-center">Notes</div>
+                <div className="flex-1 text-center">Date</div>
+                <div className="flex-1 text-center">Actions</div>
+              </div>
+            </div>
             <div className="divide-y">
               {simCards.map((card) => (
                 <div key={card.id} className="p-4 hover:bg-muted/50 transition-colors">
