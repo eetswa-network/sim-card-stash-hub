@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { ESimIcon } from "@/components/ui/esim-icon";
 
 interface SimCard {
   id: string;
@@ -201,7 +202,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
                 <div className="flex items-center gap-2">
                   {card.sim_type === 'eSIM' ? (
-                    <Smartphone className="h-4 w-4 text-muted-foreground" />
+                    <ESimIcon />
                   ) : (
                     <IdCard className="h-4 w-4 text-muted-foreground" />
                   )}
@@ -304,7 +305,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     </div>
                     <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-border">
                        {card.sim_type === 'eSIM' ? (
-                        <Smartphone className="h-4 w-4 text-muted-foreground" />
+                        <ESimIcon />
                       ) : (
                         <IdCard className="h-4 w-4 text-muted-foreground" />
                       )}
