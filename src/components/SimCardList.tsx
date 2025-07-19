@@ -33,6 +33,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   console.log("SimCardList component rendered - IdCard should be available");
   const [simCards, setSimCards] = useState<SimCard[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   const fetchSimCards = async () => {
@@ -92,6 +93,16 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       default:
         return "outline";
     }
+  };
+
+  const toggleRowExpansion = (cardId: string) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (newExpandedRows.has(cardId)) {
+      newExpandedRows.delete(cardId);
+    } else {
+      newExpandedRows.add(cardId);
+    }
+    setExpandedRows(newExpandedRows);
   };
 
   // Filter SIM cards based on search query
@@ -296,67 +307,125 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
             </div>
             <div className="divide-y">
               {filteredSimCards.map((card) => (
-                <div key={card.id} className="p-4 hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-2 text-sm flex-1 px-2 border-r border-border">
-                      <Phone className="h-3 w-3 text-muted-foreground" />
-                      <span className="font-mono">{card.phone_number}</span>
-                    </div>
-                    <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-border">
-                       {card.sim_type === 'eSIM' ? (
-                        <Smartphone className="h-4 w-4 text-muted-foreground" />
-                      ) : (
-                        <IdCard className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </div>
-                    <div className="font-mono font-medium flex-1 text-center px-2 border-r border-border">{card.sim_number}</div>
-                    <div className="flex-1 text-center px-2 border-r border-border">
-                      <Badge variant={getStatusColor(card.status)} className="text-xs">
-                        {card.status}
-                      </Badge>
-                    </div>
-                    <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-border">
-                      {card.carrier || '-'}
-                    </div>
-                    <div className="text-xs text-muted-foreground flex-1 text-center px-2 border-r border-border">
-                      {new Date(card.created_at).toLocaleDateString()}
-                    </div>
-                    <div className="flex-1 text-center px-2">
-                      <div className="flex gap-2 justify-center">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onEdit(card)}
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
-                        
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="sm">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete SIM Card</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete the SIM card {card.sim_number}? 
-                                This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleDelete(card.id)}>
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                <div key={card.id}>
+                  <div 
+                    className="p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+                    onClick={() => toggleRowExpansion(card.id)}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2 text-sm flex-1 px-2 border-r border-border">
+                        <Phone className="h-3 w-3 text-muted-foreground" />
+                        <span className="font-mono">{card.phone_number}</span>
+                      </div>
+                      <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-border">
+                         {card.sim_type === 'eSIM' ? (
+                          <Smartphone className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <IdCard className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </div>
+                      <div className="font-mono font-medium flex-1 text-center px-2 border-r border-border">{card.sim_number}</div>
+                      <div className="flex-1 text-center px-2 border-r border-border">
+                        <Badge variant={getStatusColor(card.status)} className="text-xs">
+                          {card.status}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-border">
+                        {card.carrier || '-'}
+                      </div>
+                      <div className="text-xs text-muted-foreground flex-1 text-center px-2 border-r border-border">
+                        {new Date(card.created_at).toLocaleDateString()}
+                      </div>
+                      <div className="flex-1 text-center px-2">
+                        <div className="flex gap-2 justify-center">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEdit(card);
+                            }}
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                          
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button 
+                                variant="destructive" 
+                                size="sm"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete SIM Card</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete the SIM card {card.sim_number}? 
+                                  This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDelete(card.id)}>
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Expanded content */}
+                  {expandedRows.has(card.id) && (
+                    <div className="px-4 pb-4 bg-muted/20 border-t">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                        {card.login && (
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">Login:</span>
+                            <span className="font-mono text-sm">{card.login}</span>
+                          </div>
+                        )}
+                        
+                        {card.password && (
+                          <div className="flex items-center gap-2">
+                            <Lock className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">Password:</span>
+                            <span className="font-mono text-sm">••••••••</span>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">Created:</span>
+                          <span className="text-sm text-muted-foreground">
+                            {new Date(card.created_at).toLocaleDateString()} at {new Date(card.created_at).toLocaleTimeString()}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">Updated:</span>
+                          <span className="text-sm text-muted-foreground">
+                            {new Date(card.updated_at).toLocaleDateString()} at {new Date(card.updated_at).toLocaleTimeString()}
+                          </span>
+                        </div>
+                        
+                        {card.notes && (
+                          <div className="md:col-span-2">
+                            <div className="text-sm font-medium mb-1">Notes:</div>
+                            <div className="text-sm text-muted-foreground bg-background p-2 rounded border">
+                              {card.notes}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
