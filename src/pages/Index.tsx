@@ -73,9 +73,6 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <CreditCard className="h-8 w-8 text-primary" />
-          </div>
           <div className="flex items-center gap-4">
             {!showForm && (
               <Button onClick={() => setShowForm(true)} className="flex items-center gap-2">
