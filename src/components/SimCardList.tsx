@@ -247,54 +247,44 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
             <div className="divide-y">
               {simCards.map((card) => (
                 <div key={card.id} className="p-4 hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-4">
-                        <div className="font-mono font-medium">{card.sim_number}</div>
-                        <Badge variant={getStatusColor(card.status)} className="text-xs">
-                          {card.status}
-                        </Badge>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div className="font-mono font-medium shrink-0">{card.sim_number}</div>
+                      <Badge variant={getStatusColor(card.status)} className="text-xs shrink-0">
+                        {card.status}
+                      </Badge>
+                      <div className="flex items-center gap-2 text-sm shrink-0">
+                        <Phone className="h-3 w-3 text-muted-foreground" />
+                        <span className="font-mono">{card.phone_number}</span>
                       </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-3 w-3 text-muted-foreground" />
-                          <span className="font-mono">{card.phone_number}</span>
+                      {card.carrier && (
+                        <div className="text-sm text-muted-foreground shrink-0">
+                          <strong>Carrier:</strong> {card.carrier}
                         </div>
-                        
-                        {card.carrier && (
-                          <div className="text-muted-foreground">
-                            <strong>Carrier:</strong> {card.carrier}
-                          </div>
-                        )}
-
-                        {card.login && (
-                          <div className="flex items-center gap-2">
-                            <User className="h-3 w-3 text-muted-foreground" />
-                            <span className="font-mono">{card.login}</span>
-                          </div>
-                        )}
-
-                        {card.password && (
-                          <div className="flex items-center gap-2">
-                            <Lock className="h-3 w-3 text-muted-foreground" />
-                            <span className="font-mono">••••••••</span>
-                          </div>
-                        )}
-                      </div>
-
+                      )}
+                      {card.login && (
+                        <div className="flex items-center gap-1 text-sm shrink-0">
+                          <User className="h-3 w-3 text-muted-foreground" />
+                          <span className="font-mono">{card.login}</span>
+                        </div>
+                      )}
+                      {card.password && (
+                        <div className="flex items-center gap-1 text-sm shrink-0">
+                          <Lock className="h-3 w-3 text-muted-foreground" />
+                          <span className="font-mono">••••••••</span>
+                        </div>
+                      )}
                       {card.notes && (
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-muted-foreground truncate">
                           <strong>Notes:</strong> {card.notes}
                         </div>
                       )}
-                      
-                      <div className="text-xs text-muted-foreground">
-                        Added: {new Date(card.created_at).toLocaleDateString()}
+                      <div className="text-xs text-muted-foreground shrink-0">
+                        {new Date(card.created_at).toLocaleDateString()}
                       </div>
                     </div>
                     
-                    <div className="flex gap-2 ml-4">
+                    <div className="flex gap-2 shrink-0">
                       <Button
                         variant="outline"
                         size="sm"
