@@ -13,22 +13,17 @@ export function PhysicalSimIcon({ className }: PhysicalSimIconProps) {
       strokeLinejoin="round"
       className={`h-4 w-4 text-muted-foreground ${className}`}
     >
-      {/* SIM card outline */}
-      <path d="M4 4h12l4 4v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z" />
-      {/* Corner cut */}
-      <path d="M16 4v4h4" />
-      {/* Chip pattern */}
-      <rect x="8" y="9" width="8" height="6" rx="1" fill="currentColor" />
-      {/* Chip grid pattern */}
-      <rect x="9" y="10" width="1.5" height="1" fill="white" />
-      <rect x="11" y="10" width="1.5" height="1" fill="white" />
-      <rect x="13" y="10" width="1.5" height="1" fill="white" />
-      <rect x="9" y="11.5" width="1.5" height="1" fill="white" />
-      <rect x="11" y="11.5" width="1.5" height="1" fill="white" />
-      <rect x="13" y="11.5" width="1.5" height="1" fill="white" />
-      <rect x="9" y="13" width="1.5" height="1" fill="white" />
-      <rect x="11" y="13" width="1.5" height="1" fill="white" />
-      <rect x="13" y="13" width="1.5" height="1" fill="white" />
+      {/* Card outline */}
+      <rect x="4" y="7" width="16" height="10" rx="2" />
+      {/* Chip */}
+      <rect x="8" y="10" width="4" height="3" rx="0.5" fill="currentColor" />
+      {/* Chip contact pattern */}
+      <circle cx="9" cy="11" r="0.3" fill="white" />
+      <circle cx="10" cy="11" r="0.3" fill="white" />
+      <circle cx="11" cy="11" r="0.3" fill="white" />
+      <circle cx="9" cy="12" r="0.3" fill="white" />
+      <circle cx="10" cy="12" r="0.3" fill="white" />
+      <circle cx="11" cy="12" r="0.3" fill="white" />
     </svg>
   );
 }
