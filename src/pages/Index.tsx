@@ -74,12 +74,6 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
       <div className="container mx-auto py-8 px-4">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            {!showForm && (
-              <Button onClick={() => setShowForm(true)} className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Add SIM Card
-              </Button>
-            )}
           </div>
         </div>
 
@@ -93,7 +87,15 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
           )}
 
           <div>
-            <h2 className="text-xl font-semibold mb-4 text-foreground">Your SIM Cards</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-foreground">Your SIM Cards</h2>
+              {!showForm && (
+                <Button onClick={() => setShowForm(true)} className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Add SIM Card
+                </Button>
+              )}
+            </div>
           <SimCardList 
             onEdit={handleEdit} 
             refreshTrigger={refreshTrigger}
