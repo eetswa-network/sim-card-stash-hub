@@ -4,8 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SimCardForm } from "@/components/SimCardForm";
 import { SimCardList } from "@/components/SimCardList";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { CreditCard, Plus, LogOut, User } from "lucide-react";
+import { CreditCard, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
@@ -13,7 +12,6 @@ const Index = () => {
   const [editingCard, setEditingCard] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [user, setUser] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -28,15 +26,6 @@ const Index = () => {
       }
       
       setUser(session.user);
-      
-      // Fetch user profile
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .single();
-      
-      setUserProfile(profile);
     };
     
     checkSession();
@@ -46,7 +35,6 @@ const Index = () => {
       (event, session) => {
         if (!session?.user) {
           setUser(null);
-          setUserProfile(null);
           navigate("/auth");
         } else {
           setUser(session.user);
@@ -56,17 +44,6 @@ const Index = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
-
-  const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        title: "Error signing out",
-        description: error.message,
-        variant: "destructive"
-      });
-    }
-  };
 
   const handleFormSuccess = () => {
     setShowForm(false);
@@ -97,28 +74,6 @@ const Index = () => {
             <h1 className="text-3xl font-bold text-foreground">SIM Card Stash</h1>
           </div>
           <div className="flex items-center gap-4">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <User className="h-4 w-4" />
-                  <span className="font-medium">
-                    {userProfile?.name || user.email}
-                  </span>
-                </div>
-                <div className="text-sm text-muted-foreground mb-3">
-                  {user.email}
-                </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleSignOut}
-                  className="w-full gap-2"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Sign Out
-                </Button>
-              </CardContent>
-            </Card>
             {!showForm && (
               <Button onClick={() => setShowForm(true)} className="flex items-center gap-2">
                 <Plus className="h-4 w-4" />
