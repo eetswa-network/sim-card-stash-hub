@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      sim_cards: {
+        Row: {
+          carrier: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          phone_number: string
+          sim_number: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          carrier?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          phone_number: string
+          sim_number: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          carrier?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          phone_number?: string
+          sim_number?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
