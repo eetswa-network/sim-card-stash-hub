@@ -20,6 +20,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
     phone_number: editingCard?.phone_number || "",
     carrier: editingCard?.carrier || "",
     status: editingCard?.status || "active",
+    sim_type: editingCard?.sim_type || "Physical SIM",
     notes: editingCard?.notes || "",
     login: editingCard?.login || "",
     password: editingCard?.password || "",
@@ -83,6 +84,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         phone_number: "",
         carrier: "",
         status: "active",
+        sim_type: "Physical SIM",
         notes: "",
         login: "",
         password: "",
@@ -130,7 +132,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="carrier">Carrier</Label>
               <Input
@@ -139,6 +141,18 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                 onChange={(e) => setFormData({ ...formData, carrier: e.target.value })}
                 placeholder="e.g., Verizon, AT&T, T-Mobile"
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sim_type">SIM Type</Label>
+              <Select value={formData.sim_type} onValueChange={(value) => setFormData({ ...formData, sim_type: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select SIM type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="eSIM">eSIM</SelectItem>
+                  <SelectItem value="Physical SIM">Physical SIM</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>

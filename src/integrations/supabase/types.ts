@@ -49,6 +49,7 @@ export type Database = {
           phone_number: string
           profile_id: string | null
           sim_number: string
+          sim_type: string
           status: string | null
           updated_at: string
           user_id: string | null
@@ -63,6 +64,7 @@ export type Database = {
           phone_number: string
           profile_id?: string | null
           sim_number: string
+          sim_type?: string
           status?: string | null
           updated_at?: string
           user_id?: string | null
@@ -77,6 +79,7 @@ export type Database = {
           phone_number?: string
           profile_id?: string | null
           sim_number?: string
+          sim_type?: string
           status?: string | null
           updated_at?: string
           user_id?: string | null
