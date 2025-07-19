@@ -251,7 +251,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 <div className="flex-1 text-center">SIM Number</div>
                 <div className="flex-1 text-center">Status</div>
                 <div className="flex-1 text-center">Carrier</div>
-                <div className="flex-1 text-center">Notes</div>
                 <div className="flex-1 text-center">Date</div>
                 <div className="flex-1 text-center">Actions</div>
               </div>
@@ -274,11 +273,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                        {card.carrier && (
                          <div className="text-sm text-muted-foreground flex-1 text-center">
                            <strong>Carrier:</strong> {card.carrier}
-                         </div>
-                       )}
-                       {card.notes && (
-                         <div className="text-sm text-muted-foreground truncate flex-1 text-center">
-                           <strong>Notes:</strong> {card.notes}
                          </div>
                        )}
                        <div className="text-xs text-muted-foreground flex-1 text-center">
