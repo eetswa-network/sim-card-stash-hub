@@ -66,17 +66,21 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       }
 
       if (editingCard) {
+        // Extract profile_name before updating sim_cards
+        const { profile_name, ...simCardData } = formData;
         const { error } = await supabase
           .from("sim_cards")
-          .update(formData)
+          .update(simCardData)
           .eq("id", editingCard.id);
 
         if (error) throw error;
         toast({ title: "SIM card updated successfully!" });
       } else {
+        // Extract profile_name before inserting into sim_cards
+        const { profile_name, ...simCardData } = formData;
         const { error } = await supabase
           .from("sim_cards")
-          .insert([{ ...formData, user_id: user.id, profile_id: profile?.id }]);
+          .insert([{ ...simCardData, user_id: user.id, profile_id: profile?.id }]);
 
         if (error) throw error;
         toast({ title: "SIM card added successfully!" });
