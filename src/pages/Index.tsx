@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SimCardForm } from "@/components/SimCardForm";
 import { ESimIconDemo } from "@/components/ESimIconDemo";
+import { PhysicalSimIconDemo } from "@/components/PhysicalSimIconDemo";
 import { SimCardList } from "@/components/SimCardList";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Plus } from "lucide-react";
@@ -90,6 +91,7 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
 
         <div className="space-y-8">
           <ESimIconDemo />
+          <PhysicalSimIconDemo />
           
           {showForm && (
             <SimCardForm
