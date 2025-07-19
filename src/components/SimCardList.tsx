@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ESimIcon } from "@/components/ui/esim-icon";
+import { PhysicalSimIcon } from "@/components/ui/physical-sim-icon";
 
 interface SimCard {
   id: string;
@@ -204,7 +205,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                   {card.sim_type === 'eSIM' ? (
                     <ESimIcon />
                   ) : (
-                    <IdCard className="h-4 w-4 text-muted-foreground" />
+                    <PhysicalSimIcon />
                   )}
                   <span className="text-sm">{card.sim_type}</span>
                 </div>
@@ -307,7 +308,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                        {card.sim_type === 'eSIM' ? (
                         <ESimIcon />
                       ) : (
-                        <IdCard className="h-4 w-4 text-muted-foreground" />
+                        <PhysicalSimIcon />
                       )}
                     </div>
                     <div className="font-mono font-medium flex-1 text-center px-2 border-r border-border">{card.sim_number}</div>
