@@ -25,6 +25,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
     notes: editingCard?.notes || "",
     login: editingCard?.login || "",
     password: editingCard?.password || "",
+    profile_name: editingCard?.profile_name || "",
   });
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
@@ -90,6 +91,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         notes: "",
         login: "",
         password: "",
+        profile_name: "",
       });
       onSuccess();
     } catch (error) {
@@ -202,6 +204,16 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                 </Label>
               </div>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="profile_name">Profile Name</Label>
+            <Input
+              id="profile_name"
+              value={formData.profile_name}
+              onChange={(e) => setFormData({ ...formData, profile_name: e.target.value })}
+              placeholder="Profile or account name"
+            />
           </div>
 
           <div className="space-y-2">
