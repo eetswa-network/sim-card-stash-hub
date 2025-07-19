@@ -69,7 +69,7 @@ export function Header({ onSearch }: HeaderProps) {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <CreditCard className="h-6 w-6 text-primary" />
-          <Link to="/" className="text-xl font-bold">SIM Manager</Link>
+          <Link to="/" className="text-xl font-bold">SIM Card Stash</Link>
         </div>
         
         <nav className="flex items-center gap-4">
