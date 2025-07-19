@@ -19,6 +19,7 @@ interface SimCard {
   notes?: string;
   login?: string;
   password?: string;
+  profile_name?: string;
   created_at: string;
   updated_at: string;
 }
@@ -123,7 +124,8 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         card.carrier?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         card.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
         card.sim_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        card.notes?.toLowerCase().includes(searchQuery.toLowerCase())
+        card.notes?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        card.profile_name?.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : simCards;
 
@@ -232,6 +234,12 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 {card.carrier && (
                   <div className="text-sm text-muted-foreground">
                     <strong>Carrier:</strong> {card.carrier}
+                  </div>
+                )}
+
+                {card.profile_name && (
+                  <div className="text-sm text-muted-foreground">
+                    <strong>Profile Name:</strong> {card.profile_name}
                   </div>
                 )}
 
@@ -436,6 +444,13 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                 Show password
                               </Label>
                             </div>
+                          </div>
+                        )}
+                        
+                        {card.profile_name && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium">Profile Name:</span>
+                            <span className="text-sm text-muted-foreground">{card.profile_name}</span>
                           </div>
                         )}
                         
