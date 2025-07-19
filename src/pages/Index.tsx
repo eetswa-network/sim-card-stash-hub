@@ -90,7 +90,11 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-foreground">Your SIM Cards</h2>
               {!showForm && (
-                <Button onClick={() => setShowForm(true)} className="flex items-center gap-2">
+                <Button 
+                  onClick={() => setShowForm(true)} 
+                  variant="outline" 
+                  className="flex items-center gap-2 bg-transparent border-2 border-black text-black font-semibold hover:bg-black hover:text-white"
+                >
                   <Plus className="h-4 w-4" />
                   Add SIM Card
                 </Button>
