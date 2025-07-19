@@ -48,6 +48,7 @@ export type Database = {
           sim_number: string
           status: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           carrier?: string | null
@@ -58,6 +59,7 @@ export type Database = {
           sim_number: string
           status?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           carrier?: string | null
@@ -68,6 +70,7 @@ export type Database = {
           sim_number?: string
           status?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }

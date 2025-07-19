@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,13 +23,31 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
     notes: editingCard?.notes || "",
   });
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      if (!user) {
+        toast({
+          title: "Authentication Error",
+          description: "You must be logged in to save SIM cards.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (editingCard) {
         const { error } = await supabase
           .from("sim_cards")
@@ -41,7 +59,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       } else {
         const { error } = await supabase
           .from("sim_cards")
-          .insert([formData]);
+          .insert([{ ...formData, user_id: user.id }]);
 
         if (error) throw error;
         toast({ title: "SIM card added successfully!" });
