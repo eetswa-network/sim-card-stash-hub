@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SimCard {
   id: string;
@@ -39,6 +40,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const fetchSimCards = async () => {
     try {
@@ -207,10 +209,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       {viewMode === 'grid' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredSimCards.map((card) => (
-            <Card key={card.id} className="hover:shadow-md transition-shadow">
+            <Card key={card.id} className="hover:shadow-md transition-shadow animate-fade-in">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{card.sim_number}</CardTitle>
+                  <CardTitle className="text-lg break-all">{card.sim_number}</CardTitle>
                   <Badge variant={getStatusColor(card.status)}>
                     {card.status}
                   </Badge>
@@ -218,15 +220,15 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-mono">{card.phone_number}</span>
+                  <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="font-mono break-all">{card.phone_number}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   {card.sim_type === 'eSIM' ? (
-                    <Smartphone className="h-4 w-4 text-muted-foreground" />
+                    <Smartphone className="h-4 w-4 text-muted-foreground shrink-0" />
                   ) : (
-                    <IdCard className="h-4 w-4 text-muted-foreground" />
+                    <IdCard className="h-4 w-4 text-muted-foreground shrink-0" />
                   )}
                   <span className="text-sm">{card.sim_type}</span>
                 </div>
@@ -238,23 +240,23 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 )}
 
                 {card.profile_name && (
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground break-words">
                     <strong>Profile Name:</strong> {card.profile_name}
                   </div>
                 )}
 
                 {card.login && (
                   <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-mono text-sm">{card.login}</span>
+                    <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="font-mono text-sm break-all">{card.login}</span>
                   </div>
                 )}
 
                 {card.password && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <Lock className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-mono text-sm">
+                      <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span className="font-mono text-sm break-all">
                         {showPasswords[card.id] ? card.password : "••••••••"}
                       </span>
                     </div>
@@ -273,7 +275,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 
                 {card.notes && (
                   <div className="text-sm text-muted-foreground">
-                    <strong>Notes:</strong> {card.notes}
+                    <strong>Notes:</strong> <span className="break-words">{card.notes}</span>
                   </div>
                 )}
                 
@@ -284,9 +286,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 <div className="flex gap-2 pt-2">
                   <Button
                     variant="outline"
-                    size="sm"
+                    size={isMobile ? "default" : "sm"}
                     onClick={() => onEdit(card)}
-                    className="flex-1"
+                    className="flex-1 min-h-[44px]"
                   >
                     <Edit className="h-4 w-4 mr-1" />
                     Edit
@@ -294,7 +296,11 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                   
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="sm">
+                      <Button 
+                        variant="destructive" 
+                        size={isMobile ? "default" : "sm"}
+                        className="min-h-[44px]"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </AlertDialogTrigger>
@@ -325,60 +331,55 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       {viewMode === 'list' && (
         <Card>
           <CardContent className="p-0">
-            {/* Header */}
-            <div className="p-4 border-b bg-muted/30">
-              <div className="flex items-center justify-between w-full font-medium text-sm text-muted-foreground">
-                <div className="flex-1 px-2 border-r border-border">Phone Number</div>
-                <div className="flex-1 text-center px-2 border-r border-border">SIM Type</div>
-                <div className="flex-1 text-center px-2 border-r border-border">SIM Number</div>
-                <div className="flex-1 text-center px-2 border-r border-border">Status</div>
-                <div className="flex-1 text-center px-2 border-r border-border">Carrier</div>
-                <div className="flex-1 text-center px-2 border-r border-border">Date</div>
-                <div className="flex-1 text-center px-2">Actions</div>
-              </div>
-            </div>
-            <div className="divide-y">
-              {filteredSimCards.map((card) => (
-                <div key={card.id}>
-                  <div 
-                    className="p-4 hover:bg-muted/50 transition-colors cursor-pointer"
-                    onClick={() => toggleRowExpansion(card.id)}
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-2 text-sm flex-1 px-2 border-r border-border">
-                        <Phone className="h-3 w-3 text-muted-foreground" />
-                        <span className="font-mono">{card.phone_number}</span>
-                      </div>
-                      <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-border">
-                         {card.sim_type === 'eSIM' ? (
-                          <Smartphone className="h-4 w-4 text-muted-foreground" />
-                        ) : (
-                          <IdCard className="h-4 w-4 text-muted-foreground" />
+            {isMobile ? (
+              /* Mobile List View - Simplified Card Layout */
+              <div className="divide-y">
+                {filteredSimCards.map((card) => (
+                  <div key={card.id} className="animate-fade-in">
+                    <div 
+                      className="p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+                      onClick={() => toggleRowExpansion(card.id)}
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <span className="font-mono text-sm break-all">{card.phone_number}</span>
+                          </div>
+                          <Badge variant={getStatusColor(card.status)} className="text-xs">
+                            {card.status}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            {card.sim_type === 'eSIM' ? (
+                              <Smartphone className="h-4 w-4 text-muted-foreground shrink-0" />
+                            ) : (
+                              <IdCard className="h-4 w-4 text-muted-foreground shrink-0" />
+                            )}
+                            <span className="text-sm">{card.sim_type}</span>
+                          </div>
+                          <span className="font-mono text-xs text-muted-foreground break-all">{card.sim_number}</span>
+                        </div>
+                        
+                        {card.carrier && (
+                          <div className="text-sm text-muted-foreground">
+                            <strong>Carrier:</strong> {card.carrier}
+                          </div>
                         )}
-                      </div>
-                      <div className="font-mono font-medium flex-1 text-center px-2 border-r border-border">{card.sim_number}</div>
-                      <div className="flex-1 text-center px-2 border-r border-border">
-                        <Badge variant={getStatusColor(card.status)} className="text-xs">
-                          {card.status}
-                        </Badge>
-                      </div>
-                      <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-border">
-                        {card.carrier || '-'}
-                      </div>
-                      <div className="text-xs text-muted-foreground flex-1 text-center px-2 border-r border-border">
-                        {new Date(card.created_at).toLocaleDateString()}
-                      </div>
-                      <div className="flex-1 text-center px-2">
-                        <div className="flex gap-2 justify-center">
+                        
+                        <div className="flex gap-2 pt-2">
                           <Button
                             variant="outline"
-                            size="sm"
+                            size="default"
                             onClick={(e) => {
                               e.stopPropagation();
                               onEdit(card);
                             }}
+                            className="flex-1 min-h-[44px]"
                           >
-                            <Edit className="h-4 w-4 mr-1" />
+                            <Edit className="h-4 w-4 mr-2" />
                             Edit
                           </Button>
                           
@@ -386,8 +387,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             <AlertDialogTrigger asChild>
                               <Button 
                                 variant="destructive" 
-                                size="sm"
+                                size="default"
                                 onClick={(e) => e.stopPropagation()}
+                                className="min-h-[44px]"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -411,77 +413,236 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  {/* Expanded content */}
-                  {expandedRows.has(card.id) && (
-                    <div className="px-4 pb-4 bg-muted/20 border-t">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                        {card.login && (
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Login:</span>
-                            <span className="font-mono text-sm">{card.login}</span>
-                          </div>
-                        )}
-                        
-                        {card.password && (
-                          <div className="space-y-2">
+                    
+                    {/* Mobile Expanded content */}
+                    {expandedRows.has(card.id) && (
+                      <div className="px-4 pb-4 bg-muted/20 border-t animate-accordion-down">
+                        <div className="space-y-3 pt-4">
+                          {card.login && (
                             <div className="flex items-center gap-2">
-                              <Lock className="h-4 w-4 text-muted-foreground" />
-                              <span className="text-sm font-medium">Password:</span>
-                              <span className="font-mono text-sm">
-                                {showPasswords[card.id] ? card.password : "••••••••"}
+                              <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                              <span className="text-sm font-medium">Login:</span>
+                              <span className="font-mono text-sm break-all">{card.login}</span>
+                            </div>
+                          )}
+                          
+                          {card.password && (
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
+                                <span className="text-sm font-medium">Password:</span>
+                                <span className="font-mono text-sm break-all">
+                                  {showPasswords[card.id] ? card.password : "••••••••"}
+                                </span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`show-password-mobile-${card.id}`}
+                                  checked={showPasswords[card.id] || false}
+                                  onCheckedChange={() => togglePasswordVisibility(card.id)}
+                                />
+                                <Label htmlFor={`show-password-mobile-${card.id}`} className="text-sm font-normal">
+                                  Show password
+                                </Label>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {card.profile_name && (
+                            <div>
+                              <span className="text-sm font-medium">Profile Name:</span>
+                              <span className="text-sm text-muted-foreground ml-2 break-words">{card.profile_name}</span>
+                            </div>
+                          )}
+                          
+                          <div>
+                            <span className="text-sm font-medium">Created:</span>
+                            <span className="text-sm text-muted-foreground ml-2">
+                              {new Date(card.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                          
+                          {card.notes && (
+                            <div>
+                              <span className="text-sm font-medium">Notes:</span>
+                              <p className="text-sm text-muted-foreground mt-1 break-words">{card.notes}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              /* Desktop List View - Table Layout */
+              <>
+                {/* Header */}
+                <div className="p-4 border-b bg-muted/30">
+                  <div className="flex items-center justify-between w-full font-medium text-sm text-muted-foreground">
+                    <div className="flex-1 px-2 border-r border-border">Phone Number</div>
+                    <div className="flex-1 text-center px-2 border-r border-border">SIM Type</div>
+                    <div className="flex-1 text-center px-2 border-r border-border">SIM Number</div>
+                    <div className="flex-1 text-center px-2 border-r border-border">Status</div>
+                    <div className="flex-1 text-center px-2 border-r border-border">Carrier</div>
+                    <div className="flex-1 text-center px-2 border-r border-border">Date</div>
+                    <div className="flex-1 text-center px-2">Actions</div>
+                  </div>
+                </div>
+                <div className="divide-y">
+                  {filteredSimCards.map((card) => (
+                    <div key={card.id} className="animate-fade-in">
+                      <div 
+                        className="p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+                        onClick={() => toggleRowExpansion(card.id)}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center gap-2 text-sm flex-1 px-2 border-r border-border">
+                            <Phone className="h-3 w-3 text-muted-foreground shrink-0" />
+                            <span className="font-mono break-all">{card.phone_number}</span>
+                          </div>
+                          <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-border">
+                             {card.sim_type === 'eSIM' ? (
+                              <Smartphone className="h-4 w-4 text-muted-foreground" />
+                            ) : (
+                              <IdCard className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div className="font-mono font-medium flex-1 text-center px-2 border-r border-border break-all">{card.sim_number}</div>
+                          <div className="flex-1 text-center px-2 border-r border-border">
+                            <Badge variant={getStatusColor(card.status)} className="text-xs">
+                              {card.status}
+                            </Badge>
+                          </div>
+                          <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-border">
+                            {card.carrier || '-'}
+                          </div>
+                          <div className="text-xs text-muted-foreground flex-1 text-center px-2 border-r border-border">
+                            {new Date(card.created_at).toLocaleDateString()}
+                          </div>
+                          <div className="flex-1 text-center px-2">
+                            <div className="flex gap-2 justify-center">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onEdit(card);
+                                }}
+                              >
+                                <Edit className="h-4 w-4 mr-1" />
+                                Edit
+                              </Button>
+                              
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button 
+                                    variant="destructive" 
+                                    size="sm"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Delete SIM Card</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to delete the SIM card {card.sim_number}? 
+                                      This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDelete(card.id)}>
+                                      Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Desktop Expanded content */}
+                      {expandedRows.has(card.id) && (
+                        <div className="px-4 pb-4 bg-muted/20 border-t animate-accordion-down">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                            {card.login && (
+                              <div className="flex items-center gap-2">
+                                <User className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">Login:</span>
+                                <span className="font-mono text-sm break-all">{card.login}</span>
+                              </div>
+                            )}
+                            
+                            {card.password && (
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <Lock className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-sm font-medium">Password:</span>
+                                  <span className="font-mono text-sm break-all">
+                                    {showPasswords[card.id] ? card.password : "••••••••"}
+                                  </span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`show-password-list-${card.id}`}
+                                    checked={showPasswords[card.id] || false}
+                                    onCheckedChange={() => togglePasswordVisibility(card.id)}
+                                  />
+                                  <Label htmlFor={`show-password-list-${card.id}`} className="text-xs font-normal">
+                                    Show password
+                                  </Label>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {card.carrier && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">Carrier:</span>
+                                <span className="text-sm text-muted-foreground">{card.carrier}</span>
+                              </div>
+                            )}
+                            
+                            {card.profile_name && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">Profile Name:</span>
+                                <span className="text-sm text-muted-foreground break-words">{card.profile_name}</span>
+                              </div>
+                            )}
+                            
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium">Created:</span>
+                              <span className="text-sm text-muted-foreground">
+                                {new Date(card.created_at).toLocaleDateString()}
                               </span>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <Checkbox
-                                id={`show-password-list-${card.id}`}
-                                checked={showPasswords[card.id] || false}
-                                onCheckedChange={() => togglePasswordVisibility(card.id)}
-                              />
-                              <Label htmlFor={`show-password-list-${card.id}`} className="text-xs font-normal">
-                                Show password
-                              </Label>
+                            
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium">Updated:</span>
+                              <span className="text-sm text-muted-foreground">
+                                {new Date(card.updated_at).toLocaleDateString()}
+                              </span>
                             </div>
+                            
+                            {card.notes && (
+                              <div className="md:col-span-2">
+                                <div className="flex items-start gap-2">
+                                  <span className="text-sm font-medium">Notes:</span>
+                                  <span className="text-sm text-muted-foreground break-words">{card.notes}</span>
+                                </div>
+                              </div>
+                            )}
                           </div>
-                        )}
-                        
-                        {card.profile_name && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">Profile Name:</span>
-                            <span className="text-sm text-muted-foreground">{card.profile_name}</span>
-                          </div>
-                        )}
-                        
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">Created:</span>
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(card.created_at).toLocaleDateString()} at {new Date(card.created_at).toLocaleTimeString()}
-                          </span>
                         </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">Updated:</span>
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(card.updated_at).toLocaleDateString()} at {new Date(card.updated_at).toLocaleTimeString()}
-                          </span>
-                        </div>
-                        
-                        {card.notes && (
-                          <div className="md:col-span-2">
-                            <div className="text-sm font-medium mb-1">Notes:</div>
-                            <div className="text-sm text-muted-foreground bg-background p-2 rounded border">
-                              {card.notes}
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      )}
                     </div>
-                  )}
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
           </CardContent>
         </Card>
       )}

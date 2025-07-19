@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SimCardFormProps {
   onSuccess: () => void;
@@ -32,6 +33,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
   const [profile, setProfile] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const getUser = async () => {
@@ -111,13 +113,13 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
   };
 
   return (
-    <Card>
+    <Card className="animate-fade-in">
       <CardHeader>
         <CardTitle>{editingCard ? "Edit SIM Card" : "Add New SIM Card"}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
             <div className="space-y-2">
               <Label htmlFor="sim_number">SIM Number *</Label>
               <Input
@@ -126,6 +128,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                 onChange={(e) => setFormData({ ...formData, sim_number: e.target.value })}
                 placeholder="Enter SIM number"
                 required
+                className={isMobile ? "min-h-[44px]" : ""}
               />
             </div>
             <div className="space-y-2">
@@ -136,11 +139,12 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                 onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
                 placeholder="Enter phone number"
                 required
+                className={isMobile ? "min-h-[44px]" : ""}
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-3'}`}>
             <div className="space-y-2">
               <Label htmlFor="carrier">Carrier</Label>
               <Input
@@ -148,12 +152,13 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                 value={formData.carrier}
                 onChange={(e) => setFormData({ ...formData, carrier: e.target.value })}
                 placeholder="e.g., Verizon, AT&T, T-Mobile"
+                className={isMobile ? "min-h-[44px]" : ""}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="sim_type">SIM Type</Label>
               <Select value={formData.sim_type} onValueChange={(value) => setFormData({ ...formData, sim_type: value })}>
-                <SelectTrigger>
+                <SelectTrigger className={isMobile ? "min-h-[44px]" : ""}>
                   <SelectValue placeholder="Select SIM type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -165,7 +170,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
               <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
-                <SelectTrigger>
+                <SelectTrigger className={isMobile ? "min-h-[44px]" : ""}>
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -177,7 +182,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
             <div className="space-y-2">
               <Label htmlFor="login">Login</Label>
               <Input
@@ -186,6 +191,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                 value={formData.login}
                 onChange={(e) => setFormData({ ...formData, login: e.target.value })}
                 placeholder="Account login/username"
+                className={isMobile ? "min-h-[44px]" : ""}
               />
             </div>
             <div className="space-y-2">
@@ -196,14 +202,16 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="Account password"
+                className={isMobile ? "min-h-[44px]" : ""}
               />
               <div className="flex items-center space-x-2 mt-2">
                 <Checkbox
                   id="show-password"
                   checked={showPassword}
                   onCheckedChange={(checked) => setShowPassword(checked === true)}
+                  className={isMobile ? "w-5 h-5" : ""}
                 />
-                <Label htmlFor="show-password" className="text-sm font-normal">
+                <Label htmlFor="show-password" className={`font-normal ${isMobile ? 'text-base' : 'text-sm'}`}>
                   Show password
                 </Label>
               </div>
@@ -217,6 +225,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
               value={formData.profile_name}
               onChange={(e) => setFormData({ ...formData, profile_name: e.target.value })}
               placeholder="Profile or account name"
+              className={isMobile ? "min-h-[44px]" : ""}
             />
           </div>
 
@@ -227,16 +236,26 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               placeholder="Additional notes about this SIM card"
-              rows={3}
+              rows={isMobile ? 4 : 3}
+              className={isMobile ? "min-h-[100px]" : ""}
             />
           </div>
 
-          <div className="flex gap-2">
-            <Button type="submit" disabled={loading}>
+          <div className={`flex gap-3 ${isMobile ? 'flex-col' : ''}`}>
+            <Button 
+              type="submit" 
+              disabled={loading}
+              className={isMobile ? "min-h-[48px] w-full" : "flex-1"}
+            >
               {loading ? "Saving..." : editingCard ? "Update" : "Add SIM Card"}
             </Button>
             {onCancel && (
-              <Button type="button" variant="outline" onClick={onCancel}>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={onCancel}
+                className={isMobile ? "min-h-[48px] w-full" : "flex-1"}
+              >
                 Cancel
               </Button>
             )}
