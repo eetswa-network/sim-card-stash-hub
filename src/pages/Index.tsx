@@ -75,7 +75,6 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <CreditCard className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold text-foreground">SIM Card Stash</h1>
           </div>
           <div className="flex items-center gap-4">
             {!showForm && (
