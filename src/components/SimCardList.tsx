@@ -247,71 +247,68 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
             {/* Header */}
             <div className="p-4 border-b bg-muted/30">
               <div className="flex items-center justify-between w-full font-medium text-sm text-muted-foreground">
-                <div className="flex-1">Phone Number</div>
-                <div className="flex-1 text-center">SIM Number</div>
-                <div className="flex-1 text-center">Status</div>
-                <div className="flex-1 text-center">Carrier</div>
-                <div className="flex-1 text-center">Date</div>
-                <div className="flex-1 text-center">Actions</div>
+                <div className="flex-1 px-2 border-r border-border">Phone Number</div>
+                <div className="flex-1 text-center px-2 border-r border-border">SIM Number</div>
+                <div className="flex-1 text-center px-2 border-r border-border">Status</div>
+                <div className="flex-1 text-center px-2 border-r border-border">Carrier</div>
+                <div className="flex-1 text-center px-2 border-r border-border">Date</div>
+                <div className="flex-1 text-center px-2">Actions</div>
               </div>
             </div>
             <div className="divide-y">
               {simCards.map((card) => (
                 <div key={card.id} className="p-4 hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center justify-between gap-4">
-                     <div className="flex items-center justify-between w-full">
-                       <div className="flex items-center gap-2 text-sm flex-1">
-                         <Phone className="h-3 w-3 text-muted-foreground" />
-                         <span className="font-mono">{card.phone_number}</span>
-                       </div>
-                       <div className="font-mono font-medium flex-1 text-center">{card.sim_number}</div>
-                       <div className="flex-1 text-center">
-                         <Badge variant={getStatusColor(card.status)} className="text-xs">
-                           {card.status}
-                         </Badge>
-                       </div>
-                       {card.carrier && (
-                         <div className="text-sm text-muted-foreground flex-1 text-center">
-                           <strong>Carrier:</strong> {card.carrier}
-                         </div>
-                       )}
-                       <div className="text-xs text-muted-foreground flex-1 text-center">
-                         {new Date(card.created_at).toLocaleDateString()}
-                       </div>
-                     </div>
-                    
-                    <div className="flex gap-2 shrink-0">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onEdit(card)}
-                      >
-                        <Edit className="h-4 w-4 mr-1" />
-                        Edit
-                      </Button>
-                      
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="destructive" size="sm">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete SIM Card</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete the SIM card {card.sim_number}? 
-                              This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete(card.id)}>
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2 text-sm flex-1 px-2 border-r border-border">
+                      <Phone className="h-3 w-3 text-muted-foreground" />
+                      <span className="font-mono">{card.phone_number}</span>
+                    </div>
+                    <div className="font-mono font-medium flex-1 text-center px-2 border-r border-border">{card.sim_number}</div>
+                    <div className="flex-1 text-center px-2 border-r border-border">
+                      <Badge variant={getStatusColor(card.status)} className="text-xs">
+                        {card.status}
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-border">
+                      {card.carrier || '-'}
+                    </div>
+                    <div className="text-xs text-muted-foreground flex-1 text-center px-2 border-r border-border">
+                      {new Date(card.created_at).toLocaleDateString()}
+                    </div>
+                    <div className="flex-1 text-center px-2">
+                      <div className="flex gap-2 justify-center">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onEdit(card)}
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
+                        
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="sm">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete SIM Card</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete the SIM card {card.sim_number}? 
+                                This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDelete(card.id)}>
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </div>
                   </div>
                 </div>
