@@ -248,15 +248,15 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               {simCards.map((card) => (
                 <div key={card.id} className="p-4 hover:bg-muted/50 transition-colors">
                   <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 flex-1 min-w-0">
-                      <div className="font-mono font-medium shrink-0">{card.sim_number}</div>
-                      <Badge variant={getStatusColor(card.status)} className="text-xs shrink-0">
-                        {card.status}
-                      </Badge>
-                      <div className="flex items-center gap-2 text-sm shrink-0">
-                        <Phone className="h-3 w-3 text-muted-foreground" />
-                        <span className="font-mono">{card.phone_number}</span>
-                      </div>
+                     <div className="flex items-center gap-4 flex-1 min-w-0">
+                       <div className="flex items-center gap-2 text-sm shrink-0">
+                         <Phone className="h-3 w-3 text-muted-foreground" />
+                         <span className="font-mono">{card.phone_number}</span>
+                       </div>
+                       <Badge variant={getStatusColor(card.status)} className="text-xs shrink-0">
+                         {card.status}
+                       </Badge>
+                       <div className="font-mono font-medium shrink-0">{card.sim_number}</div>
                       {card.carrier && (
                         <div className="text-sm text-muted-foreground shrink-0">
                           <strong>Carrier:</strong> {card.carrier}
