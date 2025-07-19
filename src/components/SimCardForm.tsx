@@ -26,12 +26,23 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
   });
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const { toast } = useToast();
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
+      
+      if (user) {
+        // Get the user's profile
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", user.id)
+          .single();
+        setProfile(profileData);
+      }
     };
     getUser();
   }, []);
@@ -61,7 +72,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       } else {
         const { error } = await supabase
           .from("sim_cards")
-          .insert([{ ...formData, user_id: user.id }]);
+          .insert([{ ...formData, user_id: user.id, profile_id: profile?.id }]);
 
         if (error) throw error;
         toast({ title: "SIM card added successfully!" });

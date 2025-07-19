@@ -47,6 +47,7 @@ export type Database = {
           notes: string | null
           password: string | null
           phone_number: string
+          profile_id: string | null
           sim_number: string
           status: string | null
           updated_at: string
@@ -60,6 +61,7 @@ export type Database = {
           notes?: string | null
           password?: string | null
           phone_number: string
+          profile_id?: string | null
           sim_number: string
           status?: string | null
           updated_at?: string
@@ -73,12 +75,21 @@ export type Database = {
           notes?: string | null
           password?: string | null
           phone_number?: string
+          profile_id?: string | null
           sim_number?: string
           status?: string | null
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sim_cards_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
