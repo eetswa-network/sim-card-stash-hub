@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, CreditCard, User, Lock, Grid3X3, List, Smartphone } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface SimCard {
@@ -130,7 +130,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       <Card>
         <CardContent className="pt-6">
           <div className="text-center py-8">
-            <CreditCard className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <IdCard className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium text-foreground">No SIM cards found</h3>
             <p className="text-muted-foreground">No SIM cards match your search criteria.</p>
           </div>
@@ -144,7 +144,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       <Card>
         <CardContent className="pt-6">
           <div className="text-center py-8">
-            <CreditCard className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <IdCard className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium text-foreground">No SIM cards yet</h3>
             <p className="text-muted-foreground">Add your first SIM card to get started.</p>
           </div>
@@ -202,7 +202,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                   {card.sim_type === 'eSIM' ? (
                     <Smartphone className="h-4 w-4 text-muted-foreground" />
                   ) : (
-                    <CreditCard className="h-4 w-4 text-muted-foreground" />
+                    <IdCard className="h-4 w-4 text-muted-foreground" />
                   )}
                   <span className="text-sm">{card.sim_type}</span>
                 </div>
@@ -302,10 +302,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       <span className="font-mono">{card.phone_number}</span>
                     </div>
                     <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-border">
-                      {card.sim_type === 'eSIM' ? (
+                       {card.sim_type === 'eSIM' ? (
                         <Smartphone className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <CreditCard className="h-4 w-4 text-muted-foreground" />
+                        <IdCard className="h-4 w-4 text-muted-foreground" />
                       )}
                     </div>
                     <div className="font-mono font-medium flex-1 text-center px-2 border-r border-border">{card.sim_number}</div>
