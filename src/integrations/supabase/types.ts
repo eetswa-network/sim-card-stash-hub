@@ -41,10 +41,47 @@ export type Database = {
         }
         Relationships: []
       }
+      sim_card_usage: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          sim_card_id: string
+          updated_at: string
+          use_purpose: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          sim_card_id: string
+          updated_at?: string
+          use_purpose: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          sim_card_id?: string
+          updated_at?: string
+          use_purpose?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sim_card_usage_sim_card_id_fkey"
+            columns: ["sim_card_id"]
+            isOneToOne: false
+            referencedRelation: "sim_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sim_cards: {
         Row: {
           carrier: string | null
-          crab_name: string | null
           created_at: string
           id: string
           login: string | null
@@ -60,7 +97,6 @@ export type Database = {
         }
         Insert: {
           carrier?: string | null
-          crab_name?: string | null
           created_at?: string
           id?: string
           login?: string | null
@@ -76,7 +112,6 @@ export type Database = {
         }
         Update: {
           carrier?: string | null
-          crab_name?: string | null
           created_at?: string
           id?: string
           login?: string | null

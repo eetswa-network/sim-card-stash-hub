@@ -20,9 +20,14 @@ interface SimCard {
   notes?: string;
   login?: string;
   password?: string;
-  crab_name?: string;
   created_at: string;
   updated_at: string;
+}
+
+interface UsageEntry {
+  id: string;
+  name: string;
+  use_purpose: string;
 }
 
 interface SimCardListProps {
@@ -39,6 +44,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   const [loading, setLoading] = useState(true);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
+  const [usageData, setUsageData] = useState<{[key: string]: UsageEntry[]}>({});
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -51,6 +57,28 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
       if (error) throw error;
       setSimCards(data || []);
+
+      // Fetch usage data for all sim cards
+      if (data && data.length > 0) {
+        const { data: usageData, error: usageError } = await supabase
+          .from("sim_card_usage")
+          .select("*")
+          .in("sim_card_id", data.map(card => card.id));
+
+        if (usageError) {
+          console.error("Error fetching usage data:", usageError);
+        } else {
+          // Group usage data by sim_card_id
+          const groupedUsage = (usageData || []).reduce((acc, usage) => {
+            if (!acc[usage.sim_card_id]) {
+              acc[usage.sim_card_id] = [];
+            }
+            acc[usage.sim_card_id].push(usage);
+            return acc;
+          }, {} as {[key: string]: UsageEntry[]});
+          setUsageData(groupedUsage);
+        }
+      }
     } catch (error) {
       console.error("Error fetching SIM cards:", error);
       toast({
@@ -69,6 +97,12 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
   const handleDelete = async (id: string) => {
     try {
+      // Delete usage entries first (cascade should handle this, but being explicit)
+      await supabase
+        .from("sim_card_usage")
+        .delete()
+        .eq("sim_card_id", id);
+
       const { error } = await supabase
         .from("sim_cards")
         .delete()
@@ -124,15 +158,23 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
   // Filter SIM cards based on search query
   const filteredSimCards = searchQuery 
-    ? simCards.filter(card => 
-        card.sim_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        card.phone_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        card.carrier?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        card.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        card.sim_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        card.notes?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        card.crab_name?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+    ? simCards.filter(card => {
+        // Search in basic card fields
+        const basicMatch = card.sim_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          card.phone_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          card.carrier?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          card.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          card.sim_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          card.notes?.toLowerCase().includes(searchQuery.toLowerCase());
+        
+        // Search in usage data
+        const usageMatch = usageData[card.id]?.some(usage => 
+          usage.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          usage.use_purpose.toLowerCase().includes(searchQuery.toLowerCase())
+        ) || false;
+        
+        return basicMatch || usageMatch;
+      })
     : simCards;
 
   if (loading) {
@@ -256,9 +298,21 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                   </div>
                 )}
 
-                {card.crab_name && (
+                {usageData[card.id] && usageData[card.id].length > 0 && (
                   <div className="text-sm text-muted-foreground break-words">
-                    <strong>Crab Name:</strong> {card.crab_name}
+                    <strong>Used For:</strong>
+                    <div className="mt-2 border border-muted rounded-md overflow-hidden">
+                      <div className="bg-muted/50 grid grid-cols-2 gap-0 border-b">
+                        <div className="px-2 py-1 text-xs font-medium border-r">Name</div>
+                        <div className="px-2 py-1 text-xs font-medium">Use</div>
+                      </div>
+                      {usageData[card.id].map((usage, index) => (
+                        <div key={usage.id} className={`grid grid-cols-2 gap-0 ${index < usageData[card.id].length - 1 ? 'border-b' : ''}`}>
+                          <div className="px-2 py-1 text-xs border-r">{usage.name}</div>
+                          <div className="px-2 py-1 text-xs">{usage.use_purpose}</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
@@ -463,10 +517,21 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             </div>
                           )}
                           
-                          {card.crab_name && (
+                          {usageData[card.id] && usageData[card.id].length > 0 && (
                             <div>
-                              <span className="text-sm font-medium">Crab Name:</span>
-                              <span className="text-sm text-muted-foreground ml-2 break-words">{card.crab_name}</span>
+                              <span className="text-sm font-medium">Used For:</span>
+                              <div className="mt-2 border border-muted rounded-md overflow-hidden">
+                                <div className="bg-muted/50 grid grid-cols-2 gap-0 border-b">
+                                  <div className="px-2 py-1 text-xs font-medium border-r">Name</div>
+                                  <div className="px-2 py-1 text-xs font-medium">Use</div>
+                                </div>
+                                {usageData[card.id].map((usage, index) => (
+                                  <div key={usage.id} className={`grid grid-cols-2 gap-0 ${index < usageData[card.id].length - 1 ? 'border-b' : ''}`}>
+                                    <div className="px-2 py-1 text-xs border-r">{usage.name}</div>
+                                    <div className="px-2 py-1 text-xs">{usage.use_purpose}</div>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )}
 
@@ -612,10 +677,23 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               </div>
                             )}
                             
-                            {card.crab_name && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium">Crab Name:</span>
-                                <span className="text-sm text-muted-foreground break-words">{card.crab_name}</span>
+                            {usageData[card.id] && usageData[card.id].length > 0 && (
+                              <div className="md:col-span-2">
+                                <div className="flex items-start gap-2">
+                                  <span className="text-sm font-medium">Used For:</span>
+                                  <div className="border border-muted rounded-md overflow-hidden flex-1">
+                                    <div className="bg-muted/50 grid grid-cols-2 gap-0 border-b">
+                                      <div className="px-2 py-1 text-xs font-medium border-r">Name</div>
+                                      <div className="px-2 py-1 text-xs font-medium">Use</div>
+                                    </div>
+                                    {usageData[card.id].map((usage, index) => (
+                                      <div key={usage.id} className={`grid grid-cols-2 gap-0 ${index < usageData[card.id].length - 1 ? 'border-b' : ''}`}>
+                                        <div className="px-2 py-1 text-xs border-r">{usage.name}</div>
+                                        <div className="px-2 py-1 text-xs">{usage.use_purpose}</div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
                               </div>
                             )}
                             

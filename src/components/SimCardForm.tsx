@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Plus, Trash2 } from "lucide-react";
 
 interface SimCardFormProps {
   onSuccess: () => void;
@@ -26,8 +27,8 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
     notes: editingCard?.notes || "",
     login: editingCard?.login || "",
     password: editingCard?.password || "",
-    crab_name: editingCard?.crab_name || "",
   });
+  const [usedForEntries, setUsedForEntries] = useState([{ name: "", use_purpose: "" }]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -51,7 +52,22 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       }
     };
     getUser();
-  }, []);
+
+    // Load existing used for entries if editing
+    if (editingCard) {
+      const loadUsedForEntries = async () => {
+        const { data } = await supabase
+          .from("sim_card_usage")
+          .select("*")
+          .eq("sim_card_id", editingCard.id);
+        
+        if (data && data.length > 0) {
+          setUsedForEntries(data.map(entry => ({ name: entry.name, use_purpose: entry.use_purpose })));
+        }
+      };
+      loadUsedForEntries();
+    }
+  }, [editingCard]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +83,8 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         return;
       }
 
+      let simCardId = editingCard?.id;
+
       if (editingCard) {
         const { error } = await supabase
           .from("sim_cards")
@@ -74,15 +92,39 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
           .eq("id", editingCard.id);
 
         if (error) throw error;
-        toast({ title: "SIM card updated successfully!" });
+
+        // Delete existing usage entries
+        await supabase
+          .from("sim_card_usage")
+          .delete()
+          .eq("sim_card_id", editingCard.id);
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("sim_cards")
-          .insert([{ ...formData, user_id: user.id, profile_id: profile?.id }]);
+          .insert([{ ...formData, user_id: user.id, profile_id: profile?.id }])
+          .select()
+          .single();
 
         if (error) throw error;
-        toast({ title: "SIM card added successfully!" });
+        simCardId = data.id;
       }
+
+      // Insert new usage entries (only non-empty ones)
+      const validUsedForEntries = usedForEntries.filter(entry => entry.name.trim() && entry.use_purpose.trim());
+      if (validUsedForEntries.length > 0) {
+        const { error: usageError } = await supabase
+          .from("sim_card_usage")
+          .insert(validUsedForEntries.map(entry => ({
+            sim_card_id: simCardId,
+            name: entry.name,
+            use_purpose: entry.use_purpose,
+            user_id: user.id
+          })));
+
+        if (usageError) throw usageError;
+      }
+
+      toast({ title: editingCard ? "SIM card updated successfully!" : "SIM card added successfully!" });
 
       setFormData({
         sim_number: "",
@@ -93,8 +135,8 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         notes: "",
         login: "",
         password: "",
-        crab_name: "",
       });
+      setUsedForEntries([{ name: "", use_purpose: "" }]);
       onSuccess();
     } catch (error: any) {
       console.error("Error saving SIM card:", error);
@@ -220,15 +262,70 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="crab_name">Crab Name</Label>
-            <Input
-              id="crab_name"
-              value={formData.crab_name}
-              onChange={(e) => setFormData({ ...formData, crab_name: e.target.value })}
-              placeholder="Enter crab name"
-              className={isMobile ? "min-h-[44px]" : ""}
-            />
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label>Used For</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setUsedForEntries([...usedForEntries, { name: "", use_purpose: "" }])}
+                className="px-3"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add Row
+              </Button>
+            </div>
+            <div className="space-y-3">
+              {usedForEntries.map((entry, index) => (
+                <div key={index} className={`grid gap-3 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} items-end`}>
+                  <div className="space-y-2">
+                    <Label htmlFor={`name-${index}`}>Name</Label>
+                    <Input
+                      id={`name-${index}`}
+                      value={entry.name}
+                      onChange={(e) => {
+                        const updated = [...usedForEntries];
+                        updated[index].name = e.target.value;
+                        setUsedForEntries(updated);
+                      }}
+                      placeholder="Enter name"
+                      className={isMobile ? "min-h-[44px]" : ""}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`use-${index}`}>Use</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id={`use-${index}`}
+                        value={entry.use_purpose}
+                        onChange={(e) => {
+                          const updated = [...usedForEntries];
+                          updated[index].use_purpose = e.target.value;
+                          setUsedForEntries(updated);
+                        }}
+                        placeholder="Enter use purpose"
+                        className={`flex-1 ${isMobile ? "min-h-[44px]" : ""}`}
+                      />
+                      {usedForEntries.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const updated = usedForEntries.filter((_, i) => i !== index);
+                            setUsedForEntries(updated);
+                          }}
+                          className={`px-3 ${isMobile ? "min-h-[44px]" : ""}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-2">
