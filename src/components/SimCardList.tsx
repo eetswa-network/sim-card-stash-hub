@@ -483,7 +483,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     <div className="flex-1 text-center px-2 border-r border-table-divider">SIM Type</div>
                     <div className="flex-1 text-center px-2 border-r border-table-divider">SIM Number</div>
                     <div className="flex-1 text-center px-2 border-r border-table-divider">Carrier</div>
-                    <div className="flex-1 text-center px-2 border-r border-table-divider">Date</div>
                     <div className="flex-1 text-center px-2">Actions</div>
                   </div>
                 </div>
@@ -509,9 +508,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                           <div className="font-mono font-medium flex-1 text-center px-2 border-r border-table-divider break-all">{card.sim_number}</div>
                           <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-table-divider">
                             {card.carrier || '-'}
-                          </div>
-                          <div className="text-xs text-muted-foreground flex-1 text-center px-2 border-r border-table-divider">
-                            {new Date(card.created_at).toLocaleDateString()}
                           </div>
                           <div className="flex-1 text-center px-2">
                             <div className="flex gap-2 justify-center">
