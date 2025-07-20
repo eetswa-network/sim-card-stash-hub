@@ -545,10 +545,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 {/* Header */}
                 <div className="p-4 border-b border-table-divider bg-table-orange">
                   <div className="flex items-center justify-between w-full font-medium text-sm text-table-divider">
-                    <div className="flex-1 px-2 border-r border-table-divider">Phone Number</div>
-                    <div className="flex-1 text-center px-2 border-r border-table-divider">SIM Type</div>
-                    <div className="flex-1 text-center px-2 border-r border-table-divider">SIM Number</div>
-                    <div className="flex-1 text-center px-2 border-r border-table-divider">Carrier</div>
+                    <div className="flex-1 px-2 border-r border-black">Phone Number</div>
+                    <div className="flex-1 text-center px-2 border-r border-black">SIM Type</div>
+                    <div className="flex-1 text-center px-2 border-r border-black">SIM Number</div>
+                    <div className="flex-1 text-center px-2 border-r border-black">Carrier</div>
                     <div className="flex-1 text-center px-2">Actions</div>
                   </div>
                 </div>
@@ -560,19 +560,19 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         onClick={() => toggleRowExpansion(card.id)}
                       >
                         <div className="flex items-center justify-between w-full">
-                          <div className="flex items-center gap-2 text-sm flex-1 px-2 border-r border-table-divider">
+                          <div className="flex items-center gap-2 text-sm flex-1 px-2 border-r border-black">
                             <Phone className="h-3 w-3 text-muted-foreground shrink-0" />
                             <span className="font-mono break-all">{card.phone_number}</span>
                           </div>
-                          <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-table-divider">
+                          <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-black">
                              {card.sim_type === 'eSIM' ? (
                               <Smartphone className="h-4 w-4 text-muted-foreground" />
                             ) : (
                               <IdCard className="h-4 w-4 text-muted-foreground" />
                             )}
                           </div>
-                          <div className="font-mono font-medium flex-1 text-center px-2 border-r border-table-divider break-all">{card.sim_number}</div>
-                          <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-table-divider">
+                          <div className="font-mono font-medium flex-1 text-center px-2 border-r border-black break-all">{card.sim_number}</div>
+                          <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-black">
                             {card.carrier || '-'}
                           </div>
                           <div className="flex-1 text-center px-2">
