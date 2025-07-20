@@ -330,7 +330,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
       {/* List View */}
       {viewMode === 'list' && (
-        <Card>
+        <Card className="bg-table-green">
           <CardContent className="p-0">
             {isMobile ? (
               /* Mobile List View - Simplified Card Layout */
@@ -417,7 +417,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     
                     {/* Mobile Expanded content */}
                     {expandedRows.has(card.id) && (
-                      <div className="px-4 pb-4 bg-muted/20 border-t animate-accordion-down">
+                      <div className="px-4 pb-4 bg-table-green-light border-t animate-accordion-down">
                         <div className="space-y-3 pt-4">
                           {card.login && (
                             <div className="flex items-center gap-2">
@@ -569,7 +569,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       
                       {/* Desktop Expanded content */}
                       {expandedRows.has(card.id) && (
-                        <div className="px-4 pb-4 bg-muted/20 border-t animate-accordion-down">
+                        <div className="px-4 pb-4 bg-table-green-light border-t animate-accordion-down">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                             {card.login && (
                               <div className="flex items-center gap-2">
