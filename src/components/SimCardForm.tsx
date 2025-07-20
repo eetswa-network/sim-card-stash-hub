@@ -289,7 +289,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                     <SelectValue placeholder="Select..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {existingCarriers.map((carrier) => (
+                    {existingCarriers.sort().map((carrier) => (
                       <SelectItem key={carrier} value={carrier}>
                         {carrier}
                       </SelectItem>
