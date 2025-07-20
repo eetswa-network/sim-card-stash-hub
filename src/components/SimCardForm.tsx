@@ -218,12 +218,30 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => {
+                    onClick={async () => {
                       if (customCarrier.trim()) {
-                        setFormData({ ...formData, carrier: customCarrier.trim() });
-                        if (!existingCarriers.includes(customCarrier.trim())) {
-                          setExistingCarriers([...existingCarriers, customCarrier.trim()]);
+                        const newCarrier = customCarrier.trim();
+                        setFormData({ ...formData, carrier: newCarrier });
+                        
+                        // Add to local state immediately
+                        if (!existingCarriers.includes(newCarrier)) {
+                          setExistingCarriers([...existingCarriers, newCarrier]);
                         }
+                        
+                        // Save a temporary carrier entry to make it available for future use
+                        if (user) {
+                          await supabase
+                            .from("sim_cards")
+                            .insert([{ 
+                              sim_number: `temp_${Date.now()}`, 
+                              phone_number: `temp_${Date.now()}`,
+                              carrier: newCarrier, 
+                              user_id: user.id,
+                              profile_id: profile?.id,
+                              status: 'temp'
+                            }]);
+                        }
+                        
                         setCustomCarrier("");
                         setShowCustomCarrier(false);
                       }
