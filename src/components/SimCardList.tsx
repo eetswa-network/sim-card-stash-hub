@@ -559,65 +559,65 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         className="p-4 hover:bg-muted/50 transition-colors cursor-pointer"
                         onClick={() => toggleRowExpansion(card.id)}
                       >
-                        <div className="flex items-center justify-between w-full">
-                          <div className="flex items-center gap-2 text-sm flex-1 px-2 border-r border-table-divider">
-                            <Phone className="h-3 w-3 text-muted-foreground shrink-0" />
-                            <span className="font-mono break-all">{card.phone_number}</span>
-                          </div>
-                          <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-table-divider">
-                             {card.sim_type === 'eSIM' ? (
-                              <Smartphone className="h-4 w-4 text-muted-foreground" />
-                            ) : (
-                              <IdCard className="h-4 w-4 text-muted-foreground" />
-                            )}
-                          </div>
-                          <div className="font-mono font-medium flex-1 text-center px-2 border-r border-table-divider break-all">{card.sim_number}</div>
-                          <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-table-divider">
-                            {card.carrier || '-'}
-                          </div>
-                          <div className="flex-1 text-center px-2">
-                            <div className="flex gap-2 justify-center">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onEdit(card);
-                                }}
-                              >
-                                <Edit className="h-4 w-4 mr-1" />
-                                Edit
-                              </Button>
-                              
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button 
-                                    variant="destructive" 
-                                    size="sm"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete SIM Card</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Are you sure you want to delete the SIM card {card.sim_number}? 
-                                      This action cannot be undone.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDelete(card.id)}>
-                                      Delete
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </div>
-                          </div>
-                        </div>
+                         <div className="flex items-center justify-between w-full border-b border-black">
+                           <div className="flex items-center gap-2 text-sm flex-1 px-2 border-r border-black">
+                             <Phone className="h-3 w-3 text-muted-foreground shrink-0" />
+                             <span className="font-mono break-all">{card.phone_number}</span>
+                           </div>
+                           <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-black">
+                              {card.sim_type === 'eSIM' ? (
+                               <Smartphone className="h-4 w-4 text-muted-foreground" />
+                             ) : (
+                               <IdCard className="h-4 w-4 text-muted-foreground" />
+                             )}
+                           </div>
+                           <div className="font-mono font-medium flex-1 text-center px-2 border-r border-black break-all">{card.sim_number}</div>
+                           <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-black">
+                             {card.carrier || '-'}
+                           </div>
+                           <div className="flex-1 text-center px-2">
+                             <div className="flex gap-2 justify-center">
+                               <Button
+                                 variant="outline"
+                                 size="sm"
+                                 onClick={(e) => {
+                                   e.stopPropagation();
+                                   onEdit(card);
+                                 }}
+                               >
+                                 <Edit className="h-4 w-4 mr-1" />
+                                 Edit
+                               </Button>
+                               
+                               <AlertDialog>
+                                 <AlertDialogTrigger asChild>
+                                   <Button 
+                                     variant="destructive" 
+                                     size="sm"
+                                     onClick={(e) => e.stopPropagation()}
+                                   >
+                                     <Trash2 className="h-4 w-4" />
+                                   </Button>
+                                 </AlertDialogTrigger>
+                                 <AlertDialogContent>
+                                   <AlertDialogHeader>
+                                     <AlertDialogTitle>Delete SIM Card</AlertDialogTitle>
+                                     <AlertDialogDescription>
+                                       Are you sure you want to delete the SIM card {card.sim_number}? 
+                                       This action cannot be undone.
+                                     </AlertDialogDescription>
+                                   </AlertDialogHeader>
+                                   <AlertDialogFooter>
+                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                     <AlertDialogAction onClick={() => handleDelete(card.id)}>
+                                       Delete
+                                     </AlertDialogAction>
+                                   </AlertDialogFooter>
+                                 </AlertDialogContent>
+                               </AlertDialog>
+                             </div>
+                           </div>
+                         </div>
                       </div>
                       
                       {/* Desktop Expanded content */}
