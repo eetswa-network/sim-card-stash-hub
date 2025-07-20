@@ -146,40 +146,44 @@ export function EditableUsageTable({ simCardId, usageData, onUsageUpdate }: Edit
       
       <div className="border border-muted rounded-md overflow-hidden">
         {/* Header */}
-        <div className="bg-muted/50 grid grid-cols-3 gap-0 border-b">
-          <div className="px-2 py-1 text-xs font-medium border-r">Name</div>
-          <div className="px-2 py-1 text-xs font-medium border-r">Use</div>
-          <div className="px-2 py-1 text-xs font-medium text-center">Actions</div>
+        <div className="bg-muted/50 flex border-b">
+          <div className="flex-1 flex">
+            <div className="w-1/2 px-2 py-1 text-xs font-medium border-r">Name</div>
+            <div className="w-1/2 px-2 py-1 text-xs font-medium border-r">Use</div>
+          </div>
+          <div className="w-20 px-2 py-1 text-xs font-medium text-center">Actions</div>
         </div>
         
         {/* Existing rows */}
         {usageData.map((usage, index) => (
-          <div key={usage.id} className={`grid grid-cols-3 gap-0 ${index < usageData.length - 1 || isAddingNew ? 'border-b' : ''}`}>
+          <div key={usage.id} className={`flex ${index < usageData.length - 1 || isAddingNew ? 'border-b' : ''}`}>
             {editingRow === usage.id ? (
               <>
-                <div className="px-1 py-1 border-r">
-                  <Input
-                    value={editValues[usage.id]?.name || ''}
-                    onChange={(e) => setEditValues({
-                      ...editValues,
-                      [usage.id]: { ...editValues[usage.id], name: e.target.value }
-                    })}
-                    className="h-6 text-xs"
-                    placeholder="Name"
-                  />
+                <div className="flex-1 flex">
+                  <div className="w-1/2 px-1 py-1 border-r">
+                    <Input
+                      value={editValues[usage.id]?.name || ''}
+                      onChange={(e) => setEditValues({
+                        ...editValues,
+                        [usage.id]: { ...editValues[usage.id], name: e.target.value }
+                      })}
+                      className="h-6 text-xs"
+                      placeholder="Name"
+                    />
+                  </div>
+                  <div className="w-1/2 px-1 py-1 border-r">
+                    <Input
+                      value={editValues[usage.id]?.use_purpose || ''}
+                      onChange={(e) => setEditValues({
+                        ...editValues,
+                        [usage.id]: { ...editValues[usage.id], use_purpose: e.target.value }
+                      })}
+                      className="h-6 text-xs"
+                      placeholder="Use"
+                    />
+                  </div>
                 </div>
-                <div className="px-1 py-1 border-r">
-                  <Input
-                    value={editValues[usage.id]?.use_purpose || ''}
-                    onChange={(e) => setEditValues({
-                      ...editValues,
-                      [usage.id]: { ...editValues[usage.id], use_purpose: e.target.value }
-                    })}
-                    className="h-6 text-xs"
-                    placeholder="Use"
-                  />
-                </div>
-                <div className="px-1 py-1 flex gap-1 justify-center">
+                <div className="w-20 px-1 py-1 flex gap-1 justify-center">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -200,9 +204,11 @@ export function EditableUsageTable({ simCardId, usageData, onUsageUpdate }: Edit
               </>
             ) : (
               <>
-                <div className="px-2 py-1 text-xs border-r">{usage.name}</div>
-                <div className="px-2 py-1 text-xs border-r">{usage.use_purpose}</div>
-                <div className="px-1 py-1 flex gap-1 justify-center">
+                <div className="flex-1 flex">
+                  <div className="w-1/2 px-2 py-1 text-xs border-r">{usage.name}</div>
+                  <div className="w-1/2 px-2 py-1 text-xs border-r">{usage.use_purpose}</div>
+                </div>
+                <div className="w-20 px-1 py-1 flex gap-1 justify-center">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -227,24 +233,26 @@ export function EditableUsageTable({ simCardId, usageData, onUsageUpdate }: Edit
         
         {/* Add new row */}
         {isAddingNew && (
-          <div className="grid grid-cols-3 gap-0">
-            <div className="px-1 py-1 border-r">
-              <Input
-                value={newRow.name}
-                onChange={(e) => setNewRow({ ...newRow, name: e.target.value })}
-                className="h-6 text-xs"
-                placeholder="Name"
-              />
+          <div className="flex">
+            <div className="flex-1 flex">
+              <div className="w-1/2 px-1 py-1 border-r">
+                <Input
+                  value={newRow.name}
+                  onChange={(e) => setNewRow({ ...newRow, name: e.target.value })}
+                  className="h-6 text-xs"
+                  placeholder="Name"
+                />
+              </div>
+              <div className="w-1/2 px-1 py-1 border-r">
+                <Input
+                  value={newRow.use_purpose}
+                  onChange={(e) => setNewRow({ ...newRow, use_purpose: e.target.value })}
+                  className="h-6 text-xs"
+                  placeholder="Use"
+                />
+              </div>
             </div>
-            <div className="px-1 py-1 border-r">
-              <Input
-                value={newRow.use_purpose}
-                onChange={(e) => setNewRow({ ...newRow, use_purpose: e.target.value })}
-                className="h-6 text-xs"
-                placeholder="Use"
-              />
-            </div>
-            <div className="px-1 py-1 flex gap-1 justify-center">
+            <div className="w-20 px-1 py-1 flex gap-1 justify-center">
               <Button
                 variant="ghost"
                 size="sm"
