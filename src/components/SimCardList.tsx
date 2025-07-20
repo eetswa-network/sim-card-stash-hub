@@ -481,7 +481,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               <>
                 {/* Header */}
                 <div className="p-4 border-b border-table-divider bg-table-orange">
-                  <div className="flex items-center justify-between w-full font-medium text-sm text-muted-foreground">
+                  <div className="flex items-center justify-between w-full font-medium text-sm text-table-divider">
                     <div className="flex-1 px-2 border-r border-table-divider">Phone Number</div>
                     <div className="flex-1 text-center px-2 border-r border-table-divider">SIM Type</div>
                     <div className="flex-1 text-center px-2 border-r border-table-divider">SIM Number</div>
