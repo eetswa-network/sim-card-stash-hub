@@ -53,18 +53,29 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
           .single();
         setProfile(profileData);
 
-        // Load existing carriers for this user
-        const { data: carriersData } = await supabase
-          .from("sim_cards")
-          .select("carrier")
-          .eq("user_id", user.id)
-          .not("carrier", "is", null)
-          .not("carrier", "eq", "");
+        // Load existing carriers for this user (from both sim_cards and carriers table)
+        const [carriersFromSims, carriersFromTable] = await Promise.all([
+          supabase
+            .from("sim_cards")
+            .select("carrier")
+            .eq("user_id", user.id)
+            .not("carrier", "is", null)
+            .not("carrier", "eq", ""),
+          supabase
+            .from("carriers")
+            .select("name")
+            .eq("user_id", user.id)
+        ]);
         
-        if (carriersData) {
-          const uniqueCarriers = [...new Set(carriersData.map(item => item.carrier))].filter(Boolean);
-          setExistingCarriers(uniqueCarriers);
+        const allCarriers = new Set<string>();
+        if (carriersFromSims.data) {
+          carriersFromSims.data.forEach(item => allCarriers.add(item.carrier));
         }
+        if (carriersFromTable.data) {
+          carriersFromTable.data.forEach(item => allCarriers.add(item.name));
+        }
+        
+        setExistingCarriers(Array.from(allCarriers).filter(Boolean));
       }
     };
     getUser();
@@ -228,18 +239,19 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                           setExistingCarriers([...existingCarriers, newCarrier]);
                         }
                         
-                        // Save a temporary carrier entry to make it available for future use
+                        // Save to carriers table to make it permanently available
                         if (user) {
-                          await supabase
-                            .from("sim_cards")
-                            .insert([{ 
-                              sim_number: `temp_${Date.now()}`, 
-                              phone_number: `temp_${Date.now()}`,
-                              carrier: newCarrier, 
-                              user_id: user.id,
-                              profile_id: profile?.id,
-                              status: 'temp'
-                            }]);
+                          try {
+                            await supabase
+                              .from("carriers")
+                              .insert([{ 
+                                name: newCarrier, 
+                                user_id: user.id
+                              }]);
+                          } catch (error) {
+                            // Ignore duplicate key errors (carrier already exists)
+                            console.log("Carrier might already exist:", error);
+                          }
                         }
                         
                         setCustomCarrier("");
