@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { EditableUsageTable } from "./EditableUsageTable";
 
 interface SimCard {
   id: string;
@@ -156,6 +157,13 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     setExpandedRows(new Set());
   };
 
+  const handleUsageUpdate = (simCardId: string, newUsageData: UsageEntry[]) => {
+    setUsageData(prev => ({
+      ...prev,
+      [simCardId]: newUsageData
+    }));
+  };
+
   // Filter SIM cards based on search query
   const filteredSimCards = searchQuery 
     ? simCards.filter(card => {
@@ -298,23 +306,11 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                   </div>
                 )}
 
-                {usageData[card.id] && usageData[card.id].length > 0 && (
-                  <div className="text-sm text-muted-foreground break-words">
-                    <strong>Used For:</strong>
-                    <div className="mt-2 border border-muted rounded-md overflow-hidden">
-                      <div className="bg-muted/50 grid grid-cols-2 gap-0 border-b">
-                        <div className="px-2 py-1 text-xs font-medium border-r">Name</div>
-                        <div className="px-2 py-1 text-xs font-medium">Use</div>
-                      </div>
-                      {usageData[card.id].map((usage, index) => (
-                        <div key={usage.id} className={`grid grid-cols-2 gap-0 ${index < usageData[card.id].length - 1 ? 'border-b' : ''}`}>
-                          <div className="px-2 py-1 text-xs border-r">{usage.name}</div>
-                          <div className="px-2 py-1 text-xs">{usage.use_purpose}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                <EditableUsageTable
+                  simCardId={card.id}
+                  usageData={usageData[card.id] || []}
+                  onUsageUpdate={handleUsageUpdate}
+                />
 
 
                 {card.login && (
@@ -517,23 +513,11 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             </div>
                           )}
                           
-                          {usageData[card.id] && usageData[card.id].length > 0 && (
-                            <div>
-                              <span className="text-sm font-medium">Used For:</span>
-                              <div className="mt-2 border border-muted rounded-md overflow-hidden">
-                                <div className="bg-muted/50 grid grid-cols-2 gap-0 border-b">
-                                  <div className="px-2 py-1 text-xs font-medium border-r">Name</div>
-                                  <div className="px-2 py-1 text-xs font-medium">Use</div>
-                                </div>
-                                {usageData[card.id].map((usage, index) => (
-                                  <div key={usage.id} className={`grid grid-cols-2 gap-0 ${index < usageData[card.id].length - 1 ? 'border-b' : ''}`}>
-                                    <div className="px-2 py-1 text-xs border-r">{usage.name}</div>
-                                    <div className="px-2 py-1 text-xs">{usage.use_purpose}</div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+                          <EditableUsageTable
+                            simCardId={card.id}
+                            usageData={usageData[card.id] || []}
+                            onUsageUpdate={handleUsageUpdate}
+                          />
 
                           
                           <div>
@@ -677,25 +661,13 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               </div>
                             )}
                             
-                            {usageData[card.id] && usageData[card.id].length > 0 && (
-                              <div className="md:col-span-2">
-                                <div className="flex items-start gap-2">
-                                  <span className="text-sm font-medium">Used For:</span>
-                                  <div className="border border-muted rounded-md overflow-hidden flex-1">
-                                    <div className="bg-muted/50 grid grid-cols-2 gap-0 border-b">
-                                      <div className="px-2 py-1 text-xs font-medium border-r">Name</div>
-                                      <div className="px-2 py-1 text-xs font-medium">Use</div>
-                                    </div>
-                                    {usageData[card.id].map((usage, index) => (
-                                      <div key={usage.id} className={`grid grid-cols-2 gap-0 ${index < usageData[card.id].length - 1 ? 'border-b' : ''}`}>
-                                        <div className="px-2 py-1 text-xs border-r">{usage.name}</div>
-                                        <div className="px-2 py-1 text-xs">{usage.use_purpose}</div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
+                            <div className="md:col-span-2">
+                              <EditableUsageTable
+                                simCardId={card.id}
+                                usageData={usageData[card.id] || []}
+                                onUsageUpdate={handleUsageUpdate}
+                              />
+                            </div>
                             
                             
                             <div className="flex items-center gap-2">
