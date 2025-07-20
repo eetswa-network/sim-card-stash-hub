@@ -100,11 +100,17 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         profile_name: "",
       });
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving SIM card:", error);
+      
+      let errorMessage = "Failed to save SIM card. Please try again.";
+      if (error?.code === "23505" && error?.message?.includes("sim_cards_sim_number_key")) {
+        errorMessage = "A SIM card with this SIM number already exists. Please use a different SIM number.";
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to save SIM card. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
