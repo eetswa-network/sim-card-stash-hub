@@ -20,7 +20,6 @@ interface SimCard {
   notes?: string;
   login?: string;
   password?: string;
-  profile_name?: string;
   crab_name?: string;
   created_at: string;
   updated_at: string;
@@ -128,7 +127,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         card.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
         card.sim_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
         card.notes?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        card.profile_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         card.crab_name?.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : simCards;
@@ -247,11 +245,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                   </div>
                 )}
 
-                {card.profile_name && (
-                  <div className="text-sm text-muted-foreground break-words">
-                    <strong>Profile Name:</strong> {card.profile_name}
-                  </div>
-                )}
 
                 {card.login && (
                   <div className="flex items-center gap-2">
@@ -463,12 +456,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             </div>
                           )}
 
-                          {card.profile_name && (
-                            <div>
-                              <span className="text-sm font-medium">Profile Name:</span>
-                              <span className="text-sm text-muted-foreground ml-2 break-words">{card.profile_name}</span>
-                            </div>
-                          )}
                           
                           <div>
                             <span className="text-sm font-medium">Created:</span>
@@ -628,12 +615,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               </div>
                             )}
                             
-                            {card.profile_name && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium">Profile Name:</span>
-                                <span className="text-sm text-muted-foreground break-words">{card.profile_name}</span>
-                              </div>
-                            )}
                             
                             <div className="flex items-center gap-2">
                               <span className="text-sm font-medium">Created:</span>

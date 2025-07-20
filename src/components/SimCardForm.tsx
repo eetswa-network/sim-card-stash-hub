@@ -26,7 +26,6 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
     notes: editingCard?.notes || "",
     login: editingCard?.login || "",
     password: editingCard?.password || "",
-    profile_name: editingCard?.profile_name || "",
     crab_name: editingCard?.crab_name || "",
   });
   const [loading, setLoading] = useState(false);
@@ -69,21 +68,17 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       }
 
       if (editingCard) {
-        // Extract profile_name before updating sim_cards
-        const { profile_name, ...simCardData } = formData;
         const { error } = await supabase
           .from("sim_cards")
-          .update(simCardData)
+          .update(formData)
           .eq("id", editingCard.id);
 
         if (error) throw error;
         toast({ title: "SIM card updated successfully!" });
       } else {
-        // Extract profile_name before inserting into sim_cards
-        const { profile_name, ...simCardData } = formData;
         const { error } = await supabase
           .from("sim_cards")
-          .insert([{ ...simCardData, user_id: user.id, profile_id: profile?.id }]);
+          .insert([{ ...formData, user_id: user.id, profile_id: profile?.id }]);
 
         if (error) throw error;
         toast({ title: "SIM card added successfully!" });
@@ -98,7 +93,6 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         notes: "",
         login: "",
         password: "",
-        profile_name: "",
         crab_name: "",
       });
       onSuccess();
@@ -226,27 +220,15 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             </div>
           </div>
 
-          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
-            <div className="space-y-2">
-              <Label htmlFor="crab_name">Crab Name</Label>
-              <Input
-                id="crab_name"
-                value={formData.crab_name}
-                onChange={(e) => setFormData({ ...formData, crab_name: e.target.value })}
-                placeholder="Enter crab name"
-                className={isMobile ? "min-h-[44px]" : ""}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="profile_name">Profile Name</Label>
-              <Input
-                id="profile_name"
-                value={formData.profile_name}
-                onChange={(e) => setFormData({ ...formData, profile_name: e.target.value })}
-                placeholder="Profile or account name"
-                className={isMobile ? "min-h-[44px]" : ""}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="crab_name">Crab Name</Label>
+            <Input
+              id="crab_name"
+              value={formData.crab_name}
+              onChange={(e) => setFormData({ ...formData, crab_name: e.target.value })}
+              placeholder="Enter crab name"
+              className={isMobile ? "min-h-[44px]" : ""}
+            />
           </div>
 
           <div className="space-y-2">
