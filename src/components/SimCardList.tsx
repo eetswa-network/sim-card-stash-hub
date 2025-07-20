@@ -347,46 +347,47 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                   </div>
                 )}
                 
-                <div className="text-xs text-muted-foreground">
-                  Added: {new Date(card.created_at).toLocaleDateString()}
-                </div>
-                
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    variant="outline"
-                    size={isMobile ? "default" : "sm"}
-                    onClick={() => onEdit(card)}
-                    className="flex-1 min-h-[44px]"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button 
-                        variant="destructive" 
-                        size={isMobile ? "default" : "sm"}
-                        className="min-h-[44px]"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete SIM Card</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete the SIM card {card.sim_number}? 
-                          This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDelete(card.id)}>
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-muted-foreground">
+                    Added: {new Date(card.created_at).toLocaleDateString()}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onEdit(card)}
+                      className="min-h-[32px] w-8 h-8 p-0"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          className="min-h-[32px] w-8 h-8 p-0"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete SIM Card</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete the SIM card {card.sim_number}? 
+                            This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(card.id)}>
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -433,15 +434,15 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                           </div>
                         )}
                         
-                        <div className="flex gap-2 pt-2">
+                        <div className="flex justify-end gap-2 pt-2">
                           <Button
                             variant="outline"
-                            size="default"
+                            size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
                               onEdit(card);
                             }}
-                            className="flex-1 min-h-[44px]"
+                            className="w-8 h-8 p-0"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -450,9 +451,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             <AlertDialogTrigger asChild>
                               <Button 
                                 variant="destructive" 
-                                size="default"
+                                size="sm"
                                 onClick={(e) => e.stopPropagation()}
-                                className="min-h-[44px]"
+                                className="w-8 h-8 p-0"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -582,6 +583,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                   e.stopPropagation();
                                   onEdit(card);
                                 }}
+                                className="w-8 h-8 p-0"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -592,6 +594,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                     variant="destructive" 
                                     size="sm"
                                     onClick={(e) => e.stopPropagation()}
+                                    className="w-8 h-8 p-0"
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
