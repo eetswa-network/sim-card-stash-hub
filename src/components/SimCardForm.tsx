@@ -273,7 +273,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
               <Label htmlFor="sim_type">SIM Type</Label>
               <Select value={formData.sim_type} onValueChange={(value) => setFormData({ ...formData, sim_type: value })}>
                 <SelectTrigger className={isMobile ? "min-h-[44px]" : ""}>
-                  <SelectValue placeholder="Select SIM type" />
+                  <SelectValue placeholder="Select..." />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="eSIM">eSIM</SelectItem>
