@@ -358,8 +358,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     onClick={() => onEdit(card)}
                     className="flex-1 min-h-[44px]"
                   >
-                    <Edit className="h-4 w-4 mr-1" />
-                    Edit
+                    <Edit className="h-4 w-4" />
                   </Button>
                   
                   <AlertDialog>
@@ -444,8 +443,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             }}
                             className="flex-1 min-h-[44px]"
                           >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
+                            <Edit className="h-4 w-4" />
                           </Button>
                           
                           <AlertDialog>
@@ -585,8 +583,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                   onEdit(card);
                                 }}
                               >
-                                <Edit className="h-4 w-4 mr-1" />
-                                Edit
+                                <Edit className="h-4 w-4" />
                               </Button>
                               
                               <AlertDialog>
