@@ -44,6 +44,7 @@ export type Database = {
       sim_cards: {
         Row: {
           carrier: string | null
+          crab_name: string | null
           created_at: string
           id: string
           login: string | null
@@ -59,6 +60,7 @@ export type Database = {
         }
         Insert: {
           carrier?: string | null
+          crab_name?: string | null
           created_at?: string
           id?: string
           login?: string | null
@@ -74,6 +76,7 @@ export type Database = {
         }
         Update: {
           carrier?: string | null
+          crab_name?: string | null
           created_at?: string
           id?: string
           login?: string | null

@@ -21,6 +21,7 @@ interface SimCard {
   login?: string;
   password?: string;
   profile_name?: string;
+  crab_name?: string;
   created_at: string;
   updated_at: string;
 }
@@ -127,7 +128,8 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         card.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
         card.sim_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
         card.notes?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        card.profile_name?.toLowerCase().includes(searchQuery.toLowerCase())
+        card.profile_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        card.crab_name?.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : simCards;
 
@@ -236,6 +238,12 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 {card.carrier && (
                   <div className="text-sm text-muted-foreground">
                     <strong>Carrier:</strong> {card.carrier}
+                  </div>
+                )}
+
+                {card.crab_name && (
+                  <div className="text-sm text-muted-foreground break-words">
+                    <strong>Crab Name:</strong> {card.crab_name}
                   </div>
                 )}
 
@@ -448,6 +456,13 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             </div>
                           )}
                           
+                          {card.crab_name && (
+                            <div>
+                              <span className="text-sm font-medium">Crab Name:</span>
+                              <span className="text-sm text-muted-foreground ml-2 break-words">{card.crab_name}</span>
+                            </div>
+                          )}
+
                           {card.profile_name && (
                             <div>
                               <span className="text-sm font-medium">Profile Name:</span>
@@ -603,6 +618,13 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               <div className="flex items-center gap-2">
                                 <span className="text-sm font-medium">Carrier:</span>
                                 <span className="text-sm text-muted-foreground">{card.carrier}</span>
+                              </div>
+                            )}
+                            
+                            {card.crab_name && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">Crab Name:</span>
+                                <span className="text-sm text-muted-foreground break-words">{card.crab_name}</span>
                               </div>
                             )}
                             

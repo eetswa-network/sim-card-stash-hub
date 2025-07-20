@@ -27,6 +27,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
     login: editingCard?.login || "",
     password: editingCard?.password || "",
     profile_name: editingCard?.profile_name || "",
+    crab_name: editingCard?.crab_name || "",
   });
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
@@ -98,6 +99,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         login: "",
         password: "",
         profile_name: "",
+        crab_name: "",
       });
       onSuccess();
     } catch (error: any) {
@@ -224,15 +226,27 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="profile_name">Profile Name</Label>
-            <Input
-              id="profile_name"
-              value={formData.profile_name}
-              onChange={(e) => setFormData({ ...formData, profile_name: e.target.value })}
-              placeholder="Profile or account name"
-              className={isMobile ? "min-h-[44px]" : ""}
-            />
+          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
+            <div className="space-y-2">
+              <Label htmlFor="crab_name">Crab Name</Label>
+              <Input
+                id="crab_name"
+                value={formData.crab_name}
+                onChange={(e) => setFormData({ ...formData, crab_name: e.target.value })}
+                placeholder="Enter crab name"
+                className={isMobile ? "min-h-[44px]" : ""}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profile_name">Profile Name</Label>
+              <Input
+                id="profile_name"
+                value={formData.profile_name}
+                onChange={(e) => setFormData({ ...formData, profile_name: e.target.value })}
+                placeholder="Profile or account name"
+                className={isMobile ? "min-h-[44px]" : ""}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
