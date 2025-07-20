@@ -347,9 +347,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
                             <span className="font-mono text-sm break-all">{card.phone_number}</span>
                           </div>
-                          <Badge variant={getStatusColor(card.status)} className="text-xs">
-                            {card.status}
-                          </Badge>
                         </div>
                         
                         <div className="flex items-center justify-between">
@@ -485,7 +482,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     <div className="flex-1 px-2 border-r border-table-divider">Phone Number</div>
                     <div className="flex-1 text-center px-2 border-r border-table-divider">SIM Type</div>
                     <div className="flex-1 text-center px-2 border-r border-table-divider">SIM Number</div>
-                    <div className="flex-1 text-center px-2 border-r border-table-divider">Status</div>
                     <div className="flex-1 text-center px-2 border-r border-table-divider">Carrier</div>
                     <div className="flex-1 text-center px-2 border-r border-table-divider">Date</div>
                     <div className="flex-1 text-center px-2">Actions</div>
@@ -511,11 +507,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             )}
                           </div>
                           <div className="font-mono font-medium flex-1 text-center px-2 border-r border-table-divider break-all">{card.sim_number}</div>
-                          <div className="flex-1 text-center px-2 border-r border-table-divider">
-                            <Badge variant={getStatusColor(card.status)} className="text-xs">
-                              {card.status}
-                            </Badge>
-                          </div>
                           <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-table-divider">
                             {card.carrier || '-'}
                           </div>
