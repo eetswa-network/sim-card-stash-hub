@@ -144,23 +144,23 @@ export function EditableUsageTable({ simCardId, usageData, onUsageUpdate }: Edit
         </Button>
       </div>
       
-      <div className="border-2 border-black rounded-md overflow-hidden">
+      <div className="border border-black rounded-md overflow-hidden">
         {/* Header */}
-        <div className="bg-muted/50 flex border-b-2 border-black">
+        <div className="bg-muted/50 flex border-b border-black">
           <div className="flex-1 flex">
-            <div className="w-1/2 px-2 py-1 text-xs font-medium border-r-2 border-black">Name</div>
-            <div className="w-1/2 px-2 py-1 text-xs font-medium border-r-2 border-black">Use</div>
+            <div className="w-1/2 px-2 py-1 text-xs font-medium border-r border-black">Name</div>
+            <div className="w-1/2 px-2 py-1 text-xs font-medium border-r border-black">Use</div>
           </div>
           <div className="w-20 px-2 py-1 text-xs font-medium text-center">Actions</div>
         </div>
         
         {/* Existing rows */}
         {usageData.map((usage, index) => (
-           <div key={usage.id} className={`flex ${index < usageData.length - 1 || isAddingNew ? 'border-b-2 border-black' : ''}`}>
+           <div key={usage.id} className="flex border-b border-black">
             {editingRow === usage.id ? (
               <>
                 <div className="flex-1 flex">
-                  <div className="w-1/2 px-1 py-1 border-r-2 border-black">
+                  <div className="w-1/2 px-1 py-1 border-r border-black">
                     <Input
                       value={editValues[usage.id]?.name || ''}
                       onChange={(e) => setEditValues({
@@ -171,7 +171,7 @@ export function EditableUsageTable({ simCardId, usageData, onUsageUpdate }: Edit
                       placeholder="Name"
                     />
                   </div>
-                  <div className="w-1/2 px-1 py-1 border-r-2 border-black">
+                  <div className="w-1/2 px-1 py-1 border-r border-black">
                     <Input
                       value={editValues[usage.id]?.use_purpose || ''}
                       onChange={(e) => setEditValues({
@@ -205,8 +205,8 @@ export function EditableUsageTable({ simCardId, usageData, onUsageUpdate }: Edit
             ) : (
               <>
                 <div className="flex-1 flex">
-                  <div className="w-1/2 px-2 py-1 text-xs border-r-2 border-black">{usage.name}</div>
-                  <div className="w-1/2 px-2 py-1 text-xs border-r-2 border-black">{usage.use_purpose}</div>
+                  <div className="w-1/2 px-2 py-1 text-xs border-r border-black">{usage.name}</div>
+                  <div className="w-1/2 px-2 py-1 text-xs border-r border-black">{usage.use_purpose}</div>
                 </div>
                 <div className="w-20 px-1 py-1 flex gap-1 justify-center">
                   <Button
@@ -235,7 +235,7 @@ export function EditableUsageTable({ simCardId, usageData, onUsageUpdate }: Edit
         {isAddingNew && (
           <div className="flex">
             <div className="flex-1 flex">
-              <div className="w-1/2 px-1 py-1 border-r-2 border-black">
+              <div className="w-1/2 px-1 py-1 border-r border-black">
                 <Input
                   value={newRow.name}
                   onChange={(e) => setNewRow({ ...newRow, name: e.target.value })}
@@ -243,7 +243,7 @@ export function EditableUsageTable({ simCardId, usageData, onUsageUpdate }: Edit
                   placeholder="Name"
                 />
               </div>
-              <div className="w-1/2 px-1 py-1 border-r-2 border-black">
+              <div className="w-1/2 px-1 py-1 border-r border-black">
                 <Input
                   value={newRow.use_purpose}
                   onChange={(e) => setNewRow({ ...newRow, use_purpose: e.target.value })}
