@@ -56,6 +56,8 @@ All colors MUST be HSL.
 
     --table-green: 142 76% 36%;
     --table-green-light: 142 76% 90%;
+    --table-orange: 25 95% 53%;
+    --table-divider: 0 0% 0%;
   }
 
   .dark {
@@ -97,6 +99,8 @@ All colors MUST be HSL.
 
     --table-green: 142 76% 36%;
     --table-green-light: 142 76% 90%;
+    --table-orange: 25 95% 53%;
+    --table-divider: 0 0% 0%;
   }
 }
 

@@ -334,7 +334,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
           <CardContent className="p-0">
             {isMobile ? (
               /* Mobile List View - Simplified Card Layout */
-              <div className="divide-y">
+              <div className="divide-y divide-table-divider">
                 {filteredSimCards.map((card) => (
                   <div key={card.id} className="animate-fade-in">
                     <div 
@@ -417,7 +417,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     
                     {/* Mobile Expanded content */}
                     {expandedRows.has(card.id) && (
-                      <div className="px-4 pb-4 bg-table-green-light border-t animate-accordion-down">
+                      <div className="px-4 pb-4 bg-table-green-light border-t border-table-divider animate-accordion-down">
                         <div className="space-y-3 pt-4">
                           {card.login && (
                             <div className="flex items-center gap-2">
@@ -480,18 +480,18 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               /* Desktop List View - Table Layout */
               <>
                 {/* Header */}
-                <div className="p-4 border-b bg-muted/30">
+                <div className="p-4 border-b border-table-divider bg-table-orange">
                   <div className="flex items-center justify-between w-full font-medium text-sm text-muted-foreground">
-                    <div className="flex-1 px-2 border-r border-border">Phone Number</div>
-                    <div className="flex-1 text-center px-2 border-r border-border">SIM Type</div>
-                    <div className="flex-1 text-center px-2 border-r border-border">SIM Number</div>
-                    <div className="flex-1 text-center px-2 border-r border-border">Status</div>
-                    <div className="flex-1 text-center px-2 border-r border-border">Carrier</div>
-                    <div className="flex-1 text-center px-2 border-r border-border">Date</div>
+                    <div className="flex-1 px-2 border-r border-table-divider">Phone Number</div>
+                    <div className="flex-1 text-center px-2 border-r border-table-divider">SIM Type</div>
+                    <div className="flex-1 text-center px-2 border-r border-table-divider">SIM Number</div>
+                    <div className="flex-1 text-center px-2 border-r border-table-divider">Status</div>
+                    <div className="flex-1 text-center px-2 border-r border-table-divider">Carrier</div>
+                    <div className="flex-1 text-center px-2 border-r border-table-divider">Date</div>
                     <div className="flex-1 text-center px-2">Actions</div>
                   </div>
                 </div>
-                <div className="divide-y">
+                <div className="divide-y divide-table-divider">
                   {filteredSimCards.map((card) => (
                     <div key={card.id} className="animate-fade-in">
                       <div 
@@ -499,27 +499,27 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         onClick={() => toggleRowExpansion(card.id)}
                       >
                         <div className="flex items-center justify-between w-full">
-                          <div className="flex items-center gap-2 text-sm flex-1 px-2 border-r border-border">
+                          <div className="flex items-center gap-2 text-sm flex-1 px-2 border-r border-table-divider">
                             <Phone className="h-3 w-3 text-muted-foreground shrink-0" />
                             <span className="font-mono break-all">{card.phone_number}</span>
                           </div>
-                          <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-border">
+                          <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-table-divider">
                              {card.sim_type === 'eSIM' ? (
                               <Smartphone className="h-4 w-4 text-muted-foreground" />
                             ) : (
                               <IdCard className="h-4 w-4 text-muted-foreground" />
                             )}
                           </div>
-                          <div className="font-mono font-medium flex-1 text-center px-2 border-r border-border break-all">{card.sim_number}</div>
-                          <div className="flex-1 text-center px-2 border-r border-border">
+                          <div className="font-mono font-medium flex-1 text-center px-2 border-r border-table-divider break-all">{card.sim_number}</div>
+                          <div className="flex-1 text-center px-2 border-r border-table-divider">
                             <Badge variant={getStatusColor(card.status)} className="text-xs">
                               {card.status}
                             </Badge>
                           </div>
-                          <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-border">
+                          <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-table-divider">
                             {card.carrier || '-'}
                           </div>
-                          <div className="text-xs text-muted-foreground flex-1 text-center px-2 border-r border-border">
+                          <div className="text-xs text-muted-foreground flex-1 text-center px-2 border-r border-table-divider">
                             {new Date(card.created_at).toLocaleDateString()}
                           </div>
                           <div className="flex-1 text-center px-2">
@@ -569,7 +569,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       
                       {/* Desktop Expanded content */}
                       {expandedRows.has(card.id) && (
-                        <div className="px-4 pb-4 bg-table-green-light border-t animate-accordion-down">
+                        <div className="px-4 pb-4 bg-table-green-light border-t border-table-divider animate-accordion-down">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                             {card.login && (
                               <div className="flex items-center gap-2">

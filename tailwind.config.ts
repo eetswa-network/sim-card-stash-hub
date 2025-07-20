@@ -63,7 +63,9 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				'table-green': 'hsl(var(--table-green))',
-				'table-green-light': 'hsl(var(--table-green-light))'
+				'table-green-light': 'hsl(var(--table-green-light))',
+				'table-orange': 'hsl(var(--table-orange))',
+				'table-divider': 'hsl(var(--table-divider))'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
