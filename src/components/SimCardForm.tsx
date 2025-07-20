@@ -256,7 +256,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                   }}
                 >
                   <SelectTrigger className={isMobile ? "min-h-[44px]" : ""}>
-                    <SelectValue placeholder="Select or add carrier" />
+                    <SelectValue placeholder="Select..." />
                   </SelectTrigger>
                   <SelectContent>
                     {existingCarriers.map((carrier) => (
