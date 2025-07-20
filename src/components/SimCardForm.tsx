@@ -33,6 +33,9 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [existingCarriers, setExistingCarriers] = useState<string[]>([]);
+  const [showCustomCarrier, setShowCustomCarrier] = useState(false);
+  const [customCarrier, setCustomCarrier] = useState("");
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -49,6 +52,19 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
           .eq("user_id", user.id)
           .single();
         setProfile(profileData);
+
+        // Load existing carriers for this user
+        const { data: carriersData } = await supabase
+          .from("sim_cards")
+          .select("carrier")
+          .eq("user_id", user.id)
+          .not("carrier", "is", null)
+          .not("carrier", "eq", "");
+        
+        if (carriersData) {
+          const uniqueCarriers = [...new Set(carriersData.map(item => item.carrier))].filter(Boolean);
+          setExistingCarriers(uniqueCarriers);
+        }
       }
     };
     getUser();
@@ -191,13 +207,67 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
           <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-3'}`}>
             <div className="space-y-2">
               <Label htmlFor="carrier">Carrier</Label>
-              <Input
-                id="carrier"
-                value={formData.carrier}
-                onChange={(e) => setFormData({ ...formData, carrier: e.target.value })}
-                placeholder="e.g., Verizon, AT&T, T-Mobile"
-                className={isMobile ? "min-h-[44px]" : ""}
-              />
+              {showCustomCarrier ? (
+                <div className="flex gap-2">
+                  <Input
+                    value={customCarrier}
+                    onChange={(e) => setCustomCarrier(e.target.value)}
+                    placeholder="Enter new carrier name"
+                    className={`flex-1 ${isMobile ? "min-h-[44px]" : ""}`}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      if (customCarrier.trim()) {
+                        setFormData({ ...formData, carrier: customCarrier.trim() });
+                        if (!existingCarriers.includes(customCarrier.trim())) {
+                          setExistingCarriers([...existingCarriers, customCarrier.trim()]);
+                        }
+                        setCustomCarrier("");
+                        setShowCustomCarrier(false);
+                      }
+                    }}
+                    className={isMobile ? "min-h-[44px]" : ""}
+                  >
+                    Add
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowCustomCarrier(false);
+                      setCustomCarrier("");
+                    }}
+                    className={isMobile ? "min-h-[44px]" : ""}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <Select 
+                  value={formData.carrier} 
+                  onValueChange={(value) => {
+                    if (value === "add_new") {
+                      setShowCustomCarrier(true);
+                    } else {
+                      setFormData({ ...formData, carrier: value });
+                    }
+                  }}
+                >
+                  <SelectTrigger className={isMobile ? "min-h-[44px]" : ""}>
+                    <SelectValue placeholder="Select or add carrier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {existingCarriers.map((carrier) => (
+                      <SelectItem key={carrier} value={carrier}>
+                        {carrier}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="add_new">+ Add new...</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="sim_type">SIM Type</Label>
