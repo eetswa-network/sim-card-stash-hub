@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -118,6 +118,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     }));
   };
 
+  const collapseAll = () => {
+    setExpandedRows(new Set());
+  };
+
   // Filter SIM cards based on search query
   const filteredSimCards = searchQuery 
     ? simCards.filter(card => 
@@ -182,7 +186,20 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   return (
     <div className="space-y-4">
       {/* View Toggle */}
-      <div className="flex justify-end">
+      <div className="flex justify-between">
+        <div>
+          {viewMode === 'list' && expandedRows.size > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={collapseAll}
+              className="px-3"
+            >
+              <Minimize2 className="h-4 w-4 mr-1" />
+              Collapse All
+            </Button>
+          )}
+        </div>
         <div className="flex bg-muted rounded-lg p-1">
           <Button
             variant={viewMode === 'grid' ? 'default' : 'ghost'}
