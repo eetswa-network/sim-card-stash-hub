@@ -110,6 +110,58 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         return;
       }
 
+      // Check for existing SIM number and phone number (only when adding new or if values changed)
+      if (!editingCard || formData.sim_number !== editingCard.sim_number || formData.phone_number !== editingCard.phone_number) {
+        const checks = [];
+        
+        // Only check sim_number if it's new or changed
+        if (!editingCard || formData.sim_number !== editingCard.sim_number) {
+          checks.push(
+            supabase
+              .from("sim_cards")
+              .select("id, sim_number")
+              .eq("user_id", user.id)
+              .eq("sim_number", formData.sim_number)
+              .limit(1)
+          );
+        } else {
+          checks.push(Promise.resolve({ data: [] }));
+        }
+        
+        // Only check phone_number if it's new or changed
+        if (!editingCard || formData.phone_number !== editingCard.phone_number) {
+          checks.push(
+            supabase
+              .from("sim_cards")
+              .select("id, phone_number")
+              .eq("user_id", user.id)
+              .eq("phone_number", formData.phone_number)
+              .limit(1)
+          );
+        } else {
+          checks.push(Promise.resolve({ data: [] }));
+        }
+
+        const [simNumberResult, phoneNumberResult] = await Promise.all(checks);
+        
+        const errors = [];
+        if (simNumberResult.data && simNumberResult.data.length > 0) {
+          errors.push("A SIM card with this SIM number already exists.");
+        }
+        if (phoneNumberResult.data && phoneNumberResult.data.length > 0) {
+          errors.push("A SIM card with this phone number already exists.");
+        }
+        
+        if (errors.length > 0) {
+          toast({
+            title: "Duplicate Entry",
+            description: errors.join(" "),
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
       let simCardId = editingCard?.id;
 
       if (editingCard) {
