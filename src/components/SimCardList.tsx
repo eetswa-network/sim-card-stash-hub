@@ -276,7 +276,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       {viewMode === 'grid' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredSimCards.map((card) => (
-            <Card key={card.id} className="hover:shadow-md transition-shadow animate-fade-in">
+            <Card key={card.id} className="hover:shadow-md transition-shadow animate-fade-in border border-border">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg break-all">{card.sim_number}</CardTitle>
