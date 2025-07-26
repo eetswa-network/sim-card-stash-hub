@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2 } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EditableUsageTable } from "./EditableUsageTable";
@@ -46,6 +46,8 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
   const [usageData, setUsageData] = useState<{[key: string]: UsageEntry[]}>({});
+  const [sortField, setSortField] = useState<'phone_number' | 'sim_number' | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -164,8 +166,30 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     }));
   };
 
-  // Filter SIM cards based on search query
-  const filteredSimCards = searchQuery 
+  const handleSort = (field: 'phone_number' | 'sim_number') => {
+    if (sortField === field) {
+      // Toggle direction or clear sort
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else {
+        setSortField(null);
+        setSortDirection('asc');
+      }
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortIcon = (field: 'phone_number' | 'sim_number') => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="h-3 w-3" />;
+    }
+    return sortDirection === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />;
+  };
+
+  // Filter and sort SIM cards
+  let filteredAndSortedCards = searchQuery 
     ? simCards.filter(card => {
         // Search in basic card fields
         const basicMatch = card.sim_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -184,6 +208,22 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         return basicMatch || usageMatch;
       })
     : simCards;
+
+  // Apply sorting if in list view and sort field is selected
+  if (viewMode === 'list' && sortField) {
+    filteredAndSortedCards = [...filteredAndSortedCards].sort((a, b) => {
+      const aValue = a[sortField].toLowerCase();
+      const bValue = b[sortField].toLowerCase();
+      
+      if (sortDirection === 'asc') {
+        return aValue.localeCompare(bValue);
+      } else {
+        return bValue.localeCompare(aValue);
+      }
+    });
+  }
+
+  const filteredSimCards = filteredAndSortedCards;
 
   if (loading) {
     return (
@@ -544,9 +584,21 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 {/* Header */}
                 <div className="p-4 border-b border-table-divider bg-table-orange">
                   <div className="flex items-center justify-between w-full font-medium text-sm text-table-divider">
-                    <div className="flex-1 px-2 border-r border-black">Phone Number</div>
+                    <button 
+                      className="flex-1 px-2 border-r border-black flex items-center justify-start gap-1 hover:bg-black/10 transition-colors"
+                      onClick={() => handleSort('phone_number')}
+                    >
+                      Phone Number
+                      {getSortIcon('phone_number')}
+                    </button>
                     <div className="flex-1 text-center px-2 border-r border-black">SIM Type</div>
-                    <div className="flex-1 text-center px-2 border-r border-black">SIM Number</div>
+                    <button 
+                      className="flex-1 text-center px-2 border-r border-black flex items-center justify-center gap-1 hover:bg-black/10 transition-colors"
+                      onClick={() => handleSort('sim_number')}
+                    >
+                      SIM Number
+                      {getSortIcon('sim_number')}
+                    </button>
                     <div className="flex-1 text-center px-2 border-r border-black">Carrier</div>
                     <div className="flex-1 text-center px-2">Actions</div>
                   </div>
