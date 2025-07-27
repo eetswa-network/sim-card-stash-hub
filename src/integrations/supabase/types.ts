@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounts: {
+        Row: {
+          created_at: string
+          id: string
+          login: string
+          password: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          login: string
+          password?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          login?: string
+          password?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       carriers: {
         Row: {
           created_at: string
@@ -102,6 +129,7 @@ export type Database = {
       }
       sim_cards: {
         Row: {
+          account_id: string | null
           carrier: string | null
           created_at: string
           id: string
@@ -117,6 +145,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          account_id?: string | null
           carrier?: string | null
           created_at?: string
           id?: string
@@ -132,6 +161,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          account_id?: string | null
           carrier?: string | null
           created_at?: string
           id?: string
@@ -147,6 +177,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sim_cards_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sim_cards_profile_id_fkey"
             columns: ["profile_id"]

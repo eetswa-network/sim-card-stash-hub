@@ -25,17 +25,19 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
     status: editingCard?.status || "active",
     sim_type: editingCard?.sim_type || "Physical SIM",
     notes: editingCard?.notes || "",
-    login: editingCard?.login || "",
-    password: editingCard?.password || "",
+    account_id: editingCard?.account_id || "",
   });
   const [usedForEntries, setUsedForEntries] = useState([{ name: "", use_purpose: "" }]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
   const [existingCarriers, setExistingCarriers] = useState<string[]>([]);
   const [showCustomCarrier, setShowCustomCarrier] = useState(false);
   const [customCarrier, setCustomCarrier] = useState("");
+  const [existingAccounts, setExistingAccounts] = useState<Array<{id: string, login: string, password: string}>>([]);
+  const [showNewAccount, setShowNewAccount] = useState(false);
+  const [newAccount, setNewAccount] = useState({ login: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -53,8 +55,8 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
           .single();
         setProfile(profileData);
 
-        // Load existing carriers for this user (from both sim_cards and carriers table)
-        const [carriersFromSims, carriersFromTable] = await Promise.all([
+        // Load existing carriers and accounts for this user
+        const [carriersFromSims, carriersFromTable, accountsData] = await Promise.all([
           supabase
             .from("sim_cards")
             .select("carrier")
@@ -64,6 +66,10 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
           supabase
             .from("carriers")
             .select("name")
+            .eq("user_id", user.id),
+          supabase
+            .from("accounts")
+            .select("*")
             .eq("user_id", user.id)
         ]);
         
@@ -76,6 +82,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         }
         
         setExistingCarriers(Array.from(allCarriers).filter(Boolean));
+        setExistingAccounts(accountsData.data || []);
       }
     };
     getUser();
@@ -212,8 +219,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         status: "active",
         sim_type: "Physical SIM",
         notes: "",
-        login: "",
-        password: "",
+        account_id: "",
       });
       setUsedForEntries([{ name: "", use_purpose: "" }]);
       onSuccess();
@@ -232,6 +238,42 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddNewAccount = async () => {
+    if (!user || !newAccount.login.trim()) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("accounts")
+        .insert([{
+          user_id: user.id,
+          login: newAccount.login.trim(),
+          password: newAccount.password.trim()
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Add to local state
+      setExistingAccounts([...existingAccounts, data]);
+      
+      // Set as selected account
+      setFormData({ ...formData, account_id: data.id });
+      
+      // Reset form
+      setNewAccount({ login: "", password: "" });
+      setShowNewAccount(false);
+
+      toast({ title: "Account added successfully!" });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to add account. It might already exist.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -378,40 +420,93 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             </div>
           </div>
 
-          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
-            <div className="space-y-2">
-              <Label htmlFor="login">Login</Label>
-              <Input
-                id="login"
-                type="text"
-                value={formData.login}
-                onChange={(e) => setFormData({ ...formData, login: e.target.value })}
-                placeholder="Account login/username"
-                className={isMobile ? "min-h-[44px]" : ""}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="Account password"
-                className={isMobile ? "min-h-[44px]" : ""}
-              />
-              <div className="flex items-center space-x-2 mt-2">
-                <Checkbox
-                  id="show-password"
-                  checked={showPassword}
-                  onCheckedChange={(checked) => setShowPassword(checked === true)}
-                  className={isMobile ? "w-5 h-5" : ""}
-                />
-                <Label htmlFor="show-password" className={`font-normal ${isMobile ? 'text-base' : 'text-sm'}`}>
-                  Show password
-                </Label>
+          <div className="space-y-2">
+            <Label htmlFor="account">Account Login</Label>
+            {showNewAccount ? (
+              <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium">Add New Account</Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowNewAccount(false);
+                      setNewAccount({ login: "", password: "" });
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+                <div className={`grid gap-3 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                  <div className="space-y-1">
+                    <Label htmlFor="new-login">Login/Username</Label>
+                    <Input
+                      id="new-login"
+                      value={newAccount.login}
+                      onChange={(e) => setNewAccount({ ...newAccount, login: e.target.value })}
+                      placeholder="Enter login/username"
+                      className={isMobile ? "min-h-[44px]" : ""}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="new-password">Password</Label>
+                    <Input
+                      id="new-password"
+                      type={showPassword ? "text" : "password"}
+                      value={newAccount.password}
+                      onChange={(e) => setNewAccount({ ...newAccount, password: e.target.value })}
+                      placeholder="Enter password"
+                      className={isMobile ? "min-h-[44px]" : ""}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="show-password-new"
+                      checked={showPassword}
+                      onCheckedChange={(checked) => setShowPassword(checked === true)}
+                      className={isMobile ? "w-5 h-5" : ""}
+                    />
+                    <Label htmlFor="show-password-new" className={`font-normal ${isMobile ? 'text-base' : 'text-sm'}`}>
+                      Show password
+                    </Label>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={handleAddNewAccount}
+                    disabled={!newAccount.login.trim()}
+                    className={isMobile ? "min-h-[44px]" : ""}
+                  >
+                    Add Account
+                  </Button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <Select 
+                value={formData.account_id} 
+                onValueChange={(value) => {
+                  if (value === "add_new") {
+                    setShowNewAccount(true);
+                  } else {
+                    setFormData({ ...formData, account_id: value });
+                  }
+                }}
+              >
+                <SelectTrigger className={isMobile ? "min-h-[44px]" : ""}>
+                  <SelectValue placeholder="Select account or add new..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {existingAccounts.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>
+                      {account.login}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="add_new">+ Add new account...</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div className="space-y-4">
