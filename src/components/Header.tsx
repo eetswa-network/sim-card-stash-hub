@@ -1,9 +1,10 @@
 
 import { useState, useEffect } from "react";
-import { CreditCard, User, LogOut, Shield } from "lucide-react";
+import { CreditCard, User, LogOut, Shield, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -80,6 +81,13 @@ export function Header({ onSearch }: HeaderProps) {
     }
   };
 
+  const getInitials = (name: string | null, email: string) => {
+    if (name) {
+      return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    }
+    return email.split('@')[0].slice(0, 2).toUpperCase();
+  };
+
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -105,23 +113,46 @@ export function Header({ onSearch }: HeaderProps) {
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Account
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage src={userProfile?.avatar_url || ""} />
+                    <AvatarFallback className="text-xs">
+                      {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="hidden sm:inline">Account</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
                 <Card>
                   <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <User className="h-4 w-4" />
-                      <span className="font-medium">
-                        {userProfile?.name || user.email}
-                      </span>
-                    </div>
-                    <div className="text-sm text-muted-foreground mb-3">
-                      {user.email}
+                    <div className="flex items-center gap-3 mb-4">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={userProfile?.avatar_url || ""} />
+                        <AvatarFallback>
+                          {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium truncate">
+                          {userProfile?.name || userProfile?.profile_name || user.email}
+                        </div>
+                        <div className="text-sm text-muted-foreground truncate">
+                          {user.email}
+                        </div>
+                      </div>
                     </div>
                     <div className="space-y-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        asChild
+                        className="w-full gap-2"
+                      >
+                        <Link to="/account">
+                          <Settings className="h-4 w-4" />
+                          Account Details
+                        </Link>
+                      </Button>
                       <Button 
                         variant="outline" 
                         size="sm" 
