@@ -369,7 +369,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
             <Card key={card.id} className="hover:shadow-md transition-shadow animate-fade-in border border-border">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg break-all">{card.sim_number}</CardTitle>
+                  <CardTitle className={`text-lg break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</CardTitle>
                   <Badge variant={getStatusColor(card.status)}>
                     {card.status}
                   </Badge>
@@ -516,7 +516,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             ) : (
                               <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
                             )}
-                            <span className="font-mono text-sm break-all">{card.sim_number}</span>
+                            <span className={`font-mono text-sm break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</span>
                           </div>
                           <Badge variant={getStatusColor(card.status)} className="text-xs">
                             {card.status}
@@ -672,7 +672,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               <IdCard className="h-5 w-5 text-muted-foreground" />
                             )}
                           </div>
-                          <div className="font-mono font-medium flex-1 text-center px-2 border-r border-black break-all">{card.sim_number}</div>
+                          <div className={`font-mono font-medium flex-1 text-center px-2 border-r border-black break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</div>
                           <div className="flex-1 text-center px-2 border-r border-black">
                             {card.carrier || '-'}
                           </div>
