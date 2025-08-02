@@ -183,37 +183,15 @@ export function Header({ onSearch }: HeaderProps) {
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container mx-auto px-4 min-h-40 flex flex-col lg:flex-row lg:items-center justify-between py-4 gap-4">
-        <div className="flex items-center justify-between w-full lg:w-auto">
+      <div className="container mx-auto px-4 min-h-40 flex flex-col py-4 gap-4">
+        {/* Logo and title */}
+        <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
             <img src={logoColorful} alt="SIM Card Stash" className="w-[150px] h-[150px] object-contain" />
             <Link to="/" className="text-3xl font-bold">SIM Card Stash</Link>
           </div>
           
-          {/* User menu on mobile/tablet - moved to top right */}
-          <div className="flex lg:hidden">
-            {user ? (
-              renderUserMenu(true)
-            ) : (
-              <Button variant="ghost" asChild>
-                <Link to="/auth">
-                  <User className="h-4 w-4 mr-2" />
-                  Sign In
-                </Link>
-              </Button>
-            )}
-          </div>
-        </div>
-        
-        {/* Search and navigation - new line on mobile/tablet */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto lg:flex-row">
-          {onSearch && (
-            <div className="w-full sm:w-auto">
-              <SearchBar onSearch={onSearch} />
-            </div>
-          )}
-          
-          {/* Desktop user menu */}
+          {/* Desktop user menu - top right */}
           <div className="hidden lg:flex">
             {user ? (
               renderUserMenu()
@@ -227,6 +205,102 @@ export function Header({ onSearch }: HeaderProps) {
             )}
           </div>
         </div>
+        
+        {/* Mobile navigation - horizontal buttons under logo */}
+        <div className="flex lg:hidden items-center justify-center gap-2 flex-wrap">
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/">Dashboard</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/updates">Updates</Link>
+          </Button>
+          {user ? (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                  <Avatar className="h-4 w-4">
+                    <AvatarImage src={userProfile?.avatar_url || ""} />
+                    <AvatarFallback className="text-xs">
+                      {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
+                    </AvatarFallback>
+                  </Avatar>
+                  Account
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={userProfile?.avatar_url || ""} />
+                        <AvatarFallback>
+                          {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium truncate">
+                          {userProfile?.name || userProfile?.profile_name || user.email}
+                        </div>
+                        <div className="text-sm text-muted-foreground truncate">
+                          {user.email}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        asChild
+                        className="w-full gap-2"
+                      >
+                        <Link to="/account">
+                          <Settings className="h-4 w-4" />
+                          Account Details
+                        </Link>
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        asChild
+                        className="w-full gap-2"
+                      >
+                        <Link to="/security">
+                          <Shield className="h-4 w-4" />
+                          Security Settings
+                        </Link>
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={handleSignOut}
+                        className="w-full gap-2"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Sign Out
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/auth">
+                <User className="h-4 w-4 mr-2" />
+                Sign In
+              </Link>
+            </Button>
+          )}
+        </div>
+        
+        {/* Search bar - on its own line */}
+        {onSearch && (
+          <div className="flex justify-center lg:justify-end">
+            <div className="w-full sm:w-auto max-w-md lg:max-w-none">
+              <SearchBar onSearch={onSearch} />
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
