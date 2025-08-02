@@ -273,10 +273,10 @@ export function Header({ onSearch }: HeaderProps) {
           </Button>
         </div>
         
-        {/* Search bar - on its own line */}
+        {/* Search bar - on its own line, centered */}
         {onSearch && (
-          <div className="flex justify-center lg:justify-end">
-            <div className="w-full sm:w-auto max-w-md lg:max-w-none">
+          <div className="flex justify-center">
+            <div className="w-full sm:w-auto max-w-md">
               <SearchBar onSearch={onSearch} />
             </div>
           </div>
