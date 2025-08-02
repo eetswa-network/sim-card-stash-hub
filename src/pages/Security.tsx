@@ -6,10 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Shield, Eye, EyeOff, Copy, CheckCircle, Trash2, RefreshCw } from "lucide-react";
+import { Loader2, Shield, Eye, EyeOff, Copy, CheckCircle, Trash2, RefreshCw, Fingerprint, Plus, Smartphone, Monitor } from "lucide-react";
 import { TOTP } from "otpauth";
 import QRCode from "qrcode";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
+import type { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser';
 
 export default function Security() {
   const [loading, setLoading] = useState(false);
@@ -20,7 +22,10 @@ export default function Security() {
     confirm: false
   });
   const [mfaSettings, setMfaSettings] = useState(null);
+  const [passkeys, setPasskeys] = useState([]);
   const [showMfaSetup, setShowMfaSetup] = useState(false);
+  const [showPasskeySetup, setShowPasskeySetup] = useState(false);
+  const [passkeyNickname, setPasskeyNickname] = useState("");
   const [mfaSecret, setMfaSecret] = useState("");
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
@@ -31,6 +36,7 @@ export default function Security() {
   useEffect(() => {
     checkAuth();
     fetchMfaSettings();
+    fetchPasskeys();
   }, []);
 
   const checkAuth = async () => {
@@ -57,6 +63,162 @@ export default function Security() {
       setMfaSettings(data);
     } catch (error) {
       console.error("Error fetching MFA settings:", error);
+    }
+  };
+
+  const fetchPasskeys = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+
+      const { data, error } = await supabase
+        .from("user_passkeys")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setPasskeys(data || []);
+    } catch (error) {
+      console.error("Error fetching passkeys:", error);
+    }
+  };
+
+  const generatePasskeyChallenge = () => {
+    // Generate a random challenge for the passkey registration
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  };
+
+  const startPasskeyRegistration = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      
+      // Check if WebAuthn is supported
+      if (!window.PublicKeyCredential) {
+        toast({
+          title: "Not supported",
+          description: "Passkeys are not supported on this device or browser.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const challenge = generatePasskeyChallenge();
+      
+      const registrationOptions = {
+        optionsJSON: {
+          challenge: challenge,
+          rp: {
+            name: "SIM Card Stash",
+            id: window.location.hostname,
+          },
+          user: {
+            id: btoa(user.id),
+            name: user.email,
+            displayName: user.email,
+          },
+          pubKeyCredParams: [
+            { alg: -7, type: "public-key" as const },
+            { alg: -257, type: "public-key" as const },
+          ],
+          authenticatorSelection: {
+            authenticatorAttachment: "platform" as const,
+            userVerification: "required" as const,
+            residentKey: "preferred" as const,
+          },
+          timeout: 60000,
+          attestation: "direct" as const,
+        }
+      };
+
+      const credential = await startRegistration(registrationOptions);
+      
+      if (credential) {
+        await savePasskey(credential, challenge);
+      }
+    } catch (error) {
+      console.error("Passkey registration error:", error);
+      toast({
+        title: "Registration failed",
+        description: error.message || "Failed to register passkey. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+      setShowPasskeySetup(false);
+      setPasskeyNickname("");
+    }
+  };
+
+  const savePasskey = async (credential: RegistrationResponseJSON, challenge: string) => {
+    try {
+      const { error } = await supabase
+        .from("user_passkeys")
+        .insert({
+          user_id: user.id,
+          credential_id: credential.id,
+          credential_public_key: btoa(JSON.stringify(credential.response.publicKey)),
+          credential_device_type: credential.response.authenticatorData ? "platform" : "cross-platform",
+          credential_backed_up: false,
+          transports: credential.response.transports || [],
+          nickname: passkeyNickname || `Passkey ${new Date().toLocaleDateString()}`,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Passkey registered!",
+        description: "Your passkey has been successfully registered."
+      });
+
+      fetchPasskeys();
+    } catch (error) {
+      console.error("Error saving passkey:", error);
+      throw error;
+    }
+  };
+
+  const deletePasskey = async (passkeyId: string) => {
+    try {
+      setLoading(true);
+      const { error } = await supabase
+        .from("user_passkeys")
+        .delete()
+        .eq("id", passkeyId)
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Passkey deleted",
+        description: "The passkey has been removed from your account."
+      });
+
+      fetchPasskeys();
+    } catch (error) {
+      console.error("Error deleting passkey:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete passkey. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getPasskeyIcon = (deviceType: string) => {
+    switch (deviceType) {
+      case "platform":
+        return <Fingerprint className="h-4 w-4" />;
+      case "cross-platform":
+        return <Monitor className="h-4 w-4" />;
+      default:
+        return <Smartphone className="h-4 w-4" />;
     }
   };
 
@@ -439,6 +601,67 @@ export default function Security() {
     );
   }
 
+  if (showPasskeySetup) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Fingerprint className="h-5 w-5 text-primary" />
+              <CardTitle>Add Passkey</CardTitle>
+            </div>
+            <CardDescription>
+              Create a passkey using your device's biometric authentication or security key
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="passkey-nickname">Passkey Nickname (Optional)</Label>
+              <Input
+                id="passkey-nickname"
+                placeholder="My iPhone, Security Key, etc."
+                value={passkeyNickname}
+                onChange={(e) => setPasskeyNickname(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Give your passkey a memorable name to identify it later
+              </p>
+            </div>
+
+            <div className="bg-muted p-4 rounded-lg">
+              <h4 className="font-medium mb-2 flex items-center gap-2">
+                <Fingerprint className="h-4 w-4" />
+                About Passkeys
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                Passkeys use your device's built-in security features like fingerprint, face recognition, or PIN to authenticate you securely without passwords.
+              </p>
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowPasskeySetup(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={startPasskeyRegistration}
+                disabled={loading}
+                className="flex-1"
+              >
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Create Passkey
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4 max-w-4xl">
@@ -652,6 +875,109 @@ export default function Security() {
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Passkeys Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Fingerprint className="h-5 w-5" />
+                    Passkeys
+                  </CardTitle>
+                  <CardDescription>
+                    Use biometric authentication or security keys for passwordless login
+                  </CardDescription>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPasskeySetup(true)}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Passkey
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {passkeys.length === 0 ? (
+                <div className="text-center py-8">
+                  <Fingerprint className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No passkeys yet</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Add a passkey for secure, passwordless authentication using your device's biometric features.
+                  </p>
+                  <Button onClick={() => setShowPasskeySetup(true)}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Your First Passkey
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    You have {passkeys.length} passkey{passkeys.length !== 1 ? 's' : ''} registered.
+                  </p>
+                  
+                  {passkeys.map((passkey) => (
+                    <div
+                      key={passkey.id}
+                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        {getPasskeyIcon(passkey.credential_device_type)}
+                        <div>
+                          <h4 className="font-medium">{passkey.nickname}</h4>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>Created: {new Date(passkey.created_at).toLocaleDateString()}</span>
+                            {passkey.last_used_at && (
+                              <>
+                                <span>•</span>
+                                <span>Last used: {new Date(passkey.last_used_at).toLocaleDateString()}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Passkey</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{passkey.nickname}"? You won't be able to use this passkey to sign in anymore.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deletePasskey(passkey.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete Passkey
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  ))}
+                  
+                  <div className="bg-muted p-4 rounded-lg">
+                    <h4 className="font-medium mb-2">Security Tips</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• Passkeys are more secure than passwords and can't be phished</li>
+                      <li>• Each device creates a unique passkey that only works on that device</li>
+                      <li>• You can add multiple passkeys for different devices</li>
+                    </ul>
                   </div>
                 </div>
               )}

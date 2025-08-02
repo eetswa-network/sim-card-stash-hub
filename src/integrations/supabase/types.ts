@@ -223,6 +223,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_passkeys: {
+        Row: {
+          counter: number
+          created_at: string
+          credential_backed_up: boolean
+          credential_device_type: string
+          credential_id: string
+          credential_public_key: string
+          id: string
+          last_used_at: string | null
+          nickname: string | null
+          transports: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          counter?: number
+          created_at?: string
+          credential_backed_up?: boolean
+          credential_device_type: string
+          credential_id: string
+          credential_public_key: string
+          id?: string
+          last_used_at?: string | null
+          nickname?: string | null
+          transports?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          counter?: number
+          created_at?: string
+          credential_backed_up?: boolean
+          credential_device_type?: string
+          credential_id?: string
+          credential_public_key?: string
+          id?: string
+          last_used_at?: string | null
+          nickname?: string | null
+          transports?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
