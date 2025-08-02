@@ -4,8 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { SimCardForm } from "@/components/SimCardForm";
 import { SimCardList } from "@/components/SimCardList";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Plus } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CreditCard, Plus, Shield, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 
 interface IndexProps {
   searchQuery?: string;
@@ -17,8 +19,12 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [user, setUser] = useState(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showMfaWarning, setShowMfaWarning] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // Enable session timeout monitoring
+  useSessionTimeout();
 
   useEffect(() => {
     // Check for existing session
@@ -30,6 +36,17 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
       }
       
       setUser(session.user);
+      
+      // Check if user has MFA enabled
+      const { data: mfaData } = await supabase
+        .from("user_mfa_settings")
+        .select("is_enabled")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+      
+      if (!mfaData?.is_enabled) {
+        setShowMfaWarning(true);
+      }
     };
     
     checkSession();
@@ -72,6 +89,43 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
+        {/* MFA Warning Banner */}
+        {showMfaWarning && (
+          <Card className="mb-6 border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                <div className="flex-1">
+                  <h3 className="font-medium text-orange-800 dark:text-orange-200">
+                    Secure Your Account
+                  </h3>
+                  <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">
+                    Two-step authentication is not enabled. Protect your account by setting up 2FA.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowMfaWarning(false)}
+                    className="border-orange-300 text-orange-800 hover:bg-orange-100 dark:border-orange-700 dark:text-orange-200 dark:hover:bg-orange-900"
+                  >
+                    Later
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => navigate("/security")}
+                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                  >
+                    <Shield className="mr-2 h-4 w-4" />
+                    Set Up Now
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
           </div>

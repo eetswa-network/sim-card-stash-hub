@@ -1,0 +1,664 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, Shield, Eye, EyeOff, Copy, CheckCircle, Trash2, RefreshCw } from "lucide-react";
+import { TOTP } from "otpauth";
+import QRCode from "qrcode";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+
+export default function Security() {
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+  const [mfaSettings, setMfaSettings] = useState(null);
+  const [showMfaSetup, setShowMfaSetup] = useState(false);
+  const [mfaSecret, setMfaSecret] = useState("");
+  const [qrCodeUrl, setQrCodeUrl] = useState("");
+  const [backupCodes, setBackupCodes] = useState<string[]>([]);
+  const [copied, setCopied] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    checkAuth();
+    fetchMfaSettings();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) {
+      navigate("/auth");
+      return;
+    }
+    setUser(session.user);
+  };
+
+  const fetchMfaSettings = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+
+      const { data, error } = await supabase
+        .from("user_mfa_settings")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      setMfaSettings(data);
+    } catch (error) {
+      console.error("Error fetching MFA settings:", error);
+    }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const currentPassword = formData.get("current_password") as string;
+    const newPassword = formData.get("new_password") as string;
+    const confirmPassword = formData.get("confirm_password") as string;
+
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Password mismatch",
+        description: "New password and confirmation don't match.",
+        variant: "destructive"
+      });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Verify current password by re-authenticating
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword
+      });
+
+      if (signInError) {
+        toast({
+          title: "Invalid current password",
+          description: "Please check your current password and try again.",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Update password
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Password updated successfully!",
+        description: "Your password has been changed."
+      });
+
+      // Reset form
+      (e.target as HTMLFormElement).reset();
+    } catch (error) {
+      console.error("Error updating password:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update password. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generateMfaSecret = () => {
+    const totp = new TOTP({
+      issuer: "SIM Card Stash",
+      label: user?.email || "User",
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+    });
+    return totp.secret.base32;
+  };
+
+  const generateBackupCodes = () => {
+    const codes = [];
+    for (let i = 0; i < 10; i++) {
+      codes.push(Math.random().toString(36).substring(2, 10).toUpperCase());
+    }
+    return codes;
+  };
+
+  const setupMfa = async () => {
+    const secret = generateMfaSecret();
+    const codes = generateBackupCodes();
+    
+    const totp = new TOTP({
+      issuer: "SIM Card Stash",
+      label: user.email,
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret: secret,
+    });
+
+    try {
+      const qrCodeDataUrl = await QRCode.toDataURL(totp.toString());
+      setMfaSecret(secret);
+      setQrCodeUrl(qrCodeDataUrl);
+      setBackupCodes(codes);
+      setShowMfaSetup(true);
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate QR code. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const verifyTotp = (secret: string, token: string) => {
+    const totp = new TOTP({
+      issuer: "SIM Card Stash",
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret: secret,
+    });
+
+    const currentToken = totp.generate();
+    const previousTotp = new TOTP({
+      issuer: "SIM Card Stash",
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret: secret,
+    });
+    const previousToken = previousTotp.generate({ timestamp: Date.now() - 30000 });
+
+    return token === currentToken || token === previousToken;
+  };
+
+  const handleMfaSetupComplete = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const verificationCode = formData.get("verification_code") as string;
+
+    try {
+      if (!verifyTotp(mfaSecret, verificationCode)) {
+        toast({
+          title: "Invalid verification code",
+          description: "Please check your authenticator app and try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from("user_mfa_settings")
+        .upsert({
+          user_id: user.id,
+          secret: mfaSecret,
+          backup_codes: backupCodes,
+          is_enabled: true
+        });
+
+      if (error) throw error;
+      
+      toast({
+        title: "Two-step authentication enabled!",
+        description: "Your account is now secured with 2FA."
+      });
+
+      setShowMfaSetup(false);
+      fetchMfaSettings();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to enable two-step authentication. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDisableMfa = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase
+        .from("user_mfa_settings")
+        .update({ is_enabled: false })
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Two-step authentication disabled",
+        description: "2FA has been disabled for your account."
+      });
+
+      fetchMfaSettings();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to disable 2FA. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const regenerateBackupCodes = async () => {
+    try {
+      setLoading(true);
+      const newCodes = generateBackupCodes();
+      
+      const { error } = await supabase
+        .from("user_mfa_settings")
+        .update({ backup_codes: newCodes })
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Backup codes regenerated",
+        description: "New backup codes have been generated. Please save them securely."
+      });
+
+      fetchMfaSettings();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to regenerate backup codes. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyBackupCodes = () => {
+    if (!mfaSettings?.backup_codes) return;
+    
+    const codesText = mfaSettings.backup_codes.join("\n");
+    navigator.clipboard.writeText(codesText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast({
+      title: "Backup codes copied!",
+      description: "Store these codes in a safe place."
+    });
+  };
+
+  const togglePasswordVisibility = (field: string) => {
+    setShowPasswords(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (showMfaSetup) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-lg">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              <CardTitle>Set Up Two-Step Authentication</CardTitle>
+            </div>
+            <CardDescription>
+              Secure your account with an authenticator app like Google Authenticator or Authy
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="text-center">
+              <div className="bg-white p-4 rounded-lg inline-block">
+                <img src={qrCodeUrl} alt="QR Code for 2FA setup" className="w-48 h-48" />
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                Scan this QR code with your authenticator app
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="manual-secret">Or enter this secret manually:</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="manual-secret"
+                  value={mfaSecret}
+                  readOnly
+                  className="font-mono text-xs"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText(mfaSecret);
+                    toast({ title: "Secret copied to clipboard!" });
+                  }}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="bg-muted p-4 rounded-lg">
+              <h4 className="font-medium mb-2 flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Backup Codes
+              </h4>
+              <p className="text-sm text-muted-foreground mb-3">
+                Save these backup codes in a safe place. You can use them to access your account if you lose your authenticator device.
+              </p>
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono bg-background p-3 rounded border">
+                {backupCodes.map((code, index) => (
+                  <div key={index} className="text-center py-1">
+                    {code}
+                  </div>
+                ))}
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={copyBackupCodes}
+                className="w-full mt-3"
+              >
+                {copied ? (
+                  <>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy Backup Codes
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <form onSubmit={handleMfaSetupComplete} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="verification_code">Enter verification code from your app:</Label>
+                <Input
+                  id="verification_code"
+                  name="verification_code"
+                  type="text"
+                  placeholder="123456"
+                  maxLength={6}
+                  pattern="[0-9]{6}"
+                  required
+                  className="text-center text-lg tracking-widest"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowMfaSetup(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" className="flex-1" disabled={loading}>
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Complete Setup
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto py-8 px-4 max-w-4xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground">Security Settings</h1>
+          <p className="text-muted-foreground mt-2">
+            Manage your account security and authentication settings
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          {/* Password Change Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Change Password</CardTitle>
+              <CardDescription>
+                Update your account password to keep your account secure
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handlePasswordChange} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="current_password">Current Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="current_password"
+                      name="current_password"
+                      type={showPasswords.current ? "text" : "password"}
+                      required
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => togglePasswordVisibility('current')}
+                    >
+                      {showPasswords.current ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="new_password">New Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="new_password"
+                      name="new_password"
+                      type={showPasswords.new ? "text" : "password"}
+                      required
+                      minLength={6}
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => togglePasswordVisibility('new')}
+                    >
+                      {showPasswords.new ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirm_password">Confirm New Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="confirm_password"
+                      name="confirm_password"
+                      type={showPasswords.confirm ? "text" : "password"}
+                      required
+                      minLength={6}
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => togglePasswordVisibility('confirm')}
+                    >
+                      {showPasswords.confirm ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <Button type="submit" disabled={loading}>
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Update Password
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Two-Step Authentication Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Two-Step Authentication
+                  </CardTitle>
+                  <CardDescription>
+                    Add an extra layer of security to your account
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm px-2 py-1 rounded-full ${
+                    mfaSettings?.is_enabled 
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                      : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
+                  }`}>
+                    {mfaSettings?.is_enabled ? 'Enabled' : 'Disabled'}
+                  </span>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {!mfaSettings?.is_enabled ? (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Two-step authentication is not enabled. Enable it to secure your account with time-based codes from your mobile device.
+                  </p>
+                  <Button onClick={setupMfa}>
+                    <Shield className="mr-2 h-4 w-4" />
+                    Enable Two-Step Authentication
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Two-step authentication is enabled and protecting your account.
+                  </p>
+                  
+                  {mfaSettings.backup_codes && mfaSettings.backup_codes.length > 0 && (
+                    <div className="bg-muted p-4 rounded-lg">
+                      <h4 className="font-medium mb-2">Backup Codes</h4>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        You have {mfaSettings.backup_codes.length} backup codes remaining.
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={copyBackupCodes}
+                        >
+                          <Copy className="mr-2 h-4 w-4" />
+                          Copy Codes
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={regenerateBackupCodes}
+                          disabled={loading}
+                        >
+                          {loading ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                          )}
+                          Regenerate
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={setupMfa}
+                    >
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Reconfigure 2FA
+                    </Button>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive">
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Disable 2FA
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Disable Two-Step Authentication</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to disable two-step authentication? This will make your account less secure.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleDisableMfa}>
+                            Disable 2FA
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

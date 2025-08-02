@@ -343,9 +343,9 @@ export default function Auth() {
           setTempUser(data.user);
           setShowMfaVerification(true);
         } else {
-          // Prompt user to set up MFA
-          setTempUser(data.user);
-          await setupMfa(data.user.id, data.user.email);
+          // For existing users without MFA, redirect to security page to set it up
+          setUser(data.user);
+          navigate("/security");
         }
       }
     } catch (error) {

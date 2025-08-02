@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CreditCard, User, LogOut } from "lucide-react";
+import { CreditCard, User, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -101,15 +101,28 @@ export function Header({ onSearch }: HeaderProps) {
                     <div className="text-sm text-muted-foreground mb-3">
                       {user.email}
                     </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={handleSignOut}
-                      className="w-full gap-2"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      Sign Out
-                    </Button>
+                    <div className="space-y-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        asChild
+                        className="w-full gap-2"
+                      >
+                        <Link to="/security">
+                          <Shield className="h-4 w-4" />
+                          Security Settings
+                        </Link>
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={handleSignOut}
+                        className="w-full gap-2"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Sign Out
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </PopoverContent>
