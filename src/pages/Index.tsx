@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +20,7 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
   const [editingCard, setEditingCard] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showMfaWarning, setShowMfaWarning] = useState(false);
   const navigate = useNavigate();
@@ -28,19 +30,72 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
   useSessionTimeout();
 
   useEffect(() => {
-    // Listen for auth changes FIRST
+    let mounted = true;
+
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log("Index auth state change:", event, session?.user?.id);
         
+        if (!mounted) return;
+        
         if (event === 'SIGNED_OUT' || !session?.user) {
+          console.log("User signed out, redirecting to auth");
           setUser(null);
           setShowMfaWarning(false);
-          navigate("/auth");
-        } else if (session?.user) {
+          setLoading(false);
+          navigate("/auth", { replace: true });
+          return;
+        }
+        
+        if (session?.user) {
+          console.log("User signed in:", session.user.id);
           setUser(session.user);
           
-          // Check MFA status for newly signed in users
+          // Check MFA status
+          try {
+            const { data: mfaData } = await supabase
+              .from("user_mfa_settings")
+              .select("is_enabled")
+              .eq("user_id", session.user.id)
+              .maybeSingle();
+            
+            if (!mfaData?.is_enabled) {
+              setShowMfaWarning(true);
+            }
+          } catch (error) {
+            console.error("Error checking MFA status:", error);
+          }
+          
+          setLoading(false);
+        }
+      }
+    );
+
+    // Check for existing session
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Session check error:", error);
+          setLoading(false);
+          navigate("/auth", { replace: true });
+          return;
+        }
+        
+        if (!session?.user) {
+          console.log("No session found, redirecting to auth");
+          setLoading(false);
+          navigate("/auth", { replace: true });
+          return;
+        }
+        
+        console.log("Session found:", session.user.id);
+        setUser(session.user);
+        
+        // Check MFA status
+        try {
           const { data: mfaData } = await supabase
             .from("user_mfa_settings")
             .select("is_enabled")
@@ -50,35 +105,24 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
           if (!mfaData?.is_enabled) {
             setShowMfaWarning(true);
           }
+        } catch (error) {
+          console.error("Error checking MFA status:", error);
         }
-      }
-    );
-
-    // Then check for existing session
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) {
-        navigate("/auth");
-        return;
-      }
-      
-      setUser(session.user);
-      
-      // Check if user has MFA enabled
-      const { data: mfaData } = await supabase
-        .from("user_mfa_settings")
-        .select("is_enabled")
-        .eq("user_id", session.user.id)
-        .maybeSingle();
-      
-      if (!mfaData?.is_enabled) {
-        setShowMfaWarning(true);
+        
+        setLoading(false);
+      } catch (error) {
+        console.error("Error checking session:", error);
+        setLoading(false);
+        navigate("/auth", { replace: true });
       }
     };
     
     checkSession();
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const handleFormSuccess = () => {
@@ -97,8 +141,21 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
     setEditingCard(null);
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect if no user (this shouldn't happen due to useEffect, but safety check)
   if (!user) {
-    return null; // Will redirect to auth
+    return null;
   }
 
   return (

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { CreditCard, User, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,7 @@ export function Header({ onSearch }: HeaderProps) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log("Header auth state change:", event, session?.user?.id);
         if (session?.user) {
           setUser(session.user);
         } else {
@@ -55,24 +57,27 @@ export function Header({ onSearch }: HeaderProps) {
 
   const handleSignOut = async () => {
     try {
+      console.log("Starting sign out process");
+      
       // Clear local state first
       setUser(null);
       setUserProfile(null);
       
-      // Then sign out from Supabase
-      await supabase.auth.signOut();
+      // Sign out from Supabase - this will trigger onAuthStateChange
+      const { error } = await supabase.auth.signOut();
       
-      // Force navigation after a brief delay to ensure state is cleared
-      setTimeout(() => {
-        navigate("/auth", { replace: true });
-      }, 100);
+      if (error) {
+        console.error("Sign out error:", error);
+        // Still navigate even if there's an error
+      }
+      
+      console.log("Sign out completed, navigating to auth");
       
     } catch (error) {
-      // Handle any unexpected errors by forcing logout
-      console.error("Logout error:", error);
+      console.error("Unexpected logout error:", error);
+      // Force cleanup on any error
       setUser(null);
       setUserProfile(null);
-      navigate("/auth", { replace: true });
     }
   };
 
