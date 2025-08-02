@@ -227,6 +227,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       
       toast({ title: "SIM swap completed! New record created with empty SIM number." });
       fetchSimCards();
+      
+      // Open edit form for the newly created card
+      onEdit(insertedCard);
     } catch (error) {
       console.error("Error performing SIM swap:", error);
       toast({
