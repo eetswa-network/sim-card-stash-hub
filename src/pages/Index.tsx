@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CreditCard, Plus, Shield, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
+import { UpdateNotifications } from "@/components/UpdateNotifications";
 
 interface IndexProps {
   searchQuery?: string;
@@ -103,6 +104,9 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
+        {/* Update Notifications */}
+        <UpdateNotifications userId={user.id} />
+        
         {/* MFA Warning Banner */}
         {showMfaWarning && (
           <Card className="mb-6 border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">

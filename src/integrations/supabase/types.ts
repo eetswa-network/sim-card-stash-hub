@@ -41,6 +41,39 @@ export type Database = {
         }
         Relationships: []
       }
+      app_updates: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          is_active: boolean
+          title: string
+          update_type: string
+          updated_at: string
+          version: string | null
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          is_active?: boolean
+          title: string
+          update_type?: string
+          updated_at?: string
+          version?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          title?: string
+          update_type?: string
+          updated_at?: string
+          version?: string | null
+        }
+        Relationships: []
+      }
       carriers: {
         Row: {
           created_at: string
@@ -267,6 +300,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_update_views: {
+        Row: {
+          id: string
+          update_id: string
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          update_id: string
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          update_id?: string
+          user_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_update_views_update_id_fkey"
+            columns: ["update_id"]
+            isOneToOne: false
+            referencedRelation: "app_updates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
