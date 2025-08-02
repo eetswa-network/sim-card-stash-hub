@@ -30,64 +30,41 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
   // useSessionTimeout();
 
   useEffect(() => {
-    let mounted = true;
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Index auth state change:", event, session?.user?.id);
-        
-        if (!mounted) return;
-        
-        if (event === 'SIGNED_OUT') {
-          console.log("User signed out, redirecting to auth");
-          setUser(null);
-          setShowMfaWarning(false);
-          setLoading(false);
-          navigate("/auth", { replace: true });
-          return;
-        }
+    // Simple session check without auth state listener to avoid conflicts
+    const checkInitialSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
         
         if (!session?.user) {
-          console.log("No session found, redirecting to auth");
-          setUser(null);
-          setShowMfaWarning(false);
-          setLoading(false);
           navigate("/auth", { replace: true });
           return;
         }
         
-        if (session?.user) {
-          console.log("User signed in:", session.user.id);
-          setUser(session.user);
+        setUser(session.user);
+        
+        // Check MFA status
+        try {
+          const { data: mfaData } = await supabase
+            .from("user_mfa_settings")
+            .select("is_enabled")
+            .eq("user_id", session.user.id)
+            .maybeSingle();
           
-          // Check MFA status
-          try {
-            const { data: mfaData } = await supabase
-              .from("user_mfa_settings")
-              .select("is_enabled")
-              .eq("user_id", session.user.id)
-              .maybeSingle();
-            
-            if (!mfaData?.is_enabled) {
-              setShowMfaWarning(true);
-            }
-          } catch (error) {
-            console.error("Error checking MFA status:", error);
+          if (!mfaData?.is_enabled) {
+            setShowMfaWarning(true);
           }
-          
-          setLoading(false);
+        } catch (error) {
+          console.error("Error checking MFA status:", error);
         }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error("Error checking session:", error);
+        navigate("/auth", { replace: true });
       }
-    );
-
-    // Don't check session immediately - rely on auth state listener only
-    // This prevents race conditions with auth redirects
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
     };
+
+    checkInitialSession();
   }, [navigate]);
 
   const handleFormSuccess = () => {
