@@ -745,22 +745,22 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 <div className="p-4 border-b border-table-divider bg-table-orange">
                   <div className="flex items-center justify-between w-full font-medium text-sm text-table-divider">
                     <button 
-                      className="flex-1 px-2 border-r border-black flex items-center justify-start gap-1 hover:bg-black/10 transition-colors"
+                      className="flex-[2] px-2 border-r border-black flex items-center justify-start gap-1 hover:bg-black/10 transition-colors"
                       onClick={() => handleSort('phone_number')}
                     >
                       Phone Number
                       {getSortIcon('phone_number')}
                     </button>
-                    <div className="flex-1 text-center px-2 border-r border-black">SIM Type</div>
+                    <div className="flex-[0.8] text-center px-2 border-r border-black">SIM Type</div>
                     <button 
-                      className="flex-1 text-center px-2 border-r border-black flex items-center justify-center gap-1 hover:bg-black/10 transition-colors"
+                      className="flex-[2] text-center px-2 border-r border-black flex items-center justify-center gap-1 hover:bg-black/10 transition-colors"
                       onClick={() => handleSort('sim_number')}
                     >
                       SIM Number
                       {getSortIcon('sim_number')}
                     </button>
-                    <div className="flex-1 text-center px-2 border-r border-black">Carrier</div>
-                    <div className="flex-1 text-center px-2 border-r border-black">Status</div>
+                    <div className="flex-[0.8] text-center px-2 border-r border-black">Carrier</div>
+                    <div className="flex-[0.8] text-center px-2 border-r border-black">Status</div>
                     <div className="flex-1 text-center px-2">Actions</div>
                   </div>
                 </div>
@@ -772,22 +772,22 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         onClick={() => toggleRowExpansion(card.id)}
                       >
                         <div className="flex items-center justify-between w-full">
-                          <div className="flex items-center gap-2 flex-1 px-2 border-r border-black">
+                          <div className="flex items-center gap-2 flex-[2] px-2 border-r border-black">
                             <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
-                            <span className={`font-mono break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.phone_number}</span>
+                            <span className={`font-mono truncate ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.phone_number}</span>
                           </div>
-                          <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-black">
+                          <div className="flex items-center justify-center gap-2 flex-[0.8] px-2 border-r border-black">
                              {card.sim_type === 'eSIM' ? (
                               <Smartphone className="h-5 w-5 text-muted-foreground" />
                             ) : (
                               <IdCard className="h-5 w-5 text-muted-foreground" />
                             )}
                           </div>
-                          <div className={`font-mono font-medium flex-1 text-center px-2 border-r border-black break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</div>
-                          <div className="flex-1 text-center px-2 border-r border-black">
+                          <div className={`font-mono font-medium flex-[2] text-center px-2 border-r border-black truncate ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</div>
+                          <div className="flex-[0.8] text-center px-2 border-r border-black truncate">
                             {card.carrier || '-'}
                           </div>
-                          <div className="flex-1 text-center px-2 border-r border-black">
+                          <div className="flex-[0.8] text-center px-2 border-r border-black">
                             <Badge variant={getStatusColor(card.status)}>
                               {card.status}
                             </Badge>
