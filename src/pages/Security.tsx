@@ -84,6 +84,7 @@ export default function Security() {
     }
   };
 
+
   const generatePasskeyChallenge = () => {
     // Generate a random challenge for the passkey registration
     const array = new Uint8Array(32);
