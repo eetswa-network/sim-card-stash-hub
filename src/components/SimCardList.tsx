@@ -372,7 +372,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 </div>
                 
                 {card.carrier && (
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-muted-foreground">
                     <strong>Carrier:</strong> {card.carrier}
                   </div>
                 )}
@@ -500,7 +500,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         </div>
                         
                         {card.carrier && (
-                          <div className="text-sm text-muted-foreground">
+                          <div className="text-muted-foreground">
                             <strong>Carrier:</strong> {card.carrier}
                           </div>
                         )}
@@ -654,7 +654,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             )}
                           </div>
                           <div className="font-mono font-medium flex-1 text-center px-2 border-r border-black break-all">{card.sim_number}</div>
-                          <div className="text-sm text-muted-foreground flex-1 text-center px-2 border-r border-black">
+                          <div className="flex-1 text-center px-2 border-r border-black">
                             {card.carrier || '-'}
                           </div>
                           <div className="flex-1 text-center px-2">
