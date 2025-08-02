@@ -101,7 +101,7 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-8">
+    <div className="min-h-screen bg-background pt-2">
       <div className="container mx-auto py-4 px-4">
         {/* Update Notifications */}
         <UpdateNotifications userId={user.id} />
