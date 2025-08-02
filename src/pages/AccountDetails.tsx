@@ -127,6 +127,9 @@ export default function AccountDetails() {
         title: "Profile updated",
         description: "Your account details have been saved successfully."
       });
+
+      // Navigate back to dashboard
+      navigate("/");
     } catch (error) {
       console.error("Error saving profile:", error);
       toast({
