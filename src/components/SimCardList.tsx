@@ -152,10 +152,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
   const handleSimSwap = async (card: SimCard) => {
     try {
-      // Mark the original card as swapped
+      // Mark the original card as inactive (since "swapped" isn't allowed)
       const { error: updateError } = await supabase
         .from("sim_cards")
-        .update({ status: "swapped" })
+        .update({ status: "inactive" })
         .eq("id", card.id);
 
       if (updateError) throw updateError;
@@ -200,8 +200,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       case "active":
         return "default";
       case "inactive":
-        return "secondary";
-      case "swapped":
         return "secondary";
       case "suspended":
         return "destructive";
@@ -416,7 +414,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
             <Card key={card.id} className="hover:shadow-md transition-shadow animate-fade-in border border-border">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className={`text-lg break-all ${card.status === 'inactive' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.sim_number}</CardTitle>
+                  <CardTitle className={`text-lg break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</CardTitle>
                   <Badge variant={getStatusColor(card.status)}>
                     {card.status}
                   </Badge>
@@ -425,7 +423,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
-                  <span className={`font-mono break-all ${card.status === 'swapped' ? 'line-through' : ''}`}>{card.phone_number}</span>
+                  <span className={`font-mono break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.phone_number}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -560,7 +558,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
-                            <span className={`font-mono text-sm break-all ${card.status === 'swapped' ? 'line-through' : ''}`}>{card.phone_number}</span>
+                            <span className={`font-mono text-sm break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.phone_number}</span>
                           </div>
                           <span className="text-sm font-medium text-right">{card.carrier || 'No carrier'}</span>
                         </div>
@@ -573,7 +571,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             ) : (
                               <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
                             )}
-                            <span className={`font-mono text-sm break-all ${card.status === 'inactive' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.sim_number}</span>
+                            <span className={`font-mono text-sm break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</span>
                           </div>
                           <Badge variant={getStatusColor(card.status)} className="text-xs">
                             {card.status}
@@ -733,7 +731,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         <div className="flex items-center justify-between w-full">
                           <div className="flex items-center gap-2 flex-1 px-2 border-r border-black">
                             <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
-                            <span className={`font-mono break-all ${card.status === 'swapped' ? 'line-through' : ''}`}>{card.phone_number}</span>
+                            <span className={`font-mono break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.phone_number}</span>
                           </div>
                           <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-black">
                              {card.sim_type === 'eSIM' ? (
@@ -742,7 +740,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               <IdCard className="h-5 w-5 text-muted-foreground" />
                             )}
                           </div>
-                          <div className={`font-mono font-medium flex-1 text-center px-2 border-r border-black break-all ${card.status === 'inactive' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.sim_number}</div>
+                          <div className={`font-mono font-medium flex-1 text-center px-2 border-r border-black break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</div>
                           <div className="flex-1 text-center px-2 border-r border-black">
                             {card.carrier || '-'}
                           </div>
