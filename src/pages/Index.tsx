@@ -39,8 +39,17 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
         
         if (!mounted) return;
         
-        if (event === 'SIGNED_OUT' || !session?.user) {
+        if (event === 'SIGNED_OUT') {
           console.log("User signed out, redirecting to auth");
+          setUser(null);
+          setShowMfaWarning(false);
+          setLoading(false);
+          navigate("/auth", { replace: true });
+          return;
+        }
+        
+        if (!session?.user) {
+          console.log("No session found, redirecting to auth");
           setUser(null);
           setShowMfaWarning(false);
           setLoading(false);
@@ -72,53 +81,8 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
       }
     );
 
-    // Check for existing session
-    const checkSession = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error("Session check error:", error);
-          setLoading(false);
-          navigate("/auth", { replace: true });
-          return;
-        }
-        
-        if (!session?.user) {
-          console.log("No session found, redirecting to auth");
-          setLoading(false);
-          navigate("/auth", { replace: true });
-          return;
-        }
-        
-        console.log("Session found:", session.user.id);
-        setUser(session.user);
-        
-        // Check MFA status
-        try {
-          const { data: mfaData } = await supabase
-            .from("user_mfa_settings")
-            .select("is_enabled")
-            .eq("user_id", session.user.id)
-            .maybeSingle();
-          
-          if (!mfaData?.is_enabled) {
-            setShowMfaWarning(true);
-          }
-        } catch (error) {
-          console.error("Error checking MFA status:", error);
-        }
-        
-        setLoading(false);
-      } catch (error) {
-        console.error("Error checking session:", error);
-        setLoading(false);
-        navigate("/auth", { replace: true });
-      }
-    };
-    
-    // Delay session check to avoid race condition with auth redirect
-    setTimeout(checkSession, 100);
+    // Don't check session immediately - rely on auth state listener only
+    // This prevents race conditions with auth redirects
 
     return () => {
       mounted = false;
