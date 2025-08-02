@@ -760,6 +760,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       {getSortIcon('sim_number')}
                     </button>
                     <div className="flex-1 text-center px-2 border-r border-black">Carrier</div>
+                    <div className="flex-1 text-center px-2 border-r border-black">Status</div>
                     <div className="flex-1 text-center px-2">Actions</div>
                   </div>
                 </div>
@@ -785,6 +786,11 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                           <div className={`font-mono font-medium flex-1 text-center px-2 border-r border-black break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</div>
                           <div className="flex-1 text-center px-2 border-r border-black">
                             {card.carrier || '-'}
+                          </div>
+                          <div className="flex-1 text-center px-2 border-r border-black">
+                            <Badge variant={getStatusColor(card.status)}>
+                              {card.status}
+                            </Badge>
                           </div>
                           <div className="flex-1 text-center px-2">
                             <div className="flex gap-2 justify-center">
