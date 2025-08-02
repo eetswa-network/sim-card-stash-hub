@@ -229,13 +229,13 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
                 </Button>
               )}
             </div>
-          <SimCardList 
-            onEdit={handleEdit} 
-            refreshTrigger={refreshTrigger}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            searchQuery={searchQuery}
-          />
+            <SimCardList 
+              onEdit={handleEdit} 
+              refreshTrigger={refreshTrigger}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              searchQuery={searchQuery}
+            />
           </div>
         </div>
       </div>

@@ -44,7 +44,7 @@ interface SimCardListProps {
 }
 
 export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange, searchQuery }: SimCardListProps) {
-  console.log("SimCardList component rendered - IdCard should be available");
+  console.log("SimCardList component mounted with props:", { refreshTrigger, viewMode, searchQuery });
   const [simCards, setSimCards] = useState<SimCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -111,6 +111,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   };
 
   useEffect(() => {
+    console.log("SimCardList useEffect triggered, refreshTrigger:", refreshTrigger);
     fetchSimCards();
   }, [refreshTrigger]);
 
