@@ -20,36 +20,13 @@ export function Header({ onSearch }: HeaderProps) {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check for existing session immediately
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        
-        // Try to fetch user profile, but don't fail if it doesn't exist
-        try {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("user_id", session.user.id)
-            .maybeSingle();
-          setUserProfile(profile);
-        } catch (error) {
-          console.log("Could not fetch profile on initial load:", error);
-          setUserProfile(null);
-        }
-      }
-    };
-    
-    checkSession();
-
-    // Listen for auth changes - but keep it simple to avoid conflicts
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Header auth state change:", event, session?.user?.id);
+    // Simple session check without auth state listener to avoid conflicts
+    const checkSessionState = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setUser(session.user);
-          // Try to fetch user profile, but don't fail if it doesn't exist
+          // Try to fetch user profile
           try {
             const { data: profile } = await supabase
               .from("profiles")
@@ -58,19 +35,23 @@ export function Header({ onSearch }: HeaderProps) {
               .maybeSingle();
             setUserProfile(profile);
           } catch (error) {
-            console.log("Could not fetch profile, continuing anyway:", error);
+            console.log("Could not fetch profile:", error);
             setUserProfile(null);
           }
         } else {
           setUser(null);
           setUserProfile(null);
         }
+      } catch (error) {
+        console.error("Error checking session in Header:", error);
       }
-    );
-
-    return () => {
-      subscription.unsubscribe();
     };
+
+    // Check immediately and then every 2 seconds to stay in sync
+    checkSessionState();
+    const interval = setInterval(checkSessionState, 2000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleSignOut = async () => {
