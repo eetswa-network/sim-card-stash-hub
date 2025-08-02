@@ -745,7 +745,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 <div className="p-4 border-b border-table-divider bg-table-orange">
                   <div className="flex items-center w-full font-medium text-sm text-table-divider">
                     <button 
-                      className="flex-[2] px-2 border-r border-black flex items-center justify-start gap-1 hover:bg-black/10 transition-colors"
+                      className="flex-[1.5] px-2 border-r border-black flex items-center justify-start gap-1 hover:bg-black/10 transition-colors"
                       onClick={() => handleSort('phone_number')}
                     >
                       <span className="leading-tight">Phone Number</span>
@@ -760,7 +760,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     </button>
                     <div className="flex-[1] text-center px-2 border-r border-black">Carrier</div>
                     <div className="flex-[1] text-center px-2 border-r border-black">Status</div>
-                    <div className="flex-[1] text-center px-2">Actions</div>
+                    <div className="flex-[1.5] text-center px-2">Actions</div>
                   </div>
                 </div>
                 <div className="divide-y divide-table-divider">
@@ -771,7 +771,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         onClick={() => toggleRowExpansion(card.id)}
                       >
                         <div className="flex items-center w-full">
-                          <div className="flex items-center gap-2 flex-[2] px-2 border-r border-black">
+                          <div className="flex items-center gap-2 flex-[1.5] px-2 border-r border-black">
                             <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
                             <span className={`font-mono truncate ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.phone_number}</span>
                           </div>
@@ -791,7 +791,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               {card.status}
                             </Badge>
                           </div>
-                          <div className="flex-1 text-center px-2">
+                          <div className="flex-[1.5] text-center px-2">
                             <div className="flex gap-2 justify-center">
                               <Button
                                 variant="outline"
