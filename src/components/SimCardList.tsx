@@ -23,6 +23,10 @@ interface SimCard {
   password?: string;
   created_at: string;
   updated_at: string;
+  account_id?: string;
+  account?: {
+    login: string;
+  };
 }
 
 interface UsageEntry {
@@ -55,7 +59,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     try {
       const { data, error } = await supabase
         .from("sim_cards")
-        .select("*")
+        .select(`
+          *,
+          account:accounts(login)
+        `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -205,7 +212,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
           usage.use_purpose.toLowerCase().includes(searchQuery.toLowerCase())
         ) || false;
         
-        return basicMatch || usageMatch;
+        // Search in account login
+        const accountMatch = card.account?.login?.toLowerCase().includes(searchQuery.toLowerCase()) || false;
+        
+        return basicMatch || usageMatch || accountMatch;
       })
     : simCards;
 
