@@ -20,7 +20,7 @@ export function Header({ onSearch }: HeaderProps) {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check for existing session
+    // Check for existing session immediately
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {

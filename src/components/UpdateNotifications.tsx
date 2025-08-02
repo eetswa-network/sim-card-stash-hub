@@ -65,6 +65,12 @@ export function UpdateNotifications({ userId }: UpdateNotificationsProps) {
 
   const markUpdatesAsSeen = async () => {
     try {
+      // Check authentication before proceeding
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user || session.user.id !== userId) {
+        throw new Error("Authentication required");
+      }
+
       const viewRecords = updates.map(update => ({
         user_id: userId,
         update_id: update.id
@@ -74,7 +80,10 @@ export function UpdateNotifications({ userId }: UpdateNotificationsProps) {
         .from("user_update_views")
         .insert(viewRecords);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error marking updates as seen:", error);
+        throw error;
+      }
 
       setVisible(false);
       
