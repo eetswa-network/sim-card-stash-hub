@@ -748,10 +748,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       className="flex-[2] px-2 border-r border-black flex items-center justify-start gap-1 hover:bg-black/10 transition-colors"
                       onClick={() => handleSort('phone_number')}
                     >
-                      Phone Number
+                      <span className="leading-tight">Phone Number</span>
                       {getSortIcon('phone_number')}
                     </button>
-                    <div className="flex-[0.8] text-center px-2 border-r border-black">SIM Type</div>
+                    <div className="flex-[0.8] text-center px-2 border-r border-black leading-tight">SIM Type</div>
                     <button 
                       className="flex-[2] text-center px-2 border-r border-black flex items-center justify-center gap-1 hover:bg-black/10 transition-colors"
                       onClick={() => handleSort('sim_number')}
@@ -784,7 +784,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             )}
                           </div>
                           <div className={`font-mono font-medium flex-[2] text-center px-2 border-r border-black truncate ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</div>
-                          <div className="flex-[0.8] text-center px-2 border-r border-black truncate">
+                          <div className="flex-[0.8] text-center px-2 border-r border-black">
                             {card.carrier || '-'}
                           </div>
                           <div className="flex-[0.8] text-center px-2 border-r border-black">
