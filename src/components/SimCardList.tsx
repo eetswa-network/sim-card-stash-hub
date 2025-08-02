@@ -533,7 +533,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       variant="outline"
                       size="sm"
                       onClick={() => onEdit(card)}
-                      className="min-h-[32px] w-8 h-8 p-0"
+                      className="min-h-[32px] w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -629,7 +629,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               e.stopPropagation();
                               onEdit(card);
                             }}
-                            className="w-8 h-8 p-0"
+                            className="w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -800,7 +800,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                   e.stopPropagation();
                                   onEdit(card);
                                 }}
-                                className="w-8 h-8 p-0"
+                                className="w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
