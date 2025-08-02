@@ -57,6 +57,17 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
   const fetchSimCards = async () => {
     console.log("Starting fetchSimCards...");
+    
+    // Check if user is authenticated first
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    console.log("Current session:", session?.user?.id, sessionError);
+    
+    if (!session?.user) {
+      console.log("No authenticated session found");
+      setLoading(false);
+      return;
+    }
+
     try {
       console.log("Making Supabase query for sim_cards...");
       const { data, error } = await supabase
