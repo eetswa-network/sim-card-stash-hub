@@ -492,23 +492,25 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       onClick={() => toggleRowExpansion(card.id)}
                     >
                       <div className="space-y-2">
-                        {/* First line: phone icon+number, SIM type icon, carrier - evenly spread */}
+                        {/* First line: phone icon+number, carrier - evenly spread */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
                             <span className="font-mono text-sm break-all">{card.phone_number}</span>
                           </div>
-                          {card.sim_type === 'eSIM' ? (
-                            <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
-                          ) : (
-                            <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
-                          )}
                           <span className="text-sm font-medium text-right">{card.carrier || 'No carrier'}</span>
                         </div>
                         
-                        {/* Second line: SIM number and active status */}
+                        {/* Second line: SIM type icon + SIM number and active status */}
                         <div className="flex items-center justify-between">
-                          <span className="font-mono text-sm break-all">{card.sim_number}</span>
+                          <div className="flex items-center gap-2">
+                            {card.sim_type === 'eSIM' ? (
+                              <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
+                            ) : (
+                              <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
+                            )}
+                            <span className="font-mono text-sm break-all">{card.sim_number}</span>
+                          </div>
                           <Badge variant={getStatusColor(card.status)} className="text-xs">
                             {card.status}
                           </Badge>
