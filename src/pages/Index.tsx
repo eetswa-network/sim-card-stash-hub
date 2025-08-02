@@ -53,12 +53,26 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (!session?.user) {
+      async (event, session) => {
+        console.log("Index auth state change:", event, session?.user?.id);
+        
+        if (event === 'SIGNED_OUT' || !session?.user) {
           setUser(null);
+          setShowMfaWarning(false);
           navigate("/auth");
-        } else {
+        } else if (session?.user) {
           setUser(session.user);
+          
+          // Check MFA status for newly signed in users
+          const { data: mfaData } = await supabase
+            .from("user_mfa_settings")
+            .select("is_enabled")
+            .eq("user_id", session.user.id)
+            .maybeSingle();
+          
+          if (!mfaData?.is_enabled) {
+            setShowMfaWarning(true);
+          }
         }
       }
     );
