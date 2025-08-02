@@ -20,6 +20,7 @@ export default function Auth() {
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [tempUser, setTempUser] = useState(null);
+  const [tempCredentials, setTempCredentials] = useState<{email: string, password: string} | null>(null);
   const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -226,14 +227,31 @@ export default function Auth() {
 
       await saveMfaSettings(tempUser.id, mfaSecret, backupCodes);
       
+      // Complete the login by signing in with stored credentials
+      if (tempCredentials) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: tempCredentials.email,
+          password: tempCredentials.password
+        });
+
+        if (signInError) {
+          toast({
+            title: "Login failed",
+            description: "Failed to complete login after MFA setup.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+      
       toast({
         title: "Two-step authentication enabled!",
         description: "Your account is now secured with 2FA."
       });
 
       setShowMfaSetup(false);
-      setUser(tempUser);
-      navigate("/");
+      setTempUser(null);
+      setTempCredentials(null);
     } catch (error) {
       toast({
         title: "Error",
@@ -282,9 +300,26 @@ export default function Auth() {
           .eq("user_id", tempUser.id);
       }
 
+      // Complete the login by signing in again with stored credentials
+      if (tempCredentials) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: tempCredentials.email,
+          password: tempCredentials.password
+        });
+
+        if (signInError) {
+          toast({
+            title: "Login failed",
+            description: "Failed to complete login after MFA verification.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
       setShowMfaVerification(false);
-      setUser(tempUser);
-      navigate("/");
+      setTempUser(null);
+      setTempCredentials(null);
     } catch (error) {
       toast({
         title: "Error",
@@ -340,12 +375,22 @@ export default function Auth() {
         const mfaEnabled = await checkMfaSettings(data.user.id);
         
         if (mfaEnabled) {
+          // Sign out immediately and store credentials for after MFA verification
+          await supabase.auth.signOut();
           setTempUser(data.user);
+          setTempCredentials({ email, password });
           setShowMfaVerification(true);
         } else {
-          // For existing users without MFA, redirect to security page to set it up
-          setUser(data.user);
-          navigate("/security");
+          // For existing users without MFA, show MFA setup immediately
+          await supabase.auth.signOut();
+          setTempUser(data.user);
+          setTempCredentials({ email, password });
+          toast({
+            title: "Two-step authentication required",
+            description: "Please set up 2FA to secure your account.",
+            variant: "destructive"
+          });
+          await setupMfa(data.user.id, data.user.email);
         }
       }
     } catch (error) {
@@ -506,6 +551,7 @@ export default function Auth() {
                 onClick={() => {
                   setShowMfaVerification(false);
                   setTempUser(null);
+                  setTempCredentials(null);
                 }}
               >
                 Back to Sign In
