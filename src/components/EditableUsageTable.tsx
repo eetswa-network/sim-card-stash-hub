@@ -18,6 +18,8 @@ interface EditableUsageTableProps {
 }
 
 export function EditableUsageTable({ simCardId, usageData, onUsageUpdate }: EditableUsageTableProps) {
+  console.log(`EditableUsageTable for ${simCardId}: received ${usageData.length} usage entries:`, usageData);
+  
   const [editingRow, setEditingRow] = useState<string | null>(null);
   const [newRow, setNewRow] = useState({ name: "", use_purpose: "" });
   const [isAddingNew, setIsAddingNew] = useState(false);
