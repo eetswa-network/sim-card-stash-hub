@@ -130,26 +130,21 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
   const handleDelete = async (id: string) => {
     try {
-      // Delete usage entries first (cascade should handle this, but being explicit)
-      await supabase
-        .from("sim_card_usage")
-        .delete()
-        .eq("sim_card_id", id);
-
+      // Instead of deleting, mark the SIM card as inactive (soft delete)
       const { error } = await supabase
         .from("sim_cards")
-        .delete()
+        .update({ status: "inactive" })
         .eq("id", id);
 
       if (error) throw error;
       
-      toast({ title: "SIM card deleted successfully!" });
+      toast({ title: "SIM card marked as inactive successfully!" });
       fetchSimCards();
     } catch (error) {
-      console.error("Error deleting SIM card:", error);
+      console.error("Error deactivating SIM card:", error);
       toast({
         title: "Error",
-        description: "Failed to delete SIM card. Please try again.",
+        description: "Failed to deactivate SIM card. Please try again.",
         variant: "destructive",
       });
     }
@@ -468,16 +463,16 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Delete SIM Card</AlertDialogTitle>
+                          <AlertDialogTitle>Deactivate SIM Card</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to delete the SIM card {card.sim_number}? 
-                            This action cannot be undone.
+                            Are you sure you want to deactivate the SIM card {card.sim_number}? 
+                            The record will be kept for historical purposes but marked as inactive.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction onClick={() => handleDelete(card.id)}>
-                            Delete
+                            Deactivate
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -555,16 +550,16 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Delete SIM Card</AlertDialogTitle>
+                                <AlertDialogTitle>Deactivate SIM Card</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Are you sure you want to delete the SIM card {card.sim_number}? 
-                                  This action cannot be undone.
+                                  Are you sure you want to deactivate the SIM card {card.sim_number}? 
+                                  The record will be kept for historical purposes but marked as inactive.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction onClick={() => handleDelete(card.id)}>
-                                  Delete
+                                  Deactivate
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -708,16 +703,16 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete SIM Card</AlertDialogTitle>
+                                    <AlertDialogTitle>Deactivate SIM Card</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      Are you sure you want to delete the SIM card {card.sim_number}? 
-                                      This action cannot be undone.
+                                      Are you sure you want to deactivate the SIM card {card.sim_number}? 
+                                      The record will be kept for historical purposes but marked as inactive.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                     <AlertDialogAction onClick={() => handleDelete(card.id)}>
-                                      Delete
+                                      Deactivate
                                     </AlertDialogAction>
                                   </AlertDialogFooter>
                                 </AlertDialogContent>
