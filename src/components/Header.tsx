@@ -26,60 +26,50 @@ export function Header({ onSearch }: HeaderProps) {
       if (session?.user) {
         setUser(session.user);
         
-        // Fetch user profile
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("user_id", session.user.id)
-          .single();
-        
-        setUserProfile(profile);
+        // Try to fetch user profile, but don't fail if it doesn't exist
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("user_id", session.user.id)
+            .maybeSingle();
+          setUserProfile(profile);
+        } catch (error) {
+          console.log("Could not fetch profile on initial load:", error);
+          setUserProfile(null);
+        }
       }
     };
     
     checkSession();
 
-    // Listen for auth changes and also check session periodically
+    // Listen for auth changes - but keep it simple to avoid conflicts
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log("Header auth state change:", event, session?.user?.id);
         if (session?.user) {
           setUser(session.user);
-          // Fetch user profile
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("user_id", session.user.id)
-            .single();
-          setUserProfile(profile);
+          // Try to fetch user profile, but don't fail if it doesn't exist
+          try {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("user_id", session.user.id)
+              .maybeSingle();
+            setUserProfile(profile);
+          } catch (error) {
+            console.log("Could not fetch profile, continuing anyway:", error);
+            setUserProfile(null);
+          }
         } else {
           setUser(null);
           setUserProfile(null);
         }
       }
     );
-    
-    // Also check session every 10 seconds to stay in sync
-    const interval = setInterval(async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user && !user) {
-        setUser(session.user);
-        // Fetch user profile
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("user_id", session.user.id)
-          .single();
-        setUserProfile(profile);
-      } else if (!session?.user && user) {
-        setUser(null);
-        setUserProfile(null);
-      }
-    }, 10000);
 
     return () => {
       subscription.unsubscribe();
-      clearInterval(interval);
     };
   }, []);
 
