@@ -177,11 +177,36 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         user_id: user.id
       };
 
-      const { error: insertError } = await supabase
+      const { data: insertedCard, error: insertError } = await supabase
         .from("sim_cards")
-        .insert([newCard]);
+        .insert([newCard])
+        .select()
+        .single();
 
       if (insertError) throw insertError;
+
+      // Copy usage data from the original card to the new card
+      const { data: usageData, error: usageError } = await supabase
+        .from("sim_card_usage")
+        .select("*")
+        .eq("sim_card_id", card.id);
+
+      if (usageError) throw usageError;
+
+      if (usageData && usageData.length > 0) {
+        const newUsageData = usageData.map(usage => ({
+          name: usage.name,
+          use_purpose: usage.use_purpose,
+          sim_card_id: insertedCard.id,
+          user_id: user.id
+        }));
+
+        const { error: usageInsertError } = await supabase
+          .from("sim_card_usage")
+          .insert(newUsageData);
+
+        if (usageInsertError) throw usageInsertError;
+      }
       
       toast({ title: "SIM swap completed! New record created with empty SIM number." });
       fetchSimCards();
