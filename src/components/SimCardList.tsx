@@ -181,9 +181,12 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         .from("sim_cards")
         .insert([newCard])
         .select()
-        .single();
+        .maybeSingle();
 
       if (insertError) throw insertError;
+      if (!insertedCard) throw new Error("Failed to create new SIM card");
+
+      console.log("New card created:", insertedCard.id);
 
       // Copy usage data from the original card to the new card
       const { data: usageData, error: usageError } = await supabase
@@ -191,7 +194,12 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         .select("*")
         .eq("sim_card_id", card.id);
 
-      if (usageError) throw usageError;
+      if (usageError) {
+        console.error("Error fetching usage data:", usageError);
+        throw usageError;
+      }
+
+      console.log("Original usage data found:", usageData?.length || 0, "entries");
 
       if (usageData && usageData.length > 0) {
         const newUsageData = usageData.map(usage => ({
@@ -201,11 +209,20 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
           user_id: user.id
         }));
 
+        console.log("Inserting usage data for new card:", newUsageData);
+
         const { error: usageInsertError } = await supabase
           .from("sim_card_usage")
           .insert(newUsageData);
 
-        if (usageInsertError) throw usageInsertError;
+        if (usageInsertError) {
+          console.error("Error inserting usage data:", usageInsertError);
+          throw usageInsertError;
+        }
+
+        console.log("Usage data successfully copied to new card");
+      } else {
+        console.log("No usage data found for original card");
       }
       
       toast({ title: "SIM swap completed! New record created with empty SIM number." });
