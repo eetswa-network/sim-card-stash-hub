@@ -101,8 +101,8 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-40">
-      <div className="container mx-auto py-8 px-4">
+    <div className="min-h-screen bg-background pt-8">
+      <div className="container mx-auto py-4 px-4">
         {/* Update Notifications */}
         <UpdateNotifications userId={user.id} />
         
@@ -158,25 +158,14 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
           )}
 
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-foreground">Your SIM Cards</h2>
-              {!showForm && (
-                <Button 
-                  onClick={() => setShowForm(true)} 
-                  variant="outline" 
-                  className="flex items-center gap-2 bg-transparent border-2 border-black text-black font-semibold hover:bg-black hover:text-white"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add SIM Card
-                </Button>
-              )}
-            </div>
             <SimCardList 
               onEdit={handleEdit} 
               refreshTrigger={refreshTrigger}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
               searchQuery={searchQuery}
+              showForm={showForm}
+              onAddSimCard={() => setShowForm(true)}
             />
           </div>
         </div>

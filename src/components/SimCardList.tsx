@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, ArrowUpDown, ArrowUp, ArrowDown, Plus } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EditableUsageTable } from "./EditableUsageTable";
@@ -41,9 +41,11 @@ interface SimCardListProps {
   viewMode: 'grid' | 'list';
   onViewModeChange: (mode: 'grid' | 'list') => void;
   searchQuery?: string;
+  showForm?: boolean;
+  onAddSimCard?: () => void;
 }
 
-export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange, searchQuery }: SimCardListProps) {
+export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange, searchQuery, showForm, onAddSimCard }: SimCardListProps) {
   console.log("SimCardList component mounted with props:", { refreshTrigger, viewMode, searchQuery });
   const [simCards, setSimCards] = useState<SimCard[]>([]);
   const [loading, setLoading] = useState(true);
@@ -306,9 +308,19 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
   return (
     <div className="space-y-4">
-      {/* View Toggle */}
-      <div className="flex justify-between">
-        <div>
+      {/* Add SIM Card and View Toggle */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          {!showForm && onAddSimCard && (
+            <Button 
+              onClick={onAddSimCard} 
+              variant="outline" 
+              className="flex items-center gap-2 bg-transparent border-2 border-black text-black font-semibold hover:bg-black hover:text-white"
+            >
+              <Plus className="h-4 w-4" />
+              Add SIM Card
+            </Button>
+          )}
           {viewMode === 'list' && expandedRows.size > 0 && (
             <Button
               variant="outline"
