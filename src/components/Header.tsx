@@ -54,13 +54,22 @@ export function Header({ onSearch }: HeaderProps) {
   }, []);
 
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        title: "Error signing out",
-        description: error.message,
-        variant: "destructive"
-      });
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error && error.message !== "Session from session_id claim in JWT does not exist") {
+        toast({
+          title: "Error signing out",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        // Successfully signed out or session was already invalid
+        navigate("/auth");
+      }
+    } catch (error) {
+      // Handle any unexpected errors
+      console.error("Logout error:", error);
+      navigate("/auth");
     }
   };
 
