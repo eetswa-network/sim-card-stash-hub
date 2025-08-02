@@ -156,7 +156,7 @@ export function EditableUsageTable({ simCardId, usageData, onUsageUpdate }: Edit
         
         {/* Existing rows */}
         {usageData.map((usage, index) => (
-           <div key={usage.id} className="flex border-b border-black">
+          <div key={usage.id} className="flex border-b border-black">
             {editingRow === usage.id ? (
               <>
                 <div className="flex-1 flex">
