@@ -358,15 +358,15 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
                   <span className="font-mono break-all">{card.phone_number}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   {card.sim_type === 'eSIM' ? (
-                    <Smartphone className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
                   ) : (
-                    <IdCard className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
                   )}
                   <span className="text-sm">{card.sim_type}</span>
                 </div>
@@ -482,7 +482,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
                             <span className="font-mono text-sm break-all">{card.phone_number}</span>
                           </div>
                         </div>
@@ -490,9 +490,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             {card.sim_type === 'eSIM' ? (
-                              <Smartphone className="h-4 w-4 text-muted-foreground shrink-0" />
+                              <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
                             ) : (
-                              <IdCard className="h-4 w-4 text-muted-foreground shrink-0" />
+                              <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
                             )}
                             <span className="text-sm">{card.sim_type}</span>
                           </div>
@@ -643,14 +643,14 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       >
                         <div className="flex items-center justify-between w-full">
                           <div className="flex items-center gap-2 flex-1 px-2 border-r border-black">
-                            <Phone className="h-3 w-3 text-muted-foreground shrink-0" />
+                            <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
                             <span className="font-mono break-all">{card.phone_number}</span>
                           </div>
                           <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-black">
                              {card.sim_type === 'eSIM' ? (
-                              <Smartphone className="h-4 w-4 text-muted-foreground" />
+                              <Smartphone className="h-5 w-5 text-muted-foreground" />
                             ) : (
-                              <IdCard className="h-4 w-4 text-muted-foreground" />
+                              <IdCard className="h-5 w-5 text-muted-foreground" />
                             )}
                           </div>
                           <div className="font-mono font-medium flex-1 text-center px-2 border-r border-black break-all">{card.sim_number}</div>
