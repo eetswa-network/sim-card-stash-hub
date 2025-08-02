@@ -97,6 +97,10 @@ export function Header({ onSearch }: HeaderProps) {
             <Link to="/">Dashboard</Link>
           </Button>
           
+          <Button variant="ghost" asChild>
+            <Link to="/updates">Updates</Link>
+          </Button>
+          
           {user ? (
             <Popover>
               <PopoverTrigger asChild>

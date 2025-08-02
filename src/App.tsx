@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Security from "./pages/Security";
+import Updates from "./pages/Updates";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const AppLayout = () => {
           <Route path="/" element={<Index searchQuery={searchQuery} />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/security" element={<Security />} />
+          <Route path="/updates" element={<Updates />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
