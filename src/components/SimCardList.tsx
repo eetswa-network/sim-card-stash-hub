@@ -57,6 +57,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
   const fetchSimCards = async () => {
     console.log("Starting fetchSimCards...");
+    
+    // Check current auth state for debugging
+    const { data: { session } } = await supabase.auth.getSession();
+    console.log("Current auth state in SimCardList:", session?.user?.id);
 
     try {
       console.log("Making Supabase query for sim_cards...");
@@ -69,7 +73,13 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         .order("created_at", { ascending: false });
 
       console.log("Supabase response:", { data, error });
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Error fetching sim cards:", error);
+        throw error;
+      }
+      
+      console.log("Raw data from query:", data);
       setSimCards(data || []);
       console.log("Set sim cards data:", data?.length || 0, "cards");
 

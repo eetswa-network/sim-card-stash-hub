@@ -39,20 +39,48 @@ export function Header({ onSearch }: HeaderProps) {
     
     checkSession();
 
-    // Listen for auth changes
+    // Listen for auth changes and also check session periodically
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log("Header auth state change:", event, session?.user?.id);
         if (session?.user) {
           setUser(session.user);
+          // Fetch user profile
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("user_id", session.user.id)
+            .single();
+          setUserProfile(profile);
         } else {
           setUser(null);
           setUserProfile(null);
         }
       }
     );
+    
+    // Also check session every 10 seconds to stay in sync
+    const interval = setInterval(async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user && !user) {
+        setUser(session.user);
+        // Fetch user profile
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .single();
+        setUserProfile(profile);
+      } else if (!session?.user && user) {
+        setUser(null);
+        setUserProfile(null);
+      }
+    }, 10000);
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
   const handleSignOut = async () => {
