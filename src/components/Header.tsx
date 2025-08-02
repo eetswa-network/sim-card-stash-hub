@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { CreditCard, User, LogOut, Shield, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -89,6 +88,99 @@ export function Header({ onSearch }: HeaderProps) {
     return email.split('@')[0].slice(0, 2).toUpperCase();
   };
 
+  const renderUserMenu = (isMobile = false) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" className="flex items-center gap-2">
+          <Avatar className="h-6 w-6">
+            <AvatarImage src={userProfile?.avatar_url || ""} />
+            <AvatarFallback className="text-xs">
+              {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
+            </AvatarFallback>
+          </Avatar>
+          <span className="hidden sm:inline">Account</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3 mb-4">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={userProfile?.avatar_url || ""} />
+                <AvatarFallback>
+                  {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <div className="font-medium truncate">
+                  {userProfile?.name || userProfile?.profile_name || user.email}
+                </div>
+                <div className="text-sm text-muted-foreground truncate">
+                  {user.email}
+                </div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                asChild
+                className="w-full gap-2"
+              >
+                <Link to="/">
+                  <CreditCard className="h-4 w-4" />
+                  Dashboard
+                </Link>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                asChild
+                className="w-full gap-2"
+              >
+                <Link to="/updates">
+                  <Settings className="h-4 w-4" />
+                  Updates
+                </Link>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                asChild
+                className="w-full gap-2"
+              >
+                <Link to="/account">
+                  <Settings className="h-4 w-4" />
+                  Account Details
+                </Link>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                asChild
+                className="w-full gap-2"
+              >
+                <Link to="/security">
+                  <Shield className="h-4 w-4" />
+                  Security Settings
+                </Link>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleSignOut}
+                className="w-full gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </PopoverContent>
+    </Popover>
+  );
+
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4 min-h-40 flex flex-col lg:flex-row lg:items-center justify-between py-4 gap-4">
@@ -101,74 +193,7 @@ export function Header({ onSearch }: HeaderProps) {
           {/* User menu on mobile/tablet - moved to top right */}
           <div className="flex lg:hidden">
             {user ? (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={userProfile?.avatar_url || ""} />
-                      <AvatarFallback className="text-xs">
-                        {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="hidden sm:inline">Account</span>
-                  </Button>
-                </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={userProfile?.avatar_url || ""} />
-                        <AvatarFallback>
-                          {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-medium truncate">
-                          {userProfile?.name || userProfile?.profile_name || user.email}
-                        </div>
-                        <div className="text-sm text-muted-foreground truncate">
-                          {user.email}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        asChild
-                        className="w-full gap-2"
-                      >
-                        <Link to="/account">
-                          <Settings className="h-4 w-4" />
-                          Account Details
-                        </Link>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        asChild
-                        className="w-full gap-2"
-                      >
-                        <Link to="/security">
-                          <Shield className="h-4 w-4" />
-                          Security Settings
-                        </Link>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={handleSignOut}
-                        className="w-full gap-2"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Sign Out
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                </PopoverContent>
-              </Popover>
+              renderUserMenu(true)
             ) : (
               <Button variant="ghost" asChild>
                 <Link to="/auth">
@@ -188,96 +213,19 @@ export function Header({ onSearch }: HeaderProps) {
             </div>
           )}
           
-          <nav className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link to="/">Dashboard</Link>
-            </Button>
-            
-            <Button variant="ghost" asChild>
-              <Link to="/updates">Updates</Link>
-            </Button>
-            
-            {/* Desktop user menu */}
-            <div className="hidden lg:flex">
-              {user ? (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="ghost" className="flex items-center gap-2">
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={userProfile?.avatar_url || ""} />
-                        <AvatarFallback className="text-xs">
-                          {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="hidden sm:inline">Account</span>
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-80">
-                    <Card>
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-3 mb-4">
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage src={userProfile?.avatar_url || ""} />
-                            <AvatarFallback>
-                              {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0 flex-1">
-                            <div className="font-medium truncate">
-                              {userProfile?.name || userProfile?.profile_name || user.email}
-                            </div>
-                            <div className="text-sm text-muted-foreground truncate">
-                              {user.email}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            asChild
-                            className="w-full gap-2"
-                          >
-                            <Link to="/account">
-                              <Settings className="h-4 w-4" />
-                              Account Details
-                            </Link>
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            asChild
-                            className="w-full gap-2"
-                          >
-                            <Link to="/security">
-                              <Shield className="h-4 w-4" />
-                              Security Settings
-                            </Link>
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={handleSignOut}
-                            className="w-full gap-2"
-                          >
-                            <LogOut className="h-4 w-4" />
-                            Sign Out
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </PopoverContent>
-                </Popover>
-              ) : (
-                <Button variant="ghost" asChild>
-                  <Link to="/auth">
-                    <User className="h-4 w-4 mr-2" />
-                    Sign In
-                  </Link>
-                </Button>
-              )}
-            </div>
-          </nav>
+          {/* Desktop user menu */}
+          <div className="hidden lg:flex">
+            {user ? (
+              renderUserMenu()
+            ) : (
+              <Button variant="ghost" asChild>
+                <Link to="/auth">
+                  <User className="h-4 w-4 mr-2" />
+                  Sign In
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </header>
