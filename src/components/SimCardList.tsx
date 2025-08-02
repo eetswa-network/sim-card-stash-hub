@@ -491,33 +491,28 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       className="p-4 hover:bg-muted/50 transition-colors cursor-pointer"
                       onClick={() => toggleRowExpansion(card.id)}
                     >
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
-                            <span className="font-mono text-sm break-all">{card.phone_number}</span>
-                          </div>
+                      <div className="space-y-2">
+                        {/* First line: phone icon, SIM type icon (no text), carrier */}
+                        <div className="flex items-center gap-3">
+                          <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
+                          {card.sim_type === 'eSIM' ? (
+                            <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
+                          ) : (
+                            <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
+                          )}
+                          <span className="text-sm font-medium">{card.carrier || 'No carrier'}</span>
                         </div>
                         
+                        {/* Second line: SIM number and active status */}
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            {card.sim_type === 'eSIM' ? (
-                              <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
-                            ) : (
-                              <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
-                            )}
-                            <span className="text-sm">{card.sim_type}</span>
-                          </div>
-                          <span className="font-mono text-xs text-muted-foreground break-all">{card.sim_number}</span>
+                          <span className="font-mono text-sm break-all">{card.sim_number}</span>
+                          <Badge variant={getStatusColor(card.status)} className="text-xs">
+                            {card.status}
+                          </Badge>
                         </div>
                         
-                        {card.carrier && (
-                          <div className="text-muted-foreground">
-                            <strong>Carrier:</strong> {card.carrier}
-                          </div>
-                        )}
-                        
-                        <div className="flex justify-end gap-2 pt-2">
+                        {/* Third line: edit and delete buttons */}
+                        <div className="flex justify-end gap-2 pt-1">
                           <Button
                             variant="outline"
                             size="sm"
