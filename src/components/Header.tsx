@@ -91,9 +91,9 @@ export function Header({ onSearch }: HeaderProps) {
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container mx-auto px-4 h-52 flex items-center justify-between">
+      <div className="container mx-auto px-4 h-40 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <img src={logoColorful} alt="SIM Card Stash" className="w-[200px] h-[200px] object-contain" />
+          <img src={logoColorful} alt="SIM Card Stash" className="w-[150px] h-[150px] object-contain" />
           <Link to="/" className="text-xl font-bold">SIM Card Stash</Link>
         </div>
         
