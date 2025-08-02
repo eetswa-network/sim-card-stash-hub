@@ -88,117 +88,18 @@ export function Header({ onSearch }: HeaderProps) {
     return email.split('@')[0].slice(0, 2).toUpperCase();
   };
 
-  const renderUserMenu = (isMobile = false) => (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" className="flex items-center gap-2">
-          <Avatar className="h-6 w-6">
-            <AvatarImage src={userProfile?.avatar_url || ""} />
-            <AvatarFallback className="text-xs">
-              {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
-            </AvatarFallback>
-          </Avatar>
-          <span className="hidden sm:inline">Account</span>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3 mb-4">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={userProfile?.avatar_url || ""} />
-                <AvatarFallback>
-                  {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="min-w-0 flex-1">
-                <div className="font-medium truncate">
-                  {userProfile?.name || userProfile?.profile_name || user.email}
-                </div>
-                <div className="text-sm text-muted-foreground truncate">
-                  {user.email}
-                </div>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                asChild
-                className="w-full gap-2"
-              >
-                <Link to="/">
-                  <CreditCard className="h-4 w-4" />
-                  Dashboard
-                </Link>
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                asChild
-                className="w-full gap-2"
-              >
-                <Link to="/updates">
-                  <Settings className="h-4 w-4" />
-                  Updates
-                </Link>
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                asChild
-                className="w-full gap-2"
-              >
-                <Link to="/account">
-                  <Settings className="h-4 w-4" />
-                  Account Details
-                </Link>
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                asChild
-                className="w-full gap-2"
-              >
-                <Link to="/security">
-                  <Shield className="h-4 w-4" />
-                  Security Settings
-                </Link>
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleSignOut}
-                className="w-full gap-2"
-              >
-                <LogOut className="h-4 w-4" />
-                Sign Out
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </PopoverContent>
-    </Popover>
-  );
-
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4 min-h-40 flex flex-col py-4 gap-4">
-        {/* Logo and title with tablet navigation */}
+        {/* Logo and title with tablet/desktop navigation */}
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
             <img src={logoColorful} alt="SIM Card Stash" className="w-[150px] h-[150px] object-contain" />
             <Link to="/" className="text-3xl font-bold">SIM Card Stash</Link>
           </div>
           
-          {/* Tablet navigation - vertical buttons on right */}
-          <div className="hidden md:flex lg:hidden flex-col gap-1">
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/">Dashboard</Link>
-            </Button>
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/updates">Updates</Link>
-            </Button>
+          {/* Tablet & Desktop navigation - vertical buttons on right */}
+          <div className="hidden md:flex flex-col gap-1">
             {user ? (
               <Popover>
                 <PopoverTrigger asChild>
@@ -276,31 +177,17 @@ export function Header({ onSearch }: HeaderProps) {
                 </Link>
               </Button>
             )}
-          </div>
-          
-          {/* Desktop user menu - top right */}
-          <div className="hidden lg:flex">
-            {user ? (
-              renderUserMenu()
-            ) : (
-              <Button variant="ghost" asChild>
-                <Link to="/auth">
-                  <User className="h-4 w-4 mr-2" />
-                  Sign In
-                </Link>
-              </Button>
-            )}
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/">Dashboard</Link>
+            </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/updates">Updates</Link>
+            </Button>
           </div>
         </div>
         
         {/* Mobile navigation - horizontal buttons under logo */}
         <div className="flex md:hidden items-center justify-center gap-2 flex-wrap">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/">Dashboard</Link>
-          </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/updates">Updates</Link>
-          </Button>
           {user ? (
             <Popover>
               <PopoverTrigger asChild>
@@ -378,6 +265,12 @@ export function Header({ onSearch }: HeaderProps) {
               </Link>
             </Button>
           )}
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/">Dashboard</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/updates">Updates</Link>
+          </Button>
         </div>
         
         {/* Search bar - on its own line */}
