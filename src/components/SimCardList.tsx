@@ -642,7 +642,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         onClick={() => toggleRowExpansion(card.id)}
                       >
                         <div className="flex items-center justify-between w-full">
-                          <div className="flex items-center gap-2 text-sm flex-1 px-2 border-r border-black">
+                          <div className="flex items-center gap-2 flex-1 px-2 border-r border-black">
                             <Phone className="h-3 w-3 text-muted-foreground shrink-0" />
                             <span className="font-mono break-all">{card.phone_number}</span>
                           </div>
