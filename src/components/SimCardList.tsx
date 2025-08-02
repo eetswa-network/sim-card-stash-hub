@@ -306,24 +306,33 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   // Filter and sort SIM cards
   let filteredAndSortedCards = searchQuery 
     ? simCards.filter(card => {
-        // Search in basic card fields
-        const basicMatch = card.sim_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          card.phone_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          card.carrier?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          card.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          card.sim_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          card.notes?.toLowerCase().includes(searchQuery.toLowerCase());
+        const searchLower = searchQuery.toLowerCase();
+        
+        // Check if search matches phone number - only show active records
+        const phoneMatch = card.phone_number.toLowerCase().includes(searchLower);
+        if (phoneMatch && card.status !== 'active') {
+          return false; // Don't show inactive records for phone number matches
+        }
+        
+        // Check if search matches SIM number - show both active and inactive
+        const simNumberMatch = card.sim_number.toLowerCase().includes(searchLower);
+        
+        // Check other fields (carrier, status, sim_type, notes)
+        const otherFieldsMatch = card.carrier?.toLowerCase().includes(searchLower) ||
+          card.status.toLowerCase().includes(searchLower) ||
+          card.sim_type.toLowerCase().includes(searchLower) ||
+          card.notes?.toLowerCase().includes(searchLower);
         
         // Search in usage data
         const usageMatch = usageData[card.id]?.some(usage => 
-          usage.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          usage.use_purpose.toLowerCase().includes(searchQuery.toLowerCase())
+          usage.name.toLowerCase().includes(searchLower) ||
+          usage.use_purpose.toLowerCase().includes(searchLower)
         ) || false;
         
         // Search in account login
-        const accountMatch = card.account?.login?.toLowerCase().includes(searchQuery.toLowerCase()) || false;
+        const accountMatch = card.account?.login?.toLowerCase().includes(searchLower) || false;
         
-        return basicMatch || usageMatch || accountMatch;
+        return phoneMatch || simNumberMatch || otherFieldsMatch || usageMatch || accountMatch;
       })
     : simCards;
 
