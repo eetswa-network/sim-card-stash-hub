@@ -56,7 +56,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   const isMobile = useIsMobile();
 
   const fetchSimCards = async () => {
+    console.log("Starting fetchSimCards...");
     try {
+      console.log("Making Supabase query for sim_cards...");
       const { data, error } = await supabase
         .from("sim_cards")
         .select(`
@@ -65,11 +67,14 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         `)
         .order("created_at", { ascending: false });
 
+      console.log("Supabase response:", { data, error });
       if (error) throw error;
       setSimCards(data || []);
+      console.log("Set sim cards data:", data?.length || 0, "cards");
 
       // Fetch usage data for all sim cards
       if (data && data.length > 0) {
+        console.log("Fetching usage data for", data.length, "cards");
         const { data: usageData, error: usageError } = await supabase
           .from("sim_card_usage")
           .select("*")
@@ -78,6 +83,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         if (usageError) {
           console.error("Error fetching usage data:", usageError);
         } else {
+          console.log("Usage data fetched:", usageData?.length || 0, "entries");
           // Group usage data by sim_card_id
           const groupedUsage = (usageData || []).reduce((acc, usage) => {
             if (!acc[usage.sim_card_id]) {
@@ -88,6 +94,8 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
           }, {} as {[key: string]: UsageEntry[]});
           setUsageData(groupedUsage);
         }
+      } else {
+        console.log("No sim cards found, skipping usage data fetch");
       }
     } catch (error) {
       console.error("Error fetching SIM cards:", error);
@@ -97,6 +105,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         variant: "destructive",
       });
     } finally {
+      console.log("Setting loading to false");
       setLoading(false);
     }
   };
