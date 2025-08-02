@@ -21,7 +21,7 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [showMfaWarning, setShowMfaWarning] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
