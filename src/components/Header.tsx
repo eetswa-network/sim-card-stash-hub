@@ -55,29 +55,24 @@ export function Header({ onSearch }: HeaderProps) {
 
   const handleSignOut = async () => {
     try {
-      // First try normal logout
-      const { error } = await supabase.auth.signOut();
-      
-      // Always clear local state regardless of logout success
+      // Clear local state first
       setUser(null);
       setUserProfile(null);
       
-      if (error && !error.message.includes("session") && !error.message.includes("JWT")) {
-        toast({
-          title: "Error signing out",
-          description: error.message,
-          variant: "destructive"
-        });
-      }
+      // Then sign out from Supabase
+      await supabase.auth.signOut();
       
-      // Always navigate to auth page
-      navigate("/auth");
+      // Force navigation after a brief delay to ensure state is cleared
+      setTimeout(() => {
+        navigate("/auth", { replace: true });
+      }, 100);
+      
     } catch (error) {
       // Handle any unexpected errors by forcing logout
       console.error("Logout error:", error);
       setUser(null);
       setUserProfile(null);
-      navigate("/auth");
+      navigate("/auth", { replace: true });
     }
   };
 

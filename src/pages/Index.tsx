@@ -28,31 +28,7 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
   useSessionTimeout();
 
   useEffect(() => {
-    // Check for existing session
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) {
-        navigate("/auth");
-        return;
-      }
-      
-      setUser(session.user);
-      
-      // Check if user has MFA enabled
-      const { data: mfaData } = await supabase
-        .from("user_mfa_settings")
-        .select("is_enabled")
-        .eq("user_id", session.user.id)
-        .maybeSingle();
-      
-      if (!mfaData?.is_enabled) {
-        setShowMfaWarning(true);
-      }
-    };
-    
-    checkSession();
-
-    // Listen for auth changes
+    // Listen for auth changes FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log("Index auth state change:", event, session?.user?.id);
@@ -77,6 +53,30 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
         }
       }
     );
+
+    // Then check for existing session
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        navigate("/auth");
+        return;
+      }
+      
+      setUser(session.user);
+      
+      // Check if user has MFA enabled
+      const { data: mfaData } = await supabase
+        .from("user_mfa_settings")
+        .select("is_enabled")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+      
+      if (!mfaData?.is_enabled) {
+        setShowMfaWarning(true);
+      }
+    };
+    
+    checkSession();
 
     return () => subscription.unsubscribe();
   }, [navigate]);
