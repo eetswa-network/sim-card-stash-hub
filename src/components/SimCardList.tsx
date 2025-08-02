@@ -492,9 +492,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       onClick={() => toggleRowExpansion(card.id)}
                     >
                       <div className="space-y-2">
-                        {/* First line: phone icon, SIM type icon (no text), carrier */}
+                        {/* First line: phone icon, phone number, SIM type icon (no text), carrier */}
                         <div className="flex items-center gap-3">
                           <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
+                          <span className="font-mono text-sm break-all">{card.phone_number}</span>
                           {card.sim_type === 'eSIM' ? (
                             <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
                           ) : (
