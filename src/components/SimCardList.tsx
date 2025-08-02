@@ -791,8 +791,8 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               {card.status}
                             </Badge>
                           </div>
-                          <div className="flex-[1.5] text-center px-2">
-                            <div className="flex gap-2 justify-center">
+                          <div className="flex-[1.5] flex justify-center items-center px-2">
+                            <div className="flex gap-2">
                               <Button
                                 variant="outline"
                                 size="sm"
