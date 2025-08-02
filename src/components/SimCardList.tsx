@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, ArrowUpDown, ArrowUp, ArrowDown, Plus } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EditableUsageTable } from "./EditableUsageTable";
@@ -150,11 +150,58 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     }
   };
 
+  const handleSimSwap = async (card: SimCard) => {
+    try {
+      // Mark the original card as swapped
+      const { error: updateError } = await supabase
+        .from("sim_cards")
+        .update({ status: "swapped" })
+        .eq("id", card.id);
+
+      if (updateError) throw updateError;
+
+      // Create a new card with the same data but empty sim_number
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const newCard = {
+        sim_number: "", // Empty sim number for new card
+        phone_number: card.phone_number,
+        carrier: card.carrier,
+        status: "active",
+        sim_type: card.sim_type,
+        notes: card.notes,
+        login: card.login,
+        password: card.password,
+        account_id: card.account_id,
+        user_id: user.id
+      };
+
+      const { error: insertError } = await supabase
+        .from("sim_cards")
+        .insert([newCard]);
+
+      if (insertError) throw insertError;
+      
+      toast({ title: "SIM swap completed! New record created with empty SIM number." });
+      fetchSimCards();
+    } catch (error) {
+      console.error("Error performing SIM swap:", error);
+      toast({
+        title: "Error",
+        description: "Failed to perform SIM swap. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
         return "default";
       case "inactive":
+        return "secondary";
+      case "swapped":
         return "secondary";
       case "suspended":
         return "destructive";
@@ -369,7 +416,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
             <Card key={card.id} className="hover:shadow-md transition-shadow animate-fade-in border border-border">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className={`text-lg break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</CardTitle>
+                  <CardTitle className={`text-lg break-all ${card.status === 'inactive' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.sim_number}</CardTitle>
                   <Badge variant={getStatusColor(card.status)}>
                     {card.status}
                   </Badge>
@@ -378,7 +425,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
-                  <span className="font-mono break-all">{card.phone_number}</span>
+                  <span className={`font-mono break-all ${card.status === 'swapped' ? 'line-through' : ''}`}>{card.phone_number}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -451,6 +498,16 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       <Edit className="h-4 w-4" />
                     </Button>
                     
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleSimSwap(card)}
+                      className="min-h-[32px] w-8 h-8 p-0"
+                      title="SIM Swap"
+                    >
+                      <RefreshCcw className="h-4 w-4" />
+                    </Button>
+                    
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button 
@@ -503,7 +560,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
-                            <span className="font-mono text-sm break-all">{card.phone_number}</span>
+                            <span className={`font-mono text-sm break-all ${card.status === 'swapped' ? 'line-through' : ''}`}>{card.phone_number}</span>
                           </div>
                           <span className="text-sm font-medium text-right">{card.carrier || 'No carrier'}</span>
                         </div>
@@ -516,14 +573,14 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             ) : (
                               <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
                             )}
-                            <span className={`font-mono text-sm break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</span>
+                            <span className={`font-mono text-sm break-all ${card.status === 'inactive' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.sim_number}</span>
                           </div>
                           <Badge variant={getStatusColor(card.status)} className="text-xs">
                             {card.status}
                           </Badge>
                         </div>
                         
-                        {/* Third line: edit and delete buttons */}
+                        {/* Third line: edit, sim swap and deactivate buttons */}
                         <div className="flex justify-end gap-2 pt-1">
                           <Button
                             variant="outline"
@@ -535,6 +592,19 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             className="w-8 h-8 p-0"
                           >
                             <Edit className="h-4 w-4" />
+                          </Button>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSimSwap(card);
+                            }}
+                            className="w-8 h-8 p-0"
+                            title="SIM Swap"
+                          >
+                            <RefreshCcw className="h-4 w-4" />
                           </Button>
                           
                           <AlertDialog>
@@ -663,7 +733,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         <div className="flex items-center justify-between w-full">
                           <div className="flex items-center gap-2 flex-1 px-2 border-r border-black">
                             <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
-                            <span className="font-mono break-all">{card.phone_number}</span>
+                            <span className={`font-mono break-all ${card.status === 'swapped' ? 'line-through' : ''}`}>{card.phone_number}</span>
                           </div>
                           <div className="flex items-center justify-center gap-2 flex-1 px-2 border-r border-black">
                              {card.sim_type === 'eSIM' ? (
@@ -672,7 +742,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               <IdCard className="h-5 w-5 text-muted-foreground" />
                             )}
                           </div>
-                          <div className={`font-mono font-medium flex-1 text-center px-2 border-r border-black break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</div>
+                          <div className={`font-mono font-medium flex-1 text-center px-2 border-r border-black break-all ${card.status === 'inactive' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.sim_number}</div>
                           <div className="flex-1 text-center px-2 border-r border-black">
                             {card.carrier || '-'}
                           </div>
@@ -688,6 +758,19 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                 className="w-8 h-8 p-0"
                               >
                                 <Edit className="h-4 w-4" />
+                              </Button>
+                              
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSimSwap(card);
+                                }}
+                                className="w-8 h-8 p-0"
+                                title="SIM Swap"
+                              >
+                                <RefreshCcw className="h-4 w-4" />
                               </Button>
                               
                               <AlertDialog>
