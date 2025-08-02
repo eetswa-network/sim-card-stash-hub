@@ -117,7 +117,8 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
       }
     };
     
-    checkSession();
+    // Delay session check to avoid race condition with auth redirect
+    setTimeout(checkSession, 100);
 
     return () => {
       mounted = false;
