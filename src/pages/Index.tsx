@@ -26,8 +26,8 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Enable session timeout monitoring
-  useSessionTimeout();
+  // Temporarily disabled session timeout to fix login issues
+  // useSessionTimeout();
 
   useEffect(() => {
     let mounted = true;
