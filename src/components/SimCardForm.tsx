@@ -285,7 +285,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
+          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-3'}`}>
             <div className="space-y-2">
               <Label htmlFor="sim_number">SIM Number *</Label>
               <Input
@@ -300,7 +300,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             </div>
             
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 mt-8">
                 <Checkbox
                   id="expired-sim"
                   checked={isExpiredSim}
