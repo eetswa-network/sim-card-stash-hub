@@ -27,6 +27,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
     notes: editingCard?.notes || "",
     account_id: editingCard?.account_id || "",
   });
+  const [isExpiredSim, setIsExpiredSim] = useState(false);
   const [usedForEntries, setUsedForEntries] = useState([{ name: "", use_purpose: "" }]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
@@ -294,8 +295,36 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                 placeholder="Enter SIM number"
                 required
                 className={isMobile ? "min-h-[44px]" : ""}
+                disabled={isExpiredSim}
               />
             </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="expired-sim"
+                  checked={isExpiredSim}
+                  onCheckedChange={(checked) => {
+                    setIsExpiredSim(checked as boolean);
+                    if (checked) {
+                      setFormData({
+                        ...formData,
+                        sim_number: 'XXXXXXXXXXXXX',
+                        status: 'inactive'
+                      });
+                    } else {
+                      setFormData({
+                        ...formData,
+                        sim_number: '',
+                        status: 'active'
+                      });
+                    }
+                  }}
+                />
+                <Label htmlFor="expired-sim">Expired SIM</Label>
+              </div>
+            </div>
+            
             <div className="space-y-2">
               <Label htmlFor="phone_number">Phone Number *</Label>
               <Input
