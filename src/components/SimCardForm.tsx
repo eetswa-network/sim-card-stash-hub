@@ -122,8 +122,8 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       if (!editingCard || formData.sim_number !== editingCard.sim_number || formData.phone_number !== editingCard.phone_number) {
         const checks = [];
         
-        // Only check sim_number if it's new or changed
-        if (!editingCard || formData.sim_number !== editingCard.sim_number) {
+        // Only check sim_number if it's new or changed, but allow XXXXXXXXXXXXX to be duplicated
+        if ((!editingCard || formData.sim_number !== editingCard.sim_number) && formData.sim_number !== 'XXXXXXXXXXXXX') {
           checks.push(
             supabase
               .from("sim_cards")
