@@ -229,6 +229,45 @@ export type Database = {
           },
         ]
       }
+      user_credentials: {
+        Row: {
+          backup_eligible: boolean
+          backup_state: boolean
+          counter: number
+          created_at: string
+          credential_id: string
+          id: string
+          last_used_at: string | null
+          name: string | null
+          public_key_jwk: Json
+          user_id: string
+        }
+        Insert: {
+          backup_eligible?: boolean
+          backup_state?: boolean
+          counter?: number
+          created_at?: string
+          credential_id: string
+          id?: string
+          last_used_at?: string | null
+          name?: string | null
+          public_key_jwk: Json
+          user_id: string
+        }
+        Update: {
+          backup_eligible?: boolean
+          backup_state?: boolean
+          counter?: number
+          created_at?: string
+          credential_id?: string
+          id?: string
+          last_used_at?: string | null
+          name?: string | null
+          public_key_jwk?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_mfa_settings: {
         Row: {
           backup_codes: string[] | null
