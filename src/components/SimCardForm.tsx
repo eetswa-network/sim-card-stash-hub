@@ -188,7 +188,12 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       } else {
         const { data, error } = await supabase
           .from("sim_cards")
-          .insert([{ ...formData, user_id: user.id, profile_id: profile?.id }])
+          .insert([{ 
+            ...formData, 
+            user_id: user.id, 
+            profile_id: profile?.id,
+            account_id: formData.account_id || null // Convert empty string to null for UUID field
+          }])
           .select()
           .single();
 
