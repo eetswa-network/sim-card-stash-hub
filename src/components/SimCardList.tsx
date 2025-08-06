@@ -248,6 +248,8 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         return "secondary";
       case "suspended":
         return "destructive";
+      case "expired":
+        return "outline";
       default:
         return "outline";
     }
@@ -308,10 +310,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     ? simCards.filter(card => {
         const searchLower = searchQuery.toLowerCase();
         
-        // Check if search matches phone number - only show active records
+        // Check if search matches phone number - show active and expired records
         const phoneMatch = card.phone_number.toLowerCase().includes(searchLower);
-        if (phoneMatch && card.status !== 'active') {
-          return false; // Don't show inactive records for phone number matches
+        if (phoneMatch && card.status !== 'active' && card.status !== 'expired') {
+          return false; // Don't show inactive/suspended records for phone number matches
         }
         
         // Check if search matches SIM number - show both active and inactive
