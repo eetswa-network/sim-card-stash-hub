@@ -1,0 +1,6 @@
+INSERT INTO app_updates (title, description, update_type, version, is_active) VALUES 
+('Advanced Search Filtering', 'Enhanced SIM card search to filter results by status - phone number and usage data searches now only show active SIM cards, while SIM number searches show both active and inactive records for better historical tracking.', 'improvement', 'v2.2.0', true),
+('Expired SIM Card Management', 'Added an "Expired SIM" checkbox to the SIM card form that automatically fills the SIM number with placeholder text and sets the status to inactive, streamlining the process of recording expired SIM cards.', 'feature', 'v2.2.0', true),
+('Form Layout Optimization', 'Improved the SIM card form layout by organizing SIM number, expired SIM checkbox, and phone number in a single row for better user experience and more efficient data entry.', 'improvement', 'v2.2.0', true),
+('Account Login Display Fix', 'Fixed an issue where account login information was not displaying correctly in the extended list view after editing SIM card entries. The system now properly shows both legacy login fields and new account relationship data.', 'bugfix', 'v2.2.1', true),
+('Usage Table Display Fix', 'Resolved an issue where additional rows in the "used for" tables were not displaying properly due to CSS class formatting errors.', 'bugfix', 'v2.2.1', true);
