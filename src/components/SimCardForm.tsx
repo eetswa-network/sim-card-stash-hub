@@ -310,7 +310,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                       setFormData({
                         ...formData,
                         sim_number: 'XXXXXXXXXXXXX',
-                        status: 'inactive'
+                        status: 'expired'
                       });
                     } else {
                       setFormData({
