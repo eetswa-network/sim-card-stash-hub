@@ -508,10 +508,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 />
 
 
-                {card.login && (
+                {(card.login || card.account?.login) && (
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <span className="font-mono text-sm break-all">{card.login}</span>
+                    <span className="font-mono text-sm break-all">{card.account?.login || card.login}</span>
                   </div>
                 )}
 
@@ -700,11 +700,11 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     {expandedRows.has(card.id) && (
                       <div className="px-4 pb-4 bg-table-green-light border-t border-table-divider animate-accordion-down">
                         <div className="space-y-3 pt-4">
-                          {card.login && (
+                          {(card.login || card.account?.login) && (
                             <div className="flex items-center gap-2">
                               <User className="h-4 w-4 text-muted-foreground shrink-0" />
                               <span className="text-sm font-medium">Login:</span>
-                              <span className="font-mono text-sm break-all">{card.login}</span>
+                              <span className="font-mono text-sm break-all">{card.account?.login || card.login}</span>
                             </div>
                           )}
                           
@@ -872,11 +872,11 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       {expandedRows.has(card.id) && (
                         <div className="px-4 pb-4 bg-table-green-light border-t border-table-divider animate-accordion-down">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                            {card.login && (
+                            {(card.login || card.account?.login) && (
                               <div className="flex items-center gap-2">
                                 <User className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium">Login:</span>
-                                <span className="font-mono text-sm break-all">{card.login}</span>
+                                <span className="font-mono text-sm break-all">{card.account?.login || card.login}</span>
                               </div>
                             )}
                             
