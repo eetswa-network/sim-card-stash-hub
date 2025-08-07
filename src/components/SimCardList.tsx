@@ -476,32 +476,26 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
             <Card key={card.id} className="hover:shadow-md transition-shadow animate-fade-in border border-border">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className={`text-lg break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</CardTitle>
-                  <Badge variant={getStatusColor(card.status)}>
-                    {card.status}
-                  </Badge>
+                  <CardTitle className={`text-lg break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.phone_number}</CardTitle>
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge variant={getStatusColor(card.status)}>
+                      {card.status}
+                    </Badge>
+                    {card.carrier && (
+                      <span className="text-sm text-muted-foreground">{card.carrier}</span>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
-                  <span className={`font-mono break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.phone_number}</span>
-                </div>
-
                 <div className="flex items-center gap-2">
                   {card.sim_type === 'eSIM' ? (
                     <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
                   ) : (
                     <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
                   )}
-                  <span className="text-sm">{card.sim_type}</span>
+                  <span className={`font-mono break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</span>
                 </div>
-                
-                {card.carrier && (
-                  <div className="text-muted-foreground">
-                    <strong>Carrier:</strong> {card.carrier}
-                  </div>
-                )}
 
                 <EditableUsageTable
                   simCardId={card.id}
