@@ -4,9 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Save, User, Mail, Palette } from "lucide-react";
+import { Camera, Save, User, Mail, Sun, Moon, Monitor } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
@@ -338,21 +337,51 @@ export default function AccountDetails() {
 
               {/* Theme Selection */}
               <div>
-                <Label htmlFor="theme">Theme Preference</Label>
-                <div className="relative">
-                  <Palette className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Select value={theme} onValueChange={setTheme}>
-                    <SelectTrigger className="pl-10">
-                      <SelectValue placeholder="Select theme" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="light">Light</SelectItem>
-                      <SelectItem value="dark">Dark</SelectItem>
-                      <SelectItem value="system">System (Auto)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <Label>Theme Preference</Label>
+                <div className="grid grid-cols-3 gap-3 mt-2">
+                  {/* Light Theme Tile */}
+                  <button
+                    type="button"
+                    onClick={() => setTheme('light')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover:bg-muted/50 ${
+                      theme === 'light' 
+                        ? 'border-primary bg-primary/10' 
+                        : 'border-border'
+                    }`}
+                  >
+                    <Sun className="h-6 w-6" />
+                    <span className="text-sm font-medium">Light</span>
+                  </button>
+                  
+                  {/* Dark Theme Tile */}
+                  <button
+                    type="button"
+                    onClick={() => setTheme('dark')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover:bg-muted/50 ${
+                      theme === 'dark' 
+                        ? 'border-primary bg-primary/10' 
+                        : 'border-border'
+                    }`}
+                  >
+                    <Moon className="h-6 w-6" />
+                    <span className="text-sm font-medium">Dark</span>
+                  </button>
+                  
+                  {/* System Theme Tile */}
+                  <button
+                    type="button"
+                    onClick={() => setTheme('system')}
+                    className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover:bg-muted/50 ${
+                      theme === 'system' 
+                        ? 'border-primary bg-primary/10' 
+                        : 'border-border'
+                    }`}
+                  >
+                    <Monitor className="h-6 w-6" />
+                    <span className="text-sm font-medium">Auto</span>
+                  </button>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-muted-foreground mt-2">
                   Choose your preferred theme or use system settings
                 </p>
               </div>
