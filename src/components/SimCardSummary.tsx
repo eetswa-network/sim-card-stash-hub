@@ -13,6 +13,10 @@ interface SimCardStats {
   expired: number;
 }
 
+interface CarrierStats {
+  [key: string]: number;
+}
+
 export default function SimCardSummary() {
   const [stats, setStats] = useState<SimCardStats>({
     total: 0,
@@ -20,6 +24,7 @@ export default function SimCardSummary() {
     inactive: 0,
     expired: 0
   });
+  const [carrierStats, setCarrierStats] = useState<CarrierStats>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,7 +42,7 @@ export default function SimCardSummary() {
 
       const { data: simCards, error } = await supabase
         .from("sim_cards")
-        .select("status")
+        .select("status, carrier")
         .eq("user_id", session.user.id);
 
       if (error) {
@@ -58,7 +63,15 @@ export default function SimCardSummary() {
         { total: 0, active: 0, inactive: 0, expired: 0 }
       );
 
+      // Calculate carrier statistics
+      const carrierCounts = simCards.reduce((acc: CarrierStats, card) => {
+        const carrier = card.carrier || 'No Carrier';
+        acc[carrier] = (acc[carrier] || 0) + 1;
+        return acc;
+      }, {});
+
       setStats(statCounts);
+      setCarrierStats(carrierCounts);
     } catch (error) {
       console.error("Error fetching SIM card stats:", error);
     } finally {
@@ -89,12 +102,20 @@ export default function SimCardSummary() {
     );
   }
 
-  // Prepare data for pie chart
+  // Prepare data for status pie chart
   const pieData = [
     { name: 'Active', value: stats.active, color: '#22c55e' },
     { name: 'Inactive', value: stats.inactive, color: '#6b7280' },
     { name: 'Expired', value: stats.expired, color: '#ef4444' }
   ].filter(item => item.value > 0); // Only show segments with data
+
+  // Prepare data for carrier pie chart
+  const carrierColors = ['#3b82f6', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#6366f1', '#84cc16', '#f97316'];
+  const carrierPieData = Object.entries(carrierStats).map(([carrier, count], index) => ({
+    name: carrier,
+    value: count,
+    color: carrierColors[index % carrierColors.length]
+  }));
 
   const RADIAN = Math.PI / 180;
   const renderCustomizedLabel = ({
@@ -123,43 +144,85 @@ export default function SimCardSummary() {
 
   return (
     <div className="space-y-6">
-      {/* Pie Chart */}
+      {/* Pie Charts */}
       {stats.total > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              SIM Card Distribution
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-80 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={renderCustomizedLabel}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    formatter={(value: number) => [value, 'SIM Cards']}
-                    labelFormatter={(label) => `${label} Status`}
-                  />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Status Distribution Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Status Distribution
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value: number) => [value, 'SIM Cards']}
+                      labelFormatter={(label) => `${label} Status`}
+                    />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Carrier Distribution Chart */}
+          {carrierPieData.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" />
+                  Carrier Distribution
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-80 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={carrierPieData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={renderCustomizedLabel}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {carrierPieData.map((entry, index) => (
+                          <Cell key={`carrier-cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value: number) => [value, 'SIM Cards']}
+                        labelFormatter={(label) => `${label} Carrier`}
+                      />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       )}
 
       {/* Summary Table */}
