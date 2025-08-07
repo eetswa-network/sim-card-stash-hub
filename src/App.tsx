@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import Security from "./pages/Security";
 import Updates from "./pages/Updates";
 import AccountDetails from "./pages/AccountDetails";
+import Statistics from "./pages/Statistics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const AppLayout = () => {
           <Route path="/" element={<Index searchQuery={searchQuery} />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/security" element={<Security />} />
+          <Route path="/statistics" element={<Statistics />} />
           <Route path="/updates" element={<Updates />} />
           <Route path="/account" element={<AccountDetails />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

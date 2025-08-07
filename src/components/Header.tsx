@@ -181,6 +181,9 @@ export function Header({ onSearch }: HeaderProps) {
               <Link to="/">Dashboard</Link>
             </Button>
             <Button variant="ghost" size="sm" asChild>
+              <Link to="/statistics">Statistics</Link>
+            </Button>
+            <Button variant="ghost" size="sm" asChild>
               <Link to="/updates">Updates</Link>
             </Button>
           </div>
@@ -267,6 +270,9 @@ export function Header({ onSearch }: HeaderProps) {
           )}
           <Button variant="ghost" size="sm" asChild>
             <Link to="/">Dashboard</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/statistics">Statistics</Link>
           </Button>
           <Button variant="ghost" size="sm" asChild>
             <Link to="/updates">Updates</Link>
