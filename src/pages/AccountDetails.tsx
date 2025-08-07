@@ -4,10 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Save, User, Mail } from "lucide-react";
+import { Camera, Save, User, Mail, Palette } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "next-themes";
 
 interface UserProfile {
   id: string;
@@ -29,6 +31,7 @@ export default function AccountDetails() {
   });
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     checkAuthAndLoadProfile();
@@ -330,6 +333,27 @@ export default function AccountDetails() {
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   Changing your email will require confirmation
+                </p>
+              </div>
+
+              {/* Theme Selection */}
+              <div>
+                <Label htmlFor="theme">Theme Preference</Label>
+                <div className="relative">
+                  <Palette className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Select value={theme} onValueChange={setTheme}>
+                    <SelectTrigger className="pl-10">
+                      <SelectValue placeholder="Select theme" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="light">Light</SelectItem>
+                      <SelectItem value="dark">Dark</SelectItem>
+                      <SelectItem value="system">System (Auto)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Choose your preferred theme or use system settings
                 </p>
               </div>
             </div>
