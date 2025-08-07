@@ -475,27 +475,30 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
           {filteredSimCards.map((card) => (
             <Card key={card.id} className="hover:shadow-md transition-shadow animate-fade-in border border-border">
               <CardHeader className="pb-3">
+                {/* Row 1: Phone number with icon on left, status on right */}
                 <div className="flex items-center justify-between">
-                  <CardTitle className={`text-lg break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.phone_number}</CardTitle>
-                  <div className="flex flex-col items-end gap-1">
-                    <Badge variant={getStatusColor(card.status)}>
-                      {card.status}
-                    </Badge>
-                    {card.carrier && (
-                      <span className="text-sm text-muted-foreground">{card.carrier}</span>
-                    )}
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
+                    <CardTitle className={`text-lg break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.phone_number}</CardTitle>
                   </div>
+                  <Badge variant={getStatusColor(card.status)}>
+                    {card.status}
+                  </Badge>
+                </div>
+                {/* Row 2: SIM number with icon on left, carrier on right */}
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center gap-2">
+                    {card.sim_type === 'eSIM' ? (
+                      <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
+                    ) : (
+                      <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
+                    )}
+                    <span className={`font-mono break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground">{card.carrier || 'No carrier'}</span>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex items-center gap-2">
-                  {card.sim_type === 'eSIM' ? (
-                    <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
-                  ) : (
-                    <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
-                  )}
-                  <span className={`font-mono break-all ${card.status === 'inactive' ? 'line-through' : ''}`}>{card.sim_number}</span>
-                </div>
 
                 <EditableUsageTable
                   simCardId={card.id}
