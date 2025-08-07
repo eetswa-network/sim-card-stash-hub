@@ -49,12 +49,37 @@ export default function Updates() {
     try {
       const { data: allUpdates, error } = await supabase
         .from("app_updates")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("*");
 
       if (error) throw error;
 
-      setUpdates((allUpdates || []) as Update[]);
+      // Sort by version number (highest to lowest)
+      const sortedUpdates = (allUpdates || []).sort((a, b) => {
+        const versionA = a.version || '0.0.0';
+        const versionB = b.version || '0.0.0';
+        
+        // Parse version numbers (e.g., "2.4.0" -> [2, 4, 0])
+        const parseVersion = (version: string) => 
+          version.split('.').map(num => parseInt(num) || 0);
+        
+        const partsA = parseVersion(versionA);
+        const partsB = parseVersion(versionB);
+        
+        // Compare version parts (major, minor, patch)
+        for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+          const partA = partsA[i] || 0;
+          const partB = partsB[i] || 0;
+          
+          if (partA !== partB) {
+            return partB - partA; // Descending order (highest first)
+          }
+        }
+        
+        // If versions are equal, sort by creation date (newest first)
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+
+      setUpdates(sortedUpdates as Update[]);
     } catch (error) {
       console.error("Error fetching updates:", error);
       toast({
