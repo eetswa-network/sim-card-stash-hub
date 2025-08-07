@@ -236,86 +236,102 @@ export default function SimCardSummary() {
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Status</TableHead>
-                <TableHead>Phone Numbers</TableHead>
-                <TableHead>SIM Cards</TableHead>
-                <TableHead className="text-right">Percentage</TableHead>
+              <TableRow className="border-b-2">
+                <TableHead className="border-r">Status</TableHead>
+                <TableHead className="border-r text-center">Phone Numbers</TableHead>
+                <TableHead className="border-r text-center">SIM Cards</TableHead>
+                <TableHead className="text-center">Percentage</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell>
+              <TableRow className="border-b">
+                <TableCell className="border-r">
                   <Badge variant={getStatusVariant('active')} className="flex items-center gap-1 w-fit">
                     <div className="w-2 h-2 rounded-full bg-green-500"></div>
                     Active
                   </Badge>
                 </TableCell>
-                <TableCell className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  {stats.active}
+                <TableCell className="border-r text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <span>{stats.active}</span>
+                  </div>
                 </TableCell>
-                <TableCell className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4 text-muted-foreground" />
-                  {stats.active}
+                <TableCell className="border-r text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <CreditCard className="h-4 w-4 text-muted-foreground" />
+                    <span>{stats.active}</span>
+                  </div>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-center">
                   {stats.total > 0 ? ((stats.active / stats.total) * 100).toFixed(1) : 0}%
                 </TableCell>
               </TableRow>
-              <TableRow>
-                <TableCell>
+              <TableRow className="border-b">
+                <TableCell className="border-r">
                   <Badge variant={getStatusVariant('inactive')} className="flex items-center gap-1 w-fit">
                     <div className="w-2 h-2 rounded-full bg-gray-500"></div>
                     Inactive
                   </Badge>
                 </TableCell>
-                <TableCell className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  {stats.inactive}
+                <TableCell className="border-r text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <span>{stats.inactive}</span>
+                  </div>
                 </TableCell>
-                <TableCell className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4 text-muted-foreground" />
-                  {stats.inactive}
+                <TableCell className="border-r text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <CreditCard className="h-4 w-4 text-muted-foreground" />
+                    <span>{stats.inactive}</span>
+                  </div>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-center">
                   {stats.total > 0 ? ((stats.inactive / stats.total) * 100).toFixed(1) : 0}%
                 </TableCell>
               </TableRow>
-              <TableRow>
-                <TableCell>
+              <TableRow className="border-b">
+                <TableCell className="border-r">
                   <Badge variant={getStatusVariant('expired')} className="flex items-center gap-1 w-fit">
                     <div className="w-2 h-2 rounded-full bg-red-500"></div>
                     Expired
                   </Badge>
                 </TableCell>
-                <TableCell className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  {stats.expired}
+                <TableCell className="border-r text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <span>{stats.expired}</span>
+                  </div>
                 </TableCell>
-                <TableCell className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4 text-muted-foreground" />
-                  {stats.expired}
+                <TableCell className="border-r text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <CreditCard className="h-4 w-4 text-muted-foreground" />
+                    <span>{stats.expired}</span>
+                  </div>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-center">
                   {stats.total > 0 ? ((stats.expired / stats.total) * 100).toFixed(1) : 0}%
                 </TableCell>
               </TableRow>
-              <TableRow className="font-semibold border-t-2">
-                <TableCell>
-                  <Badge variant="outline" className="flex items-center gap-1 w-fit">
+              <TableRow className="font-semibold border-t-2 bg-muted/30">
+                <TableCell className="border-r">
+                  <Badge variant="outline" className="flex items-center gap-1 w-fit font-semibold">
                     Total
                   </Badge>
                 </TableCell>
-                <TableCell className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  {stats.total}
+                <TableCell className="border-r text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <span>{stats.total}</span>
+                  </div>
                 </TableCell>
-                <TableCell className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4 text-muted-foreground" />
-                  {stats.total}
+                <TableCell className="border-r text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <CreditCard className="h-4 w-4 text-muted-foreground" />
+                    <span>{stats.total}</span>
+                  </div>
                 </TableCell>
-                <TableCell className="text-right">100%</TableCell>
+                <TableCell className="text-center">100%</TableCell>
               </TableRow>
             </TableBody>
           </Table>
