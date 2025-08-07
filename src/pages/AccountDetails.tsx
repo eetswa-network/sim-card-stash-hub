@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera, Save, User, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import SimCardSummary from "@/components/SimCardSummary";
 
 interface UserProfile {
   id: string;
@@ -253,6 +254,12 @@ export default function AccountDetails() {
           </p>
         </div>
 
+        {/* SIM Card Summary */}
+        <div className="mb-6">
+          <SimCardSummary />
+        </div>
+
+        {/* Profile Information Card */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
