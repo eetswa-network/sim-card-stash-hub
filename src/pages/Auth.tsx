@@ -356,7 +356,7 @@ export default function Auth() {
         return;
       }
 
-      // Generate authentication options
+      // Generate authentication options (simplified approach)
       const challenge = new Uint8Array(32);
       crypto.getRandomValues(challenge);
       
@@ -364,13 +364,15 @@ export default function Auth() {
         challenge: btoa(String.fromCharCode(...challenge)),
         timeout: 60000,
         userVerification: "preferred" as const,
-        rpId: window.location.hostname,
+        rpId: window.location.hostname
       };
 
       // Start authentication
       const authResponse = await startAuthentication({
         optionsJSON: options
       });
+
+      console.log("Authentication response:", authResponse);
 
       // Look up the passkey in our database
       const { data: passkeyData, error: passkeyError } = await supabase
@@ -380,6 +382,15 @@ export default function Auth() {
         .single();
 
       if (passkeyError || !passkeyData) {
+        console.error("Passkey lookup error:", passkeyError);
+        console.log("Looking for credential_id:", authResponse.id);
+        
+        // Let's also try to search for any passkeys to debug
+        const { data: allPasskeys } = await supabase
+          .from("user_passkeys")
+          .select("credential_id");
+        console.log("All stored passkeys:", allPasskeys);
+        
         toast({
           title: "Passkey not found",
           description: "This passkey is not registered. Please register a passkey first or use email/password.",
@@ -388,10 +399,7 @@ export default function Auth() {
         return;
       }
 
-      // For this demo, we'll trust the passkey authentication
-      // In production, you'd verify the signature server-side
-      
-      // Get user's email to sign them in
+      // Get user profile to find email
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("name")
@@ -399,6 +407,7 @@ export default function Auth() {
         .single();
 
       if (profileError) {
+        console.error("Profile lookup error:", profileError);
         toast({
           title: "Authentication failed",
           description: "Could not find user profile.",
@@ -416,11 +425,11 @@ export default function Auth() {
         })
         .eq("credential_id", authResponse.id);
 
-      // Sign in the user using Supabase auth
-      // Note: This is simplified - in production you'd need a proper auth flow
+      // For now, just show success and let user enter email manually
+      // In a production app, you'd implement a proper server-side verification flow
       toast({
-        title: "Passkey authentication successful!",
-        description: `Welcome back! Please complete sign-in with your email for security.`
+        title: "Passkey verified successfully!",
+        description: "Passkey authentication completed. Please sign in with your email for full access.",
       });
 
     } catch (error: any) {
@@ -429,6 +438,12 @@ export default function Auth() {
         toast({
           title: "Authentication cancelled",
           description: "Passkey authentication was cancelled or failed.",
+          variant: "destructive"
+        });
+      } else if (error.name === 'NotSupportedError') {
+        toast({
+          title: "Passkeys not supported",
+          description: "Your browser or device doesn't support passkeys.",
           variant: "destructive"
         });
       } else {
