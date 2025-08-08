@@ -346,6 +346,16 @@ export default function Auth() {
   const handlePasskeySignIn = async () => {
     setLoading(true);
     try {
+      // Check if we're in an iframe (like Lovable preview)
+      if (window.self !== window.top) {
+        toast({
+          title: "Passkeys not available in preview",
+          description: "Passkeys don't work in iframe environments for security reasons. Please test this feature in the deployed version of your app.",
+          variant: "destructive"
+        });
+        return;
+      }
+
       // Check if passkeys are supported
       if (!window.PublicKeyCredential) {
         toast({
@@ -435,11 +445,19 @@ export default function Auth() {
     } catch (error: any) {
       console.error("Passkey authentication error:", error);
       if (error.name === 'NotAllowedError') {
-        toast({
-          title: "Authentication cancelled",
-          description: "Passkey authentication was cancelled or failed.",
-          variant: "destructive"
-        });
+        if (error.message.includes('publickey-credentials-get')) {
+          toast({
+            title: "Passkeys not available in preview",
+            description: "Passkeys don't work in iframe environments. Please test this in the deployed version of your app.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Authentication cancelled",
+            description: "Passkey authentication was cancelled or failed.",
+            variant: "destructive"
+          });
+        }
       } else if (error.name === 'NotSupportedError') {
         toast({
           title: "Passkeys not supported",
