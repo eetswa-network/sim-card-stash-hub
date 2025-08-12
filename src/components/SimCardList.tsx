@@ -10,6 +10,11 @@ import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Min
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EditableUsageTable } from "./EditableUsageTable";
+import ebayLogo from "@/assets/ebay-logo.png";
+import paypalLogo from "@/assets/paypal-logo.png";
+import afterpayLogo from "@/assets/afterpay-logo.png";
+import klarnaLogo from "@/assets/klarna-logo.png";
+import auspostLogo from "@/assets/auspost-logo.png";
 
 interface SimCard {
   id: string;
@@ -741,23 +746,33 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             <div className="flex justify-between items-center">
                               <div className="flex items-center space-x-2">
                                 <Checkbox id={`ebay-mobile-${card.id}`} />
-                                <Label htmlFor={`ebay-mobile-${card.id}`} className="text-sm">eBay</Label>
+                                <Label htmlFor={`ebay-mobile-${card.id}`} className="cursor-pointer">
+                                  <img src={ebayLogo} alt="eBay" className="h-6 w-auto" />
+                                </Label>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Checkbox id={`paypal-mobile-${card.id}`} />
-                                <Label htmlFor={`paypal-mobile-${card.id}`} className="text-sm">PayPal</Label>
+                                <Label htmlFor={`paypal-mobile-${card.id}`} className="cursor-pointer">
+                                  <img src={paypalLogo} alt="PayPal" className="h-6 w-auto" />
+                                </Label>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Checkbox id={`afterpay-mobile-${card.id}`} />
-                                <Label htmlFor={`afterpay-mobile-${card.id}`} className="text-sm">Afterpay</Label>
+                                <Label htmlFor={`afterpay-mobile-${card.id}`} className="cursor-pointer">
+                                  <img src={afterpayLogo} alt="Afterpay" className="h-6 w-auto" />
+                                </Label>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Checkbox id={`klarna-mobile-${card.id}`} />
-                                <Label htmlFor={`klarna-mobile-${card.id}`} className="text-sm">Klarna</Label>
+                                <Label htmlFor={`klarna-mobile-${card.id}`} className="cursor-pointer">
+                                  <img src={klarnaLogo} alt="Klarna" className="h-6 w-auto" />
+                                </Label>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Checkbox id={`auspost-mobile-${card.id}`} />
-                                <Label htmlFor={`auspost-mobile-${card.id}`} className="text-sm">AusPost</Label>
+                                <Label htmlFor={`auspost-mobile-${card.id}`} className="cursor-pointer">
+                                  <img src={auspostLogo} alt="Australia Post" className="h-6 w-auto" />
+                                </Label>
                               </div>
                             </div>
                           </div>
@@ -948,23 +963,33 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               <div className="flex justify-between items-center">
                                 <div className="flex items-center space-x-2">
                                   <Checkbox id={`ebay-desktop-${card.id}`} />
-                                  <Label htmlFor={`ebay-desktop-${card.id}`} className="text-sm">eBay</Label>
+                                  <Label htmlFor={`ebay-desktop-${card.id}`} className="cursor-pointer">
+                                    <img src={ebayLogo} alt="eBay" className="h-6 w-auto" />
+                                  </Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                   <Checkbox id={`paypal-desktop-${card.id}`} />
-                                  <Label htmlFor={`paypal-desktop-${card.id}`} className="text-sm">PayPal</Label>
+                                  <Label htmlFor={`paypal-desktop-${card.id}`} className="cursor-pointer">
+                                    <img src={paypalLogo} alt="PayPal" className="h-6 w-auto" />
+                                  </Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                   <Checkbox id={`afterpay-desktop-${card.id}`} />
-                                  <Label htmlFor={`afterpay-desktop-${card.id}`} className="text-sm">Afterpay</Label>
+                                  <Label htmlFor={`afterpay-desktop-${card.id}`} className="cursor-pointer">
+                                    <img src={afterpayLogo} alt="Afterpay" className="h-6 w-auto" />
+                                  </Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                   <Checkbox id={`klarna-desktop-${card.id}`} />
-                                  <Label htmlFor={`klarna-desktop-${card.id}`} className="text-sm">Klarna</Label>
+                                  <Label htmlFor={`klarna-desktop-${card.id}`} className="cursor-pointer">
+                                    <img src={klarnaLogo} alt="Klarna" className="h-6 w-auto" />
+                                  </Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                   <Checkbox id={`auspost-desktop-${card.id}`} />
-                                  <Label htmlFor={`auspost-desktop-${card.id}`} className="text-sm">AusPost</Label>
+                                  <Label htmlFor={`auspost-desktop-${card.id}`} className="cursor-pointer">
+                                    <img src={auspostLogo} alt="Australia Post" className="h-6 w-auto" />
+                                  </Label>
                                 </div>
                               </div>
                             </div>
