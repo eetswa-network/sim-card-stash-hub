@@ -735,6 +735,32 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             onUsageUpdate={handleUsageUpdate}
                           />
 
+                          {/* Service Checkboxes Row */}
+                          <div className="space-y-2">
+                            <span className="text-sm font-medium">Services:</span>
+                            <div className="flex justify-between items-center">
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id={`ebay-mobile-${card.id}`} />
+                                <Label htmlFor={`ebay-mobile-${card.id}`} className="text-sm">eBay</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id={`paypal-mobile-${card.id}`} />
+                                <Label htmlFor={`paypal-mobile-${card.id}`} className="text-sm">PayPal</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id={`afterpay-mobile-${card.id}`} />
+                                <Label htmlFor={`afterpay-mobile-${card.id}`} className="text-sm">Afterpay</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id={`klarna-mobile-${card.id}`} />
+                                <Label htmlFor={`klarna-mobile-${card.id}`} className="text-sm">Klarna</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Checkbox id={`auspost-mobile-${card.id}`} />
+                                <Label htmlFor={`auspost-mobile-${card.id}`} className="text-sm">AusPost</Label>
+                              </div>
+                            </div>
+                          </div>
                           
                           <div>
                             <span className="text-sm font-medium">Created:</span>
@@ -916,6 +942,32 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               />
                             </div>
                             
+                            {/* Service Checkboxes Row */}
+                            <div className="md:col-span-2 space-y-2">
+                              <span className="text-sm font-medium">Services:</span>
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox id={`ebay-desktop-${card.id}`} />
+                                  <Label htmlFor={`ebay-desktop-${card.id}`} className="text-sm">eBay</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox id={`paypal-desktop-${card.id}`} />
+                                  <Label htmlFor={`paypal-desktop-${card.id}`} className="text-sm">PayPal</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox id={`afterpay-desktop-${card.id}`} />
+                                  <Label htmlFor={`afterpay-desktop-${card.id}`} className="text-sm">Afterpay</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox id={`klarna-desktop-${card.id}`} />
+                                  <Label htmlFor={`klarna-desktop-${card.id}`} className="text-sm">Klarna</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox id={`auspost-desktop-${card.id}`} />
+                                  <Label htmlFor={`auspost-desktop-${card.id}`} className="text-sm">AusPost</Label>
+                                </div>
+                              </div>
+                            </div>
                             
                             <div className="flex items-center gap-2">
                               <span className="text-sm font-medium">Created:</span>
