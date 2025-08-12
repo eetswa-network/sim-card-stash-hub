@@ -759,7 +759,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               <div className="flex items-center space-x-2">
                                 <Checkbox id={`afterpay-mobile-${card.id}`} />
                                 <Label htmlFor={`afterpay-mobile-${card.id}`} className="cursor-pointer">
-                                  <img src={afterpayLogo} alt="Afterpay" className="h-6 w-auto" />
+                                  <img src={afterpayLogo} alt="Afterpay" className="h-8 w-auto" />
                                 </Label>
                               </div>
                               <div className="flex items-center space-x-2">
@@ -976,7 +976,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                 <div className="flex items-center space-x-2">
                                   <Checkbox id={`afterpay-desktop-${card.id}`} />
                                   <Label htmlFor={`afterpay-desktop-${card.id}`} className="cursor-pointer">
-                                    <img src={afterpayLogo} alt="Afterpay" className="h-6 w-auto" />
+                                    <img src={afterpayLogo} alt="Afterpay" className="h-8 w-auto" />
                                   </Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
