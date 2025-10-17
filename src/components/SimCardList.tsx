@@ -157,10 +157,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
   const handleSimSwap = async (card: SimCard) => {
     try {
-      // Mark the original card as inactive (since "swapped" isn't allowed)
+      // Mark the original card as swapped
       const { error: updateError } = await supabase
         .from("sim_cards")
-        .update({ status: "inactive" })
+        .update({ status: "swapped" })
         .eq("id", card.id);
 
       if (updateError) throw updateError;
