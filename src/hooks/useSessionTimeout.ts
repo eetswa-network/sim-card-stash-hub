@@ -27,7 +27,6 @@ export const useSessionTimeout = () => {
 
       if ((now - parseInt(lastActivity)) > oneHour) {
         // Session has expired
-        console.log('Session timeout - signing out user');
         supabase.auth.signOut();
         localStorage.removeItem('lastActivity');
         toast({

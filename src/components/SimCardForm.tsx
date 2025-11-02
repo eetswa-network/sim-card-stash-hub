@@ -245,7 +245,12 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         const { error } = await supabase
           .from("sim_cards")
           .update({
-            ...validatedData,
+            sim_number: validatedData.sim_number,
+            phone_number: validatedData.phone_number,
+            carrier: validatedData.carrier || null,
+            status: validatedData.status,
+            sim_type: validatedData.sim_type,
+            notes: validatedData.notes || null,
             account_id: validatedData.account_id || null
           })
           .eq("id", editingCard.id);
@@ -258,7 +263,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
           .delete()
           .eq("sim_card_id", editingCard.id);
       } else {
-        const { data, error } = await supabase
+        const { data, error} = await supabase
           .from("sim_cards")
           .insert([{ 
             sim_number: validatedData.sim_number,

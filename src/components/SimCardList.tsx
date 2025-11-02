@@ -51,11 +51,10 @@ interface SimCardListProps {
 }
 
 export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange, searchQuery, showForm, onAddSimCard }: SimCardListProps) {
-  console.log("SimCardList component mounted with props:", { refreshTrigger, viewMode, searchQuery });
   const [simCards, setSimCards] = useState<SimCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-  const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
+  const [showPasswords, setShowPasswords] = useState<{[key: string]: string | boolean}>({});
   const [usageData, setUsageData] = useState<{[key: string]: UsageEntry[]}>({});
   const [sortField, setSortField] = useState<'phone_number' | 'sim_number' | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -272,11 +271,40 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     setExpandedRows(newExpandedRows);
   };
 
-  const togglePasswordVisibility = (cardId: string) => {
-    setShowPasswords(prev => ({
-      ...prev,
-      [cardId]: !prev[cardId]
-    }));
+  const togglePasswordVisibility = async (cardId: string) => {
+    // If already visible, just hide it
+    if (showPasswords[cardId]) {
+      setShowPasswords(prev => ({
+        ...prev,
+        [cardId]: false
+      }));
+      return;
+    }
+
+    // Otherwise, decrypt and show
+    const card = simCards.find(c => c.id === cardId);
+    if (card?.password) {
+      try {
+        const { data: decrypted, error } = await supabase.rpc(
+          'decrypt_account_password',
+          { encrypted_text: card.password }
+        );
+        if (error) throw error;
+        
+        // Store decrypted password temporarily
+        setShowPasswords(prev => ({
+          ...prev,
+          [cardId]: decrypted || card.password
+        }));
+      } catch (error) {
+        console.error("Error decrypting password:", error);
+        // Fallback to showing encrypted value
+        setShowPasswords(prev => ({
+          ...prev,
+          [cardId]: card.password
+        }));
+      }
+    }
   };
 
   const collapseAll = () => {
@@ -532,7 +560,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id={`show-password-grid-${card.id}`}
-                        checked={showPasswords[card.id] || false}
+                        checked={!!showPasswords[card.id]}
                         onCheckedChange={() => togglePasswordVisibility(card.id)}
                       />
                       <Label htmlFor={`show-password-grid-${card.id}`} className="text-xs font-normal">
@@ -726,7 +754,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               <div className="flex items-center space-x-2">
                                 <Checkbox
                                   id={`show-password-mobile-${card.id}`}
-                                  checked={showPasswords[card.id] || false}
+                                  checked={!!showPasswords[card.id]}
                                   onCheckedChange={() => togglePasswordVisibility(card.id)}
                                 />
                                 <Label htmlFor={`show-password-mobile-${card.id}`} className="text-sm font-normal">
@@ -934,7 +962,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                 <div className="flex items-center space-x-2">
                                   <Checkbox
                                     id={`show-password-list-${card.id}`}
-                                    checked={showPasswords[card.id] || false}
+                                    checked={!!showPasswords[card.id]}
                                     onCheckedChange={() => togglePasswordVisibility(card.id)}
                                   />
                                   <Label htmlFor={`show-password-list-${card.id}`} className="text-xs font-normal">

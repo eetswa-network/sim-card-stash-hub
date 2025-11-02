@@ -443,13 +443,7 @@ export default function Auth() {
         optionsJSON: options
       });
 
-      console.log("Authentication response:", authResponse);
-      console.log("Raw credential ID from auth response:", authResponse.rawId);
-      console.log("ID from auth response:", authResponse.id);
-
       // Look up the passkey in our database - try different formats
-      console.log("Searching for credential_id:", authResponse.id);
-      
       let { data: passkeyData, error: passkeyError } = await supabase
         .from("user_passkeys")
         .select("user_id, counter, credential_id")
@@ -457,21 +451,11 @@ export default function Auth() {
         .single();
 
       if (passkeyError || !passkeyData) {
-        console.error("Passkey lookup error:", passkeyError);
-        console.log("Looking for credential_id:", authResponse.id);
-        
-        // Let's also try to search for any passkeys to debug
-        const { data: allPasskeys } = await supabase
-          .from("user_passkeys")
-          .select("credential_id, user_id");
-        console.log("All stored passkeys:", allPasskeys);
-        
         // Try alternative ID formats - check if rawId exists and convert properly
         if (authResponse.rawId && typeof authResponse.rawId !== 'string') {
           // rawId is likely an ArrayBuffer, convert to base64
           const uint8Array = new Uint8Array(authResponse.rawId as ArrayBuffer);
           const altId = btoa(String.fromCharCode(...uint8Array));
-          console.log("Alternative credential ID format:", altId);
           
           const { data: altPasskeyData } = await supabase
             .from("user_passkeys")
@@ -480,7 +464,6 @@ export default function Auth() {
             .single();
           
           if (altPasskeyData) {
-            console.log("Found passkey with alternative ID format!");
             passkeyData = altPasskeyData;
             passkeyError = null;
           }

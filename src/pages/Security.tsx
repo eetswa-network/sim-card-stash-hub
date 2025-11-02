@@ -62,7 +62,7 @@ export default function Security() {
       if (error && error.code !== 'PGRST116') throw error;
       setMfaSettings(data);
     } catch (error) {
-      console.error("Error fetching MFA settings:", error);
+      // Silent error - MFA settings not found is expected for new users
     }
   };
 
@@ -80,7 +80,7 @@ export default function Security() {
       if (error) throw error;
       setPasskeys(data || []);
     } catch (error) {
-      console.error("Error fetching passkeys:", error);
+      // Silent error - passkeys not found is expected for new users
     }
   };
 
@@ -178,7 +178,6 @@ export default function Security() {
 
       fetchPasskeys();
     } catch (error) {
-      console.error("Error saving passkey:", error);
       throw error;
     }
   };
@@ -201,7 +200,6 @@ export default function Security() {
 
       fetchPasskeys();
     } catch (error) {
-      console.error("Error deleting passkey:", error);
       toast({
         title: "Error",
         description: "Failed to delete passkey. Please try again.",
