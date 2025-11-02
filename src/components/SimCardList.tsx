@@ -255,6 +255,8 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         return "destructive";
       case "expired":
         return "outline";
+      case "swapped":
+        return "swapped" as any;
       default:
         return "outline";
     }
