@@ -338,12 +338,23 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       // Validate account data
       const validatedAccount = accountSchema.parse(newAccount);
 
+      // Encrypt password before saving
+      let encryptedPassword = null;
+      if (validatedAccount.password) {
+        const { data: encrypted, error: encryptError } = await supabase.rpc(
+          'encrypt_account_password',
+          { password_text: validatedAccount.password }
+        );
+        if (encryptError) throw encryptError;
+        encryptedPassword = encrypted;
+      }
+
       const { data, error } = await supabase
         .from("accounts")
         .insert([{
           user_id: user.id,
           login: validatedAccount.login,
-          password: validatedAccount.password || null
+          password: encryptedPassword
         }])
         .select()
         .single();
@@ -552,11 +563,11 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
 
           <div className="space-y-2">
             <Label htmlFor="account">Account Login</Label>
-            <Alert variant="destructive" className="mb-3">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Security Warning</AlertTitle>
-              <AlertDescription>
-                Account credentials are stored unencrypted in the database. Only store non-sensitive accounts or use OAuth/API tokens when possible.
+            <Alert className="mb-3 border-blue-500 bg-blue-50 dark:bg-blue-950">
+              <AlertTriangle className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-blue-800 dark:text-blue-200">Security Notice</AlertTitle>
+              <AlertDescription className="text-blue-700 dark:text-blue-300">
+                Account passwords are now encrypted in the database using secure encryption functions.
               </AlertDescription>
             </Alert>
             {showNewAccount ? (
