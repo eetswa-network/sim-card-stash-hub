@@ -9,8 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, AlertTriangle } from "lucide-react";
 import { z } from "zod";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const simCardSchema = z.object({
   sim_number: z.string()
@@ -551,6 +552,13 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
 
           <div className="space-y-2">
             <Label htmlFor="account">Account Login</Label>
+            <Alert variant="destructive" className="mb-3">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Security Warning</AlertTitle>
+              <AlertDescription>
+                Account credentials are stored unencrypted in the database. Only store non-sensitive accounts or use OAuth/API tokens when possible.
+              </AlertDescription>
+            </Alert>
             {showNewAccount ? (
               <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
                 <div className="flex items-center justify-between">
