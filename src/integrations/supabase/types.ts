@@ -178,7 +178,7 @@ export type Database = {
           sim_type: string
           status: string | null
           updated_at: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           account_id?: string | null
@@ -194,7 +194,7 @@ export type Database = {
           sim_type?: string
           status?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           account_id?: string | null
@@ -210,7 +210,7 @@ export type Database = {
           sim_type?: string
           status?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
