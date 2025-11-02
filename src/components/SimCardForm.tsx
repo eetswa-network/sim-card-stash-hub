@@ -10,6 +10,61 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Plus, Trash2 } from "lucide-react";
+import { z } from "zod";
+
+const simCardSchema = z.object({
+  sim_number: z.string()
+    .trim()
+    .min(1, "SIM number is required")
+    .max(100, "SIM number must be less than 100 characters"),
+  phone_number: z.string()
+    .trim()
+    .min(1, "Phone number is required")
+    .max(20, "Phone number must be less than 20 characters")
+    .regex(/^[0-9+\-() ]+$/, "Phone number must contain only digits and valid separators"),
+  carrier: z.string()
+    .trim()
+    .max(100, "Carrier name must be less than 100 characters")
+    .optional(),
+  status: z.enum(["active", "inactive", "expired"], { 
+    errorMap: () => ({ message: "Status must be active, inactive, or expired" })
+  }),
+  sim_type: z.string()
+    .trim()
+    .max(50, "SIM type must be less than 50 characters"),
+  notes: z.string()
+    .trim()
+    .max(1000, "Notes must be less than 1000 characters")
+    .optional(),
+  account_id: z.string().uuid("Invalid account ID").optional().or(z.literal(""))
+});
+
+const accountSchema = z.object({
+  login: z.string()
+    .trim()
+    .min(1, "Account login is required")
+    .max(255, "Account login must be less than 255 characters"),
+  password: z.string()
+    .trim()
+    .max(255, "Account password must be less than 255 characters")
+    .optional()
+});
+
+const carrierSchema = z.string()
+  .trim()
+  .min(1, "Carrier name is required")
+  .max(100, "Carrier name must be less than 100 characters");
+
+const usageEntrySchema = z.object({
+  name: z.string()
+    .trim()
+    .min(1, "Name is required")
+    .max(100, "Name must be less than 100 characters"),
+  use_purpose: z.string()
+    .trim()
+    .min(1, "Use purpose is required")
+    .max(255, "Use purpose must be less than 255 characters")
+});
 
 interface SimCardFormProps {
   onSuccess: () => void;
@@ -118,6 +173,19 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         return;
       }
 
+      // Validate form data
+      const validatedData = simCardSchema.parse({
+        ...formData,
+        carrier: formData.carrier || undefined,
+        notes: formData.notes || undefined,
+        account_id: formData.account_id || ""
+      });
+
+      // Validate usage entries
+      const validatedUsageEntries = usedForEntries
+        .filter(entry => entry.name || entry.use_purpose)
+        .map(entry => usageEntrySchema.parse(entry));
+
       // Check for existing SIM number and phone number (only when adding new or if values changed)
       if (!editingCard || formData.sim_number !== editingCard.sim_number || formData.phone_number !== editingCard.phone_number) {
         const checks = [];
@@ -175,7 +243,10 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       if (editingCard) {
         const { error } = await supabase
           .from("sim_cards")
-          .update(formData)
+          .update({
+            ...validatedData,
+            account_id: validatedData.account_id || null
+          })
           .eq("id", editingCard.id);
 
         if (error) throw error;
@@ -189,10 +260,15 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         const { data, error } = await supabase
           .from("sim_cards")
           .insert([{ 
-            ...formData, 
+            sim_number: validatedData.sim_number,
+            phone_number: validatedData.phone_number,
+            carrier: validatedData.carrier || null,
+            status: validatedData.status,
+            sim_type: validatedData.sim_type,
+            notes: validatedData.notes || null,
             user_id: user.id, 
             profile_id: profile?.id,
-            account_id: formData.account_id || null // Convert empty string to null for UUID field
+            account_id: validatedData.account_id || null
           }])
           .select()
           .single();
@@ -201,12 +277,11 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         simCardId = data.id;
       }
 
-      // Insert new usage entries (only non-empty ones)
-      const validUsedForEntries = usedForEntries.filter(entry => entry.name.trim() && entry.use_purpose.trim());
-      if (validUsedForEntries.length > 0) {
+      // Insert new usage entries
+      if (validatedUsageEntries.length > 0) {
         const { error: usageError } = await supabase
           .from("sim_card_usage")
-          .insert(validUsedForEntries.map(entry => ({
+          .insert(validatedUsageEntries.map(entry => ({
             sim_card_id: simCardId,
             name: entry.name,
             use_purpose: entry.use_purpose,
@@ -230,18 +305,26 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       setUsedForEntries([{ name: "", use_purpose: "" }]);
       onSuccess();
     } catch (error: any) {
-      console.error("Error saving SIM card:", error);
-      
-      let errorMessage = "Failed to save SIM card. Please try again.";
-      if (error?.code === "23505" && error?.message?.includes("sim_cards_sim_number_key")) {
-        errorMessage = "A SIM card with this SIM number already exists. Please use a different SIM number.";
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        console.error("Error saving SIM card:", error);
+        
+        let errorMessage = "Failed to save SIM card. Please try again.";
+        if (error?.code === "23505" && error?.message?.includes("sim_cards_sim_number_key")) {
+          errorMessage = "A SIM card with this SIM number already exists. Please use a different SIM number.";
+        }
+        
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
       }
-      
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
@@ -251,12 +334,15 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
     if (!user || !newAccount.login.trim()) return;
 
     try {
+      // Validate account data
+      const validatedAccount = accountSchema.parse(newAccount);
+
       const { data, error } = await supabase
         .from("accounts")
         .insert([{
           user_id: user.id,
-          login: newAccount.login.trim(),
-          password: newAccount.password.trim()
+          login: validatedAccount.login,
+          password: validatedAccount.password || null
         }])
         .select()
         .single();
@@ -275,11 +361,19 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
 
       toast({ title: "Account added successfully!" });
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to add account. It might already exist.",
-        variant: "destructive",
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to add account. It might already exist.",
+          variant: "destructive",
+        });
+      }
     }
   };
 

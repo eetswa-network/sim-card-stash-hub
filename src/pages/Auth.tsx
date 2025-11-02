@@ -11,6 +11,35 @@ import { Loader2, Shield, QrCode, Copy, CheckCircle, Fingerprint } from "lucide-
 import { TOTP } from "otpauth";
 import QRCode from "qrcode";
 import { startRegistration, startAuthentication } from "@simplewebauthn/browser";
+import { z } from "zod";
+
+const signUpSchema = z.object({
+  name: z.string()
+    .trim()
+    .min(1, "Name is required")
+    .max(100, "Name must be less than 100 characters"),
+  email: z.string()
+    .trim()
+    .email("Invalid email address")
+    .max(255, "Email must be less than 255 characters"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .max(72, "Password must be less than 72 characters")
+});
+
+const signInSchema = z.object({
+  email: z.string()
+    .trim()
+    .email("Invalid email address")
+    .max(255, "Email must be less than 255 characters"),
+  password: z.string()
+    .min(1, "Password is required")
+    .max(72, "Password must be less than 72 characters")
+});
+
+const mfaCodeSchema = z.string()
+  .trim()
+  .regex(/^[0-9]{6}$/, "Verification code must be 6 digits");
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
@@ -63,13 +92,16 @@ export default function Auth() {
     const name = formData.get("name") as string;
 
     try {
+      // Validate inputs
+      const validatedData = signUpSchema.parse({ name, email, password });
+
       const { error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: validatedData.email,
+        password: validatedData.password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            name
+            name: validatedData.name
           }
         }
       });
@@ -95,11 +127,19 @@ export default function Auth() {
         });
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive"
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -217,7 +257,10 @@ export default function Auth() {
     const verificationCode = formData.get("verification_code") as string;
 
     try {
-      if (!verifyTotp(mfaSecret, verificationCode)) {
+      // Validate MFA code
+      const validatedCode = mfaCodeSchema.parse(verificationCode);
+
+      if (!verifyTotp(mfaSecret, validatedCode)) {
         toast({
           title: "Invalid verification code",
           description: "Please check your authenticator app and try again.",
@@ -254,11 +297,19 @@ export default function Auth() {
       setTempUser(null);
       setTempCredentials(null);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to enable two-step authentication. Please try again.",
-        variant: "destructive"
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to enable two-step authentication. Please try again.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -272,6 +323,8 @@ export default function Auth() {
     const verificationCode = formData.get("mfa_code") as string;
 
     try {
+      // Validate MFA code
+      const validatedCode = mfaCodeSchema.parse(verificationCode);
       const { data: mfaData, error } = await supabase
         .from("user_mfa_settings")
         .select("secret, backup_codes")
@@ -280,8 +333,8 @@ export default function Auth() {
 
       if (error) throw error;
 
-      const isValidTotp = verifyTotp(mfaData.secret, verificationCode);
-      const isValidBackupCode = mfaData.backup_codes?.includes(verificationCode);
+      const isValidTotp = verifyTotp(mfaData.secret, validatedCode);
+      const isValidBackupCode = mfaData.backup_codes?.includes(validatedCode);
 
       if (!isValidTotp && !isValidBackupCode) {
         toast({
@@ -294,7 +347,7 @@ export default function Auth() {
 
       // If backup code was used, remove it from the list
       if (isValidBackupCode) {
-        const updatedCodes = mfaData.backup_codes.filter(code => code !== verificationCode);
+        const updatedCodes = mfaData.backup_codes.filter(code => code !== validatedCode);
         await supabase
           .from("user_mfa_settings")
           .update({ backup_codes: updatedCodes })
@@ -322,11 +375,19 @@ export default function Auth() {
       setTempUser(null);
       setTempCredentials(null);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to verify code. Please try again.",
-        variant: "destructive"
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to verify code. Please try again.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -511,9 +572,12 @@ export default function Auth() {
     const password = formData.get("password") as string;
 
     try {
+      // Validate inputs
+      const validatedData = signInSchema.parse({ email, password });
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
+        email: validatedData.email,
+        password: validatedData.password
       });
 
       if (error) {
@@ -543,11 +607,19 @@ export default function Auth() {
         // No need to manually navigate here
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive"
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
     }

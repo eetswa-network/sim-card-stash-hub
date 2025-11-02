@@ -9,6 +9,18 @@ import { Camera, Save, User, Mail, Sun, Moon, Monitor } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
+import { z } from "zod";
+
+const profileSchema = z.object({
+  name: z.string()
+    .trim()
+    .max(100, "Name must be less than 100 characters")
+    .optional(),
+  email: z.string()
+    .trim()
+    .email("Invalid email address")
+    .max(255, "Email must be less than 255 characters")
+});
 
 interface UserProfile {
   id: string;
@@ -86,10 +98,13 @@ export default function AccountDetails() {
 
     setSaving(true);
     try {
+      // Validate inputs
+      const validatedData = profileSchema.parse(formData);
+
       // Update email if it has changed
-      if (formData.email !== user.email) {
+      if (validatedData.email !== user.email) {
         const { error: emailError } = await supabase.auth.updateUser({
-          email: formData.email
+          email: validatedData.email
         });
 
         if (emailError) throw emailError;
@@ -103,8 +118,8 @@ export default function AccountDetails() {
       // Update or create profile
       const profileUpdate = {
         user_id: user.id,
-        name: formData.name || null,
-        profile_name: formData.name || null
+        name: validatedData.name || null,
+        profile_name: validatedData.name || null
       };
 
       if (profile) {
@@ -133,12 +148,20 @@ export default function AccountDetails() {
       // Navigate back to dashboard
       navigate("/");
     } catch (error) {
-      console.error("Error saving profile:", error);
-      toast({
-        title: "Error",
-        description: "Failed to save profile changes.",
-        variant: "destructive"
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+      } else {
+        console.error("Error saving profile:", error);
+        toast({
+          title: "Error",
+          description: "Failed to save profile changes.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setSaving(false);
     }
