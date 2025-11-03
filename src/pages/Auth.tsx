@@ -505,11 +505,39 @@ export default function Auth() {
         })
         .eq("credential_id", authResponse.id);
 
-      // For now, just show success and let user enter email manually
-      // In a production app, you'd implement a proper server-side verification flow
+      // Get user's email from auth.users via their user_id
+      const { data: { user: authUser }, error: authError } = await supabase.auth.admin.getUserById(passkeyData.user_id);
+      
+      if (authError || !authUser?.email) {
+        // Fallback: Try to create a session using the user_id directly
+        // This requires signing in with a magic link or creating a session token
+        toast({
+          title: "Passkey verified!",
+          description: "Passkey verified, but automatic sign-in is not available. Please sign in with your email.",
+        });
+        return;
+      }
+
+      // Sign in the user using their email with a one-time password (OTP)
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        email: authUser.email,
+        options: {
+          shouldCreateUser: false,
+        }
+      });
+
+      if (otpError) {
+        toast({
+          title: "Sign-in failed",
+          description: "Passkey verified but couldn't complete sign-in. Please use email/password.",
+          variant: "destructive"
+        });
+        return;
+      }
+
       toast({
-        title: "Passkey verified successfully!",
-        description: "Passkey authentication completed. Please sign in with your email for full access.",
+        title: "Check your email",
+        description: `Passkey verified! We've sent a sign-in link to ${authUser.email}`,
       });
 
     } catch (error: any) {
