@@ -345,39 +345,27 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     ? simCards.filter(card => {
         const searchLower = searchQuery.toLowerCase();
         
-        // Check if search matches phone number - show active and expired records
+        // Check if search matches any field
         const phoneMatch = card.phone_number.toLowerCase().includes(searchLower);
-        if (phoneMatch && card.status !== 'active' && card.status !== 'expired') {
-          return false; // Don't show inactive/suspended records for phone number matches
-        }
-        
-        // Check if search matches SIM number - show both active and inactive
         const simNumberMatch = card.sim_number.toLowerCase().includes(searchLower);
+        const carrierMatch = card.carrier?.toLowerCase().includes(searchLower) || false;
+        const statusMatch = card.status.toLowerCase().includes(searchLower);
+        const simTypeMatch = card.sim_type.toLowerCase().includes(searchLower);
+        const notesMatch = card.notes?.toLowerCase().includes(searchLower) || false;
+        const loginMatch = card.login?.toLowerCase().includes(searchLower) || false;
+        const accountMatch = card.account?.login?.toLowerCase().includes(searchLower) || false;
         
-        // Search in usage data - only show active records
+        // Search in usage data
         const usageMatch = usageData[card.id]?.some(usage => 
           usage.name.toLowerCase().includes(searchLower) ||
           usage.use_purpose.toLowerCase().includes(searchLower)
         ) || false;
-        if (usageMatch && card.status !== 'active') {
-          return false; // Don't show inactive records for usage data matches
-        }
         
-        // Search in account login - only show active records
-        const accountMatch = card.account?.login?.toLowerCase().includes(searchLower) || false;
-        if (accountMatch && card.status !== 'active') {
-          return false; // Don't show inactive records for login matches
-        }
-        
-        // Check other fields (carrier, status, sim_type, notes)
-        const otherFieldsMatch = card.carrier?.toLowerCase().includes(searchLower) ||
-          card.status.toLowerCase().includes(searchLower) ||
-          card.sim_type.toLowerCase().includes(searchLower) ||
-          card.notes?.toLowerCase().includes(searchLower);
-        
-        return phoneMatch || simNumberMatch || otherFieldsMatch || usageMatch || accountMatch;
+        // If any field matches, show the card (even if inactive)
+        return phoneMatch || simNumberMatch || carrierMatch || statusMatch || 
+               simTypeMatch || notesMatch || loginMatch || accountMatch || usageMatch;
       })
-    : simCards;
+    : simCards.filter(card => card.status !== 'inactive'); // Hide inactive cards when no search query
 
   // Apply sorting if in list view and sort field is selected
   if (viewMode === 'list' && sortField) {
