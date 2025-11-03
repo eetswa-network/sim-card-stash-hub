@@ -443,34 +443,31 @@ export default function Auth() {
         optionsJSON: options
       });
 
-      // Look up the passkey in our database - try different formats
-      let { data: passkeyData, error: passkeyError } = await supabase
-        .from("user_passkeys")
-        .select("user_id, counter, credential_id")
-        .eq("credential_id", authResponse.id)
-        .single();
+      console.log("Passkey auth response ID:", authResponse.id);
 
-      if (passkeyError || !passkeyData) {
-        // Try alternative ID formats - check if rawId exists and convert properly
-        if (authResponse.rawId && typeof authResponse.rawId !== 'string') {
-          // rawId is likely an ArrayBuffer, convert to base64
-          const uint8Array = new Uint8Array(authResponse.rawId as ArrayBuffer);
-          const altId = btoa(String.fromCharCode(...uint8Array));
-          
-          const { data: altPasskeyData } = await supabase
-            .from("user_passkeys")
-            .select("user_id, counter, credential_id")
-            .eq("credential_id", altId)
-            .single();
-          
-          if (altPasskeyData) {
-            passkeyData = altPasskeyData;
-            passkeyError = null;
-          }
-        }
+      // Look up the passkey in our database
+      // First, get all passkeys to see what we have
+      const { data: allPasskeys, error: fetchError } = await supabase
+        .from("user_passkeys")
+        .select("user_id, counter, credential_id");
+
+      if (fetchError) {
+        console.error("Error fetching passkeys:", fetchError);
+        toast({
+          title: "Database error",
+          description: "Could not retrieve passkeys. Please try again.",
+          variant: "destructive"
+        });
+        return;
       }
 
-      if (passkeyError || !passkeyData) {
+      console.log("All passkeys in database:", allPasskeys);
+
+      // Try to find matching passkey
+      const passkeyData = allPasskeys?.find(pk => pk.credential_id === authResponse.id);
+
+      if (!passkeyData) {
+        console.log("Passkey not found with ID:", authResponse.id);
         toast({
           title: "Passkey not found",
           description: "This passkey is not registered. Please register a passkey first or use email/password.",
@@ -478,6 +475,8 @@ export default function Auth() {
         });
         return;
       }
+
+      console.log("Found passkey for user:", passkeyData.user_id);
 
       // Get user profile to find email
       const { data: profileData, error: profileError } = await supabase
