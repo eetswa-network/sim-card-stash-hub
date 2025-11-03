@@ -361,11 +361,15 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
           usage.use_purpose.toLowerCase().includes(searchLower)
         ) || false;
         
-        // If any field matches, show the card (even if inactive)
+        // If any field matches, show the card (even if inactive/swapped/expired)
         return phoneMatch || simNumberMatch || carrierMatch || statusMatch || 
                simTypeMatch || notesMatch || loginMatch || accountMatch || usageMatch;
       })
-    : simCards.filter(card => card.status !== 'inactive'); // Hide inactive cards when no search query
+    : simCards.filter(card => 
+        card.status !== 'inactive' && 
+        card.status !== 'swapped' && 
+        card.status !== 'expired'
+      ); // Hide inactive, swapped, and expired cards when no search query
 
   // Apply sorting if in list view and sort field is selected
   if (viewMode === 'list' && sortField) {
