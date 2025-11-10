@@ -211,12 +211,22 @@ export default function Auth() {
 
   const saveMfaSettings = async (userId: string, secret: string, codes: string[]) => {
     try {
+      const { encryptMfaSecret, hashBackupCode } = await import("@/lib/crypto");
+      
+      // Encrypt the MFA secret
+      const encryptedSecret = await encryptMfaSecret(secret, userId);
+      
+      // Hash all backup codes
+      const hashedCodes = await Promise.all(
+        codes.map(code => hashBackupCode(code))
+      );
+
       const { error } = await supabase
         .from("user_mfa_settings")
         .upsert({
           user_id: userId,
-          secret: secret,
-          backup_codes: codes,
+          secret_encrypted: encryptedSecret,
+          backup_codes_hashed: hashedCodes,
           is_enabled: true
         });
 
@@ -327,14 +337,43 @@ export default function Auth() {
       const validatedCode = mfaCodeSchema.parse(verificationCode);
       const { data: mfaData, error } = await supabase
         .from("user_mfa_settings")
-        .select("secret, backup_codes")
+        .select("secret, secret_encrypted, backup_codes, backup_codes_hashed")
         .eq("user_id", tempUser.id)
         .single();
 
       if (error) throw error;
 
-      const isValidTotp = verifyTotp(mfaData.secret, validatedCode);
-      const isValidBackupCode = mfaData.backup_codes?.includes(validatedCode);
+      // Import crypto utilities
+      const { decryptMfaSecret, verifyBackupCode } = await import("@/lib/crypto");
+
+      // Decrypt the MFA secret (support legacy plaintext for migration)
+      let secret: string;
+      if (mfaData.secret_encrypted) {
+        secret = await decryptMfaSecret(mfaData.secret_encrypted, tempUser.id);
+      } else if (mfaData.secret) {
+        // Legacy plaintext secret - still supported during migration
+        secret = mfaData.secret;
+      } else {
+        throw new Error("No MFA secret found");
+      }
+
+      // Verify TOTP code
+      const isValidTotp = verifyTotp(secret, validatedCode);
+
+      // Verify backup code (check both hashed and legacy plaintext)
+      let isValidBackupCode = false;
+      if (mfaData.backup_codes_hashed) {
+        // Check against hashed backup codes
+        for (const hash of mfaData.backup_codes_hashed) {
+          if (await verifyBackupCode(validatedCode, hash)) {
+            isValidBackupCode = true;
+            break;
+          }
+        }
+      } else if (mfaData.backup_codes) {
+        // Legacy plaintext backup codes
+        isValidBackupCode = mfaData.backup_codes.includes(validatedCode);
+      }
 
       if (!isValidTotp && !isValidBackupCode) {
         toast({
@@ -347,11 +386,29 @@ export default function Auth() {
 
       // If backup code was used, remove it from the list
       if (isValidBackupCode) {
-        const updatedCodes = mfaData.backup_codes.filter(code => code !== validatedCode);
-        await supabase
-          .from("user_mfa_settings")
-          .update({ backup_codes: updatedCodes })
-          .eq("user_id", tempUser.id);
+        if (mfaData.backup_codes_hashed) {
+          // Find and remove the matching hash
+          const updatedHashes: string[] = [];
+          let removed = false;
+          for (const hash of mfaData.backup_codes_hashed) {
+            if (!removed && await verifyBackupCode(validatedCode, hash)) {
+              removed = true;
+              continue; // Skip this hash
+            }
+            updatedHashes.push(hash);
+          }
+          await supabase
+            .from("user_mfa_settings")
+            .update({ backup_codes_hashed: updatedHashes })
+            .eq("user_id", tempUser.id);
+        } else if (mfaData.backup_codes) {
+          // Legacy plaintext backup codes
+          const updatedCodes = mfaData.backup_codes.filter(code => code !== validatedCode);
+          await supabase
+            .from("user_mfa_settings")
+            .update({ backup_codes: updatedCodes })
+            .eq("user_id", tempUser.id);
+        }
       }
 
       // Complete the login by signing in again with stored credentials

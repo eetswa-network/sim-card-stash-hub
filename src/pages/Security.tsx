@@ -370,12 +370,23 @@ export default function Security() {
         return;
       }
 
+      // Import crypto utilities
+      const { encryptMfaSecret, hashBackupCode } = await import("@/lib/crypto");
+      
+      // Encrypt the MFA secret
+      const encryptedSecret = await encryptMfaSecret(mfaSecret, user.id);
+      
+      // Hash all backup codes
+      const hashedCodes = await Promise.all(
+        backupCodes.map(code => hashBackupCode(code))
+      );
+
       const { error } = await supabase
         .from("user_mfa_settings")
         .upsert({
           user_id: user.id,
-          secret: mfaSecret,
-          backup_codes: backupCodes,
+          secret_encrypted: encryptedSecret,
+          backup_codes_hashed: hashedCodes,
           is_enabled: true
         });
 
@@ -431,9 +442,17 @@ export default function Security() {
       setLoading(true);
       const newCodes = generateBackupCodes();
       
+      // Import crypto utilities
+      const { hashBackupCode } = await import("@/lib/crypto");
+      
+      // Hash all backup codes
+      const hashedCodes = await Promise.all(
+        newCodes.map(code => hashBackupCode(code))
+      );
+      
       const { error } = await supabase
         .from("user_mfa_settings")
-        .update({ backup_codes: newCodes })
+        .update({ backup_codes_hashed: hashedCodes })
         .eq("user_id", user.id);
 
       if (error) throw error;
