@@ -17,6 +17,7 @@ interface HeaderProps {
 export function Header({ onSearch }: HeaderProps) {
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -39,9 +40,24 @@ export function Header({ onSearch }: HeaderProps) {
             console.log("Could not fetch profile:", error);
             setUserProfile(null);
           }
+
+          // Check if user is super admin
+          try {
+            const { data: roleData } = await supabase
+              .from("user_roles")
+              .select("role")
+              .eq("user_id", session.user.id)
+              .eq("role", "super_admin")
+              .maybeSingle();
+            setIsSuperAdmin(!!roleData);
+          } catch (error) {
+            console.log("Could not fetch role:", error);
+            setIsSuperAdmin(false);
+          }
         } else {
           setUser(null);
           setUserProfile(null);
+          setIsSuperAdmin(false);
         }
       } catch (error) {
         console.error("Error checking session in Header:", error);
@@ -155,6 +171,19 @@ export function Header({ onSearch }: HeaderProps) {
                             Security Settings
                           </Link>
                         </Button>
+                        {isSuperAdmin && (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            asChild
+                            className="w-full gap-2 border-orange-300 text-orange-800 hover:bg-orange-100 dark:border-orange-700 dark:text-orange-200 dark:hover:bg-orange-900"
+                          >
+                            <Link to="/admin">
+                              <Shield className="h-4 w-4" />
+                              Admin Panel
+                            </Link>
+                          </Button>
+                        )}
                         <Button 
                           variant="outline" 
                           size="sm" 
@@ -246,6 +275,19 @@ export function Header({ onSearch }: HeaderProps) {
                           Security Settings
                         </Link>
                       </Button>
+                      {isSuperAdmin && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          asChild
+                          className="w-full gap-2 border-orange-300 text-orange-800 hover:bg-orange-100 dark:border-orange-700 dark:text-orange-200 dark:hover:bg-orange-900"
+                        >
+                          <Link to="/admin">
+                            <Shield className="h-4 w-4" />
+                            Admin Panel
+                          </Link>
+                        </Button>
+                      )}
                       <Button 
                         variant="outline" 
                         size="sm" 
