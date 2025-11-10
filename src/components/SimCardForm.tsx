@@ -343,15 +343,15 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       // Validate account data
       const validatedAccount = accountSchema.parse(newAccount);
 
-      // Encrypt password before saving
-      let encryptedPassword = null;
+      // Hash password before saving (one-way hashing for security)
+      let hashedPassword = null;
       if (validatedAccount.password) {
-        const { data: encrypted, error: encryptError } = await supabase.rpc(
-          'encrypt_account_password',
+        const { data: hashed, error: hashError } = await supabase.rpc(
+          'hash_account_password',
           { password_text: validatedAccount.password }
         );
-        if (encryptError) throw encryptError;
-        encryptedPassword = encrypted;
+        if (hashError) throw hashError;
+        hashedPassword = hashed;
       }
 
       const { data, error } = await supabase
@@ -359,7 +359,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         .insert([{
           user_id: user.id,
           login: validatedAccount.login,
-          password: encryptedPassword
+          password: hashedPassword
         }])
         .select()
         .single();

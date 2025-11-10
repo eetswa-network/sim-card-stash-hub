@@ -500,53 +500,26 @@ export default function Auth() {
         optionsJSON: options
       });
 
-      console.log("Passkey auth response ID:", authResponse.id);
-
       // Look up the passkey in our database
-      // First, get all passkeys to see what we have
-      const { data: allPasskeys, error: fetchError } = await supabase
+      const { data: passkeyData, error: fetchError } = await supabase
         .from("user_passkeys")
-        .select("user_id, counter, credential_id");
+        .select("user_id, counter, credential_id")
+        .eq("credential_id", authResponse.id)
+        .maybeSingle();
 
       if (fetchError) {
-        console.error("Error fetching passkeys:", fetchError);
         toast({
           title: "Database error",
-          description: "Could not retrieve passkeys. Please try again.",
+          description: "Could not retrieve passkey. Please try again.",
           variant: "destructive"
         });
         return;
       }
 
-      console.log("All passkeys in database:", allPasskeys);
-
-      // Try to find matching passkey
-      const passkeyData = allPasskeys?.find(pk => pk.credential_id === authResponse.id);
-
       if (!passkeyData) {
-        console.log("Passkey not found with ID:", authResponse.id);
         toast({
           title: "Passkey not found",
           description: "This passkey is not registered. Please register a passkey first or use email/password.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      console.log("Found passkey for user:", passkeyData.user_id);
-
-      // Get user profile to find email
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("name")
-        .eq("user_id", passkeyData.user_id)
-        .single();
-
-      if (profileError) {
-        console.error("Profile lookup error:", profileError);
-        toast({
-          title: "Authentication failed",
-          description: "Could not find user profile.",
           variant: "destructive"
         });
         return;
@@ -561,43 +534,21 @@ export default function Auth() {
         })
         .eq("credential_id", authResponse.id);
 
-      // Get user's email from auth.users via their user_id
-      const { data: { user: authUser }, error: authError } = await supabase.auth.admin.getUserById(passkeyData.user_id);
-      
-      if (authError || !authUser?.email) {
-        // Fallback: Try to create a session using the user_id directly
-        // This requires signing in with a magic link or creating a session token
-        toast({
-          title: "Passkey verified!",
-          description: "Passkey verified, but automatic sign-in is not available. Please sign in with your email.",
-        });
-        return;
-      }
+      // Get user's email from profiles table
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("name, user_id")
+        .eq("user_id", passkeyData.user_id)
+        .maybeSingle();
 
-      // Sign in the user using their email with a one-time password (OTP)
-      const { error: otpError } = await supabase.auth.signInWithOtp({
-        email: authUser.email,
-        options: {
-          shouldCreateUser: false,
-        }
-      });
-
-      if (otpError) {
-        toast({
-          title: "Sign-in failed",
-          description: "Passkey verified but couldn't complete sign-in. Please use email/password.",
-          variant: "destructive"
-        });
-        return;
-      }
-
+      // SECURITY NOTE: We cannot directly create a session for another user from client-side code
+      // Without access to admin API. Instead, we need to inform the user and redirect them to email login.
       toast({
-        title: "Check your email",
-        description: `Passkey verified! We've sent a sign-in link to ${authUser.email}`,
+        title: "Passkey verified!",
+        description: "For security, passkey login requires additional backend configuration. Please use email/password for now.",
       });
 
     } catch (error: any) {
-      console.error("Passkey authentication error:", error);
       if (error.name === 'NotAllowedError') {
         if (error.message.includes('publickey-credentials-get')) {
           toast({

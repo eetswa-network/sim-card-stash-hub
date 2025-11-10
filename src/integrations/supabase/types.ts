@@ -383,13 +383,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      decrypt_account_password: {
-        Args: { encrypted_text: string }
-        Returns: string
-      }
-      encrypt_account_password: {
+      hash_account_password: {
         Args: { password_text: string }
         Returns: string
+      }
+      verify_account_password: {
+        Args: { password_hash: string; password_text: string }
+        Returns: boolean
       }
     }
     Enums: {

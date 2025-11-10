@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreditCard, Plus, Shield, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import { UpdateNotifications } from "@/components/UpdateNotifications";
 
 interface IndexProps {
@@ -25,9 +24,6 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
   const [showMfaWarning, setShowMfaWarning] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  
-  // Temporarily disabled session timeout to fix login issues
-  // useSessionTimeout();
 
   useEffect(() => {
     // Simple session check without auth state listener to avoid conflicts

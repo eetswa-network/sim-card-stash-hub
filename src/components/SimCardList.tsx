@@ -281,29 +281,20 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       return;
     }
 
-    // Otherwise, decrypt and show
+    // Show a message that passwords are now hashed and cannot be decrypted
     const card = simCards.find(c => c.id === cardId);
     if (card?.password) {
-      try {
-        const { data: decrypted, error } = await supabase.rpc(
-          'decrypt_account_password',
-          { encrypted_text: card.password }
-        );
-        if (error) throw error;
-        
-        // Store decrypted password temporarily
-        setShowPasswords(prev => ({
-          ...prev,
-          [cardId]: decrypted || card.password
-        }));
-      } catch (error) {
-        console.error("Error decrypting password:", error);
-        // Fallback to showing encrypted value
-        setShowPasswords(prev => ({
-          ...prev,
-          [cardId]: card.password
-        }));
-      }
+      toast({
+        title: "Password Security Update",
+        description: "Account passwords are now securely hashed and cannot be displayed. Please use your password manager or reset the password if needed.",
+        variant: "default"
+      });
+      
+      // Mark as "attempted to show" to prevent repeated attempts
+      setShowPasswords(prev => ({
+        ...prev,
+        [cardId]: "••••••••"
+      }));
     }
   };
 
