@@ -563,6 +563,8 @@ const Admin = () => {
                             <TableHead>SIM Number</TableHead>
                             <TableHead>Network</TableHead>
                             <TableHead>Account</TableHead>
+                            <TableHead>Login</TableHead>
+                            <TableHead>Status</TableHead>
                             <TableHead>Actions</TableHead>
                           </TableRow>
                         </TableHeader>
@@ -584,37 +586,53 @@ const Admin = () => {
                                 </div>
                               </TableCell>
                               <TableCell>{simCard.sim_number}</TableCell>
-                              <TableCell>
-                                <Badge variant="outline">{simCard.carrier || "Unknown"}</Badge>
-                              </TableCell>
+                              <TableCell>{simCard.carrier || "Unknown"}</TableCell>
                               <TableCell>
                                 {simCard.account?.login ? (
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm">{simCard.account.login}</span>
-                                    <Button size="sm" variant="ghost" title="Login to account">
-                                      <LogIn className="h-4 w-4" />
-                                    </Button>
-                                  </div>
+                                  <span className="text-sm">{simCard.account.login}</span>
                                 ) : (
                                   <span className="text-muted-foreground text-sm">-</span>
                                 )}
                               </TableCell>
                               <TableCell>
+                                {simCard.account?.login ? (
+                                  <Button size="sm" variant="ghost" title="Login to account">
+                                    <LogIn className="h-4 w-4" />
+                                  </Button>
+                                ) : (
+                                  <span className="text-muted-foreground text-sm">-</span>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant={
+                                    simCard.status === "active"
+                                      ? "default"
+                                      : simCard.status === "inactive"
+                                      ? "secondary"
+                                      : simCard.status === "swapped"
+                                      ? "outline"
+                                      : "destructive"
+                                  }
+                                >
+                                  {simCard.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
                                 <div className="flex gap-2">
-                                  <Select
-                                    value={simCard.status}
-                                    onValueChange={(value) => handleUpdateSimStatus(simCard.id, value)}
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      toast({
+                                        title: "SIM Swap",
+                                        description: "SIM swap functionality coming soon",
+                                      });
+                                    }}
                                   >
-                                    <SelectTrigger className="w-[110px]">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="active">Active</SelectItem>
-                                      <SelectItem value="inactive">Inactive</SelectItem>
-                                      <SelectItem value="expired">Expired</SelectItem>
-                                      <SelectItem value="swapped">Swapped</SelectItem>
-                                    </SelectContent>
-                                  </Select>
+                                    <ArrowRightLeft className="h-4 w-4 mr-2" />
+                                    Swap
+                                  </Button>
                                   <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                       <Button size="sm" variant="destructive">
