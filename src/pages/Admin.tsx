@@ -33,7 +33,7 @@ const Admin = () => {
 
   useEffect(() => {
     if (selectedUser) {
-      fetchUserSimCards(selectedUser.id);
+      fetchUserSimCards(selectedUser.user_id);
     }
   }, [selectedUser]);
 
