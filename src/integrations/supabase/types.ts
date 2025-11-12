@@ -125,6 +125,36 @@ export type Database = {
         }
         Relationships: []
       }
+      sim_card_history: {
+        Row: {
+          changed_at: string
+          changed_by: string
+          id: string
+          new_user_id: string
+          notes: string | null
+          previous_user_id: string
+          sim_card_id: string
+        }
+        Insert: {
+          changed_at?: string
+          changed_by: string
+          id?: string
+          new_user_id: string
+          notes?: string | null
+          previous_user_id: string
+          sim_card_id: string
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string
+          id?: string
+          new_user_id?: string
+          notes?: string | null
+          previous_user_id?: string
+          sim_card_id?: string
+        }
+        Relationships: []
+      }
       sim_card_usage: {
         Row: {
           created_at: string
