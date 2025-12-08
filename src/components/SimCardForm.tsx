@@ -361,16 +361,17 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
           login: validatedAccount.login,
           password: hashedPassword
         }])
-        .select()
+        .select("id, login, password")
         .single();
 
       if (error) throw error;
 
-      // Add to local state
-      setExistingAccounts([...existingAccounts, data]);
+      // Add to local state - create new array reference to ensure re-render
+      const addedAccount = { id: data.id, login: data.login, password: data.password };
+      setExistingAccounts(prev => [...prev, addedAccount]);
       
       // Set as selected account
-      setFormData({ ...formData, account_id: data.id });
+      setFormData(prev => ({ ...prev, account_id: data.id }));
       
       // Reset form
       setNewAccount({ login: "", password: "" });
