@@ -652,11 +652,13 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                   <SelectValue placeholder="Select account or add new..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {existingAccounts.map((account) => (
-                    <SelectItem key={account.id} value={account.id}>
-                      {account.login}
-                    </SelectItem>
-                  ))}
+                  {[...existingAccounts]
+                    .sort((a, b) => a.login.localeCompare(b.login))
+                    .map((account) => (
+                      <SelectItem key={account.id} value={account.id}>
+                        {account.login}
+                      </SelectItem>
+                    ))}
                   <SelectItem value="add_new">+ Add new account...</SelectItem>
                 </SelectContent>
               </Select>
