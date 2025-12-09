@@ -428,18 +428,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
   return (
     <div className="space-y-4">
-      {/* SIM Type Legend */}
-      <div className="flex items-center justify-center gap-6 p-3 bg-muted/30 rounded-lg border">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Smartphone className="h-4 w-4" />
-          <span>eSIM</span>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <IdCard className="h-4 w-4" />
-          <span>Physical SIM</span>
-        </div>
-      </div>
-
       {/* Add SIM Card and View Toggle */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
