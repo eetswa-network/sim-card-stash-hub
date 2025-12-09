@@ -436,7 +436,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               onClick={onAddSimCard} 
               variant="outline" 
               size="sm"
-              className="flex items-center gap-2 bg-transparent border-2 border-black text-black font-semibold hover:bg-black hover:text-white"
+              className="flex items-center gap-2 bg-transparent border-2 border-black text-black font-semibold hover:bg-black hover:text-white h-[38px]"
             >
               <Plus className="h-4 w-4" />
               Add SIM Card
