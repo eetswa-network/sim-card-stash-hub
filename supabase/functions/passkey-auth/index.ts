@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.52.0";
+import { verifyAuthenticationResponse } from "https://esm.sh/@simplewebauthn/server@13.1.2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,10 +11,22 @@ interface PasskeyAuthRequest {
   authenticator_data: string;
   client_data_json: string;
   signature: string;
+  challenge: string;
+}
+
+// Convert base64url to Uint8Array
+function base64URLToUint8Array(base64url: string): Uint8Array {
+  const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+  const padding = '='.repeat((4 - base64.length % 4) % 4);
+  const binary = atob(base64 + padding);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -22,7 +35,6 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
-    // Create admin client for privileged operations
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
@@ -31,21 +43,21 @@ Deno.serve(async (req) => {
     });
 
     const body: PasskeyAuthRequest = await req.json();
-    const { credential_id, authenticator_data, client_data_json, signature } = body;
+    const { credential_id, authenticator_data, client_data_json, signature, challenge } = body;
 
     console.log("Passkey auth request for credential:", credential_id);
 
-    if (!credential_id) {
+    if (!credential_id || !authenticator_data || !client_data_json || !signature || !challenge) {
       return new Response(
-        JSON.stringify({ error: "Missing credential_id" }),
+        JSON.stringify({ error: "Missing required authentication data" }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Look up the passkey by credential_id using service role
+    // Look up the passkey by credential_id
     const { data: passkey, error: fetchError } = await supabaseAdmin
       .from("user_passkeys")
-      .select("user_id, counter, credential_public_key, credential_id")
+      .select("user_id, counter, credential_public_key, credential_id, transports")
       .eq("credential_id", credential_id)
       .maybeSingle();
 
@@ -67,39 +79,69 @@ Deno.serve(async (req) => {
 
     console.log("Found passkey for user:", passkey.user_id);
 
-    // Verify the signature
-    // In a production environment, you would verify the WebAuthn signature here using
-    // the stored public key and the authenticator data + client data hash
-    // For now, we trust the client-side verification and validate the credential exists
-    
-    // NOTE: Full signature verification requires importing @simplewebauthn/server
-    // which adds complexity. The current implementation:
-    // 1. Validates the credential_id exists in our database
-    // 2. Derives user_id from the database, never from client
-    // 3. Only creates a session if the credential matches
-    
-    if (!authenticator_data || !client_data_json || !signature) {
-      console.log("Missing verification data, requiring full auth data");
+    // Get origin from request headers
+    const origin = req.headers.get('origin') || 'https://zltcbjwkbzmuqiwqsfwv.lovableproject.com';
+    const rpID = new URL(origin).hostname;
+
+    // Verify the WebAuthn signature cryptographically
+    try {
+      const verification = await verifyAuthenticationResponse({
+        response: {
+          id: credential_id,
+          rawId: credential_id,
+          response: {
+            authenticatorData: authenticator_data,
+            clientDataJSON: client_data_json,
+            signature: signature,
+          },
+          type: 'public-key',
+          clientExtensionResults: {},
+          authenticatorAttachment: 'platform',
+        },
+        expectedChallenge: challenge,
+        expectedOrigin: origin,
+        expectedRPID: rpID,
+        credential: {
+          id: credential_id,
+          publicKey: base64URLToUint8Array(passkey.credential_public_key),
+          counter: passkey.counter,
+          transports: passkey.transports || [],
+        },
+      });
+
+      if (!verification.verified) {
+        console.error("Passkey verification failed");
+        return new Response(
+          JSON.stringify({ error: "Authentication failed" }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log("Passkey signature verified successfully");
+
+      // Update the counter to prevent replay attacks
+      const newCounter = verification.authenticationInfo.newCounter;
+      const { error: updateError } = await supabaseAdmin
+        .from("user_passkeys")
+        .update({ 
+          counter: newCounter,
+          last_used_at: new Date().toISOString()
+        })
+        .eq("credential_id", credential_id);
+
+      if (updateError) {
+        console.error("Failed to update passkey counter:", updateError);
+      }
+
+    } catch (verifyError) {
+      console.error("Signature verification error:", verifyError);
       return new Response(
-        JSON.stringify({ error: "Missing authenticator verification data" }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: "Authentication verification failed" }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Update the passkey counter to prevent replay attacks
-    const { error: updateError } = await supabaseAdmin
-      .from("user_passkeys")
-      .update({ 
-        counter: passkey.counter + 1,
-        last_used_at: new Date().toISOString()
-      })
-      .eq("credential_id", credential_id);
-
-    if (updateError) {
-      console.error("Failed to update passkey counter:", updateError);
-    }
-
-    // Get the user's email for session creation
+    // Get user email for session creation
     const { data: authUser, error: userError } = await supabaseAdmin.auth.admin.getUserById(
       passkey.user_id
     );
@@ -114,13 +156,11 @@ Deno.serve(async (req) => {
 
     console.log("Creating session for user:", authUser.user.email);
 
-    // Generate a magic link token for the user
-    // This is the secure way to create a session for a verified passkey
     const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'magiclink',
       email: authUser.user.email!,
       options: {
-        redirectTo: `${req.headers.get('origin') || supabaseUrl}/`,
+        redirectTo: `${origin}/`,
       }
     });
 
@@ -132,17 +172,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Extract the token from the magic link
-    const hashed_token = linkData.properties?.hashed_token;
-    const email = authUser.user.email;
-
-    console.log("Passkey authentication successful for:", email);
+    console.log("Passkey authentication successful for:", authUser.user.email);
 
     return new Response(
       JSON.stringify({ 
         success: true,
         verification_url: linkData.properties?.verification_url,
-        email: email,
+        email: authUser.user.email,
         message: "Passkey verified. Use the verification URL to complete login."
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -151,7 +187,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error("Passkey auth error:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "Internal server error" }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

@@ -489,12 +489,18 @@ export default function Auth() {
         return;
       }
 
-      // Generate authentication options (simplified approach)
-      const challenge = new Uint8Array(32);
-      crypto.getRandomValues(challenge);
+      // Generate authentication options with base64url challenge
+      const challengeBytes = new Uint8Array(32);
+      crypto.getRandomValues(challengeBytes);
+      
+      // Convert to base64url for WebAuthn
+      const challengeBase64 = btoa(String.fromCharCode(...challengeBytes))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
       
       const options = {
-        challenge: btoa(String.fromCharCode(...challenge)),
+        challenge: challengeBase64,
         timeout: 60000,
         userVerification: "preferred" as const,
         rpId: window.location.hostname
@@ -511,7 +517,8 @@ export default function Auth() {
           credential_id: authResponse.id,
           authenticator_data: authResponse.response.authenticatorData,
           client_data_json: authResponse.response.clientDataJSON,
-          signature: authResponse.response.signature
+          signature: authResponse.response.signature,
+          challenge: challengeBase64
         }
       });
 
