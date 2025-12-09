@@ -453,7 +453,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
             </Button>
           )}
         </div>
-        <div className="flex bg-muted rounded-lg p-1">
+        <div className="flex bg-muted rounded-lg p-1 border-2 border-black">
           <Button
             variant={viewMode === 'grid' ? 'default' : 'ghost'}
             size="sm"
