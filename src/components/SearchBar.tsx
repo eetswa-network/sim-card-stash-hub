@@ -30,7 +30,7 @@ export function SearchBar({ onSearch, placeholder = "Search SIM cards..." }: Sea
           placeholder={placeholder}
           value={query}
           onChange={(e) => handleSearch(e.target.value)}
-          className="pl-10 pr-10"
+          className="pl-10 pr-10 border-2 border-black"
         />
         {query && (
           <Button
