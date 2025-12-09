@@ -116,107 +116,38 @@ export function Header({ onSearch }: HeaderProps) {
             <Link to="/" className="text-3xl font-bold">SIM Card Stash</Link>
           </div>
           
-          {/* Tablet & Desktop navigation - vertical buttons on right */}
-          <div className="hidden md:flex flex-col gap-1">
-            {user ? (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="sm" className="flex flex-col items-center gap-1 h-auto py-2">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={userProfile?.avatar_url || ""} />
-                      <AvatarFallback className="text-sm">
-                        {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span>Account</span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80">
-                  <Card>
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3 mb-4">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={userProfile?.avatar_url || ""} />
-                          <AvatarFallback>
-                            {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="min-w-0 flex-1">
-                          <div className="font-medium truncate">
-                            {userProfile?.name || userProfile?.profile_name || user.email}
-                          </div>
-                          <div className="text-sm text-muted-foreground truncate">
-                            {user.email}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          asChild
-                          className="w-full gap-2"
-                        >
-                          <Link to="/account">
-                            <Settings className="h-4 w-4" />
-                            Account Details
-                          </Link>
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          asChild
-                          className="w-full gap-2"
-                        >
-                          <Link to="/security">
-                            <Shield className="h-4 w-4" />
-                            Security Settings
-                          </Link>
-                        </Button>
-                        {isSuperAdmin && (
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            asChild
-                            className="w-full gap-2 border-orange-300 text-orange-800 hover:bg-orange-100 dark:border-orange-700 dark:text-orange-200 dark:hover:bg-orange-900"
-                          >
-                            <Link to="/admin">
-                              <Shield className="h-4 w-4" />
-                              Admin Panel
-                            </Link>
-                          </Button>
-                        )}
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={handleSignOut}
-                          className="w-full gap-2"
-                        >
-                          <LogOut className="h-4 w-4" />
-                          Sign Out
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </PopoverContent>
-              </Popover>
-            ) : (
-              <Button variant="ghost" size="sm" asChild className="flex flex-col items-center gap-1 h-auto py-2">
-                <Link to="/auth">
-                  <User className="h-10 w-10" />
-                  <span>Sign In</span>
-                </Link>
+          {/* Tablet & Desktop navigation - vertical buttons on right with avatar */}
+          <div className="hidden md:flex items-center gap-6">
+            {/* Navigation buttons */}
+            <div className="flex flex-col gap-1">
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/">Dashboard</Link>
               </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/statistics">Statistics</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/updates">Updates</Link>
+              </Button>
+            </div>
+            
+            {/* Large Avatar Circle */}
+            {user ? (
+              <Link to="/account" className="flex-shrink-0">
+                <Avatar className="h-[100px] w-[100px] border-2 border-black hover:border-primary transition-colors cursor-pointer">
+                  <AvatarImage src={userProfile?.avatar_url || ""} />
+                  <AvatarFallback className="text-2xl font-bold">
+                    {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+            ) : (
+              <Link to="/auth" className="flex-shrink-0">
+                <div className="h-[100px] w-[100px] border-2 border-black rounded-full flex items-center justify-center hover:border-primary transition-colors cursor-pointer bg-muted">
+                  <User className="h-12 w-12 text-muted-foreground" />
+                </div>
+              </Link>
             )}
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/">Dashboard</Link>
-            </Button>
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/statistics">Statistics</Link>
-            </Button>
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/updates">Updates</Link>
-            </Button>
           </div>
         </div>
         
