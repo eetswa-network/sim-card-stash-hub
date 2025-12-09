@@ -119,14 +119,14 @@ export function Header({ onSearch }: HeaderProps) {
             {user ? (
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                    <Avatar className="h-4 w-4">
+                  <Button variant="ghost" size="sm" className="flex flex-col items-center gap-1 h-auto py-2">
+                    <Avatar className="h-10 w-10">
                       <AvatarImage src={userProfile?.avatar_url || ""} />
-                      <AvatarFallback className="text-xs">
+                      <AvatarFallback className="text-sm">
                         {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
                       </AvatarFallback>
                     </Avatar>
-                    Account
+                    <span className="text-xs">Account</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80">
@@ -199,10 +199,10 @@ export function Header({ onSearch }: HeaderProps) {
                 </PopoverContent>
               </Popover>
             ) : (
-              <Button variant="ghost" size="sm" asChild>
+              <Button variant="ghost" size="sm" asChild className="flex flex-col items-center gap-1 h-auto py-2">
                 <Link to="/auth">
-                  <User className="h-4 w-4 mr-2" />
-                  Sign In
+                  <User className="h-10 w-10" />
+                  <span className="text-xs">Sign In</span>
                 </Link>
               </Button>
             )}
@@ -223,14 +223,14 @@ export function Header({ onSearch }: HeaderProps) {
           {user ? (
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                  <Avatar className="h-4 w-4">
+                <Button variant="ghost" size="sm" className="flex flex-col items-center gap-1 h-auto py-2">
+                  <Avatar className="h-10 w-10">
                     <AvatarImage src={userProfile?.avatar_url || ""} />
-                    <AvatarFallback className="text-xs">
+                    <AvatarFallback className="text-sm">
                       {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
                     </AvatarFallback>
                   </Avatar>
-                  Account
+                  <span className="text-xs">Account</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
@@ -303,10 +303,10 @@ export function Header({ onSearch }: HeaderProps) {
               </PopoverContent>
             </Popover>
           ) : (
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="ghost" size="sm" asChild className="flex flex-col items-center gap-1 h-auto py-2">
               <Link to="/auth">
-                <User className="h-4 w-4 mr-2" />
-                Sign In
+                <User className="h-10 w-10" />
+                <span className="text-xs">Sign In</span>
               </Link>
             </Button>
           )}
@@ -321,15 +321,18 @@ export function Header({ onSearch }: HeaderProps) {
           </Button>
         </div>
         
-        {/* Search bar - on its own line, centered */}
-        {onSearch && (
-          <div className="flex justify-center">
+      </div>
+      
+      {/* Search bar - full width background strip */}
+      {onSearch && (
+        <div className="w-full bg-muted/50 border-t py-3">
+          <div className="container mx-auto px-4 flex justify-center">
             <div className="w-full sm:w-auto max-w-md">
               <SearchBar onSearch={onSearch} />
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   );
 }
