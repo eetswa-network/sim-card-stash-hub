@@ -211,10 +211,13 @@ export default function Auth() {
 
   const saveMfaSettings = async (userId: string, secret: string, codes: string[]) => {
     try {
-      const { encryptMfaSecret, hashBackupCode } = await import("@/lib/crypto");
+      const { encryptMfaSecret, hashBackupCode, clearSaltCache } = await import("@/lib/crypto");
       
-      // Encrypt the MFA secret
-      const encryptedSecret = await encryptMfaSecret(secret, userId);
+      // Clear any cached salt to ensure we generate a fresh one
+      clearSaltCache(userId);
+      
+      // Encrypt the MFA secret (returns { encrypted, salt })
+      const { encrypted, salt } = await encryptMfaSecret(secret, userId);
       
       // Hash all backup codes
       const hashedCodes = await Promise.all(
@@ -225,7 +228,8 @@ export default function Auth() {
         .from("user_mfa_settings")
         .upsert({
           user_id: userId,
-          secret_encrypted: encryptedSecret,
+          secret_encrypted: encrypted,
+          encryption_salt: salt,
           backup_codes_hashed: hashedCodes,
           is_enabled: true
         });
@@ -337,7 +341,7 @@ export default function Auth() {
       const validatedCode = mfaCodeSchema.parse(verificationCode);
       const { data: mfaData, error } = await supabase
         .from("user_mfa_settings")
-        .select("secret, secret_encrypted, backup_codes, backup_codes_hashed")
+        .select("secret, secret_encrypted, encryption_salt, backup_codes, backup_codes_hashed")
         .eq("user_id", tempUser.id)
         .single();
 
@@ -349,7 +353,8 @@ export default function Auth() {
       // Decrypt the MFA secret (support legacy plaintext for migration)
       let secret: string;
       if (mfaData.secret_encrypted) {
-        secret = await decryptMfaSecret(mfaData.secret_encrypted, tempUser.id);
+        // Pass the salt if available (new format), null for legacy format
+        secret = await decryptMfaSecret(mfaData.secret_encrypted, tempUser.id, mfaData.encryption_salt);
       } else if (mfaData.secret) {
         // Legacy plaintext secret - still supported during migration
         secret = mfaData.secret;
@@ -495,58 +500,49 @@ export default function Auth() {
         rpId: window.location.hostname
       };
 
-      // Start authentication
+      // Start authentication with WebAuthn
       const authResponse = await startAuthentication({
         optionsJSON: options
       });
 
-      // Look up the passkey in our database
-      const { data: passkeyData, error: fetchError } = await supabase
-        .from("user_passkeys")
-        .select("user_id, counter, credential_id")
-        .eq("credential_id", authResponse.id)
-        .maybeSingle();
-
-      if (fetchError) {
-        toast({
-          title: "Database error",
-          description: "Could not retrieve passkey. Please try again.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (!passkeyData) {
-        toast({
-          title: "Passkey not found",
-          description: "This passkey is not registered. Please register a passkey first or use email/password.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Update the passkey usage counter
-      await supabase
-        .from("user_passkeys")
-        .update({ 
-          counter: passkeyData.counter + 1,
-          last_used_at: new Date().toISOString()
-        })
-        .eq("credential_id", authResponse.id);
-
-      // Get user's email from profiles table
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("name, user_id")
-        .eq("user_id", passkeyData.user_id)
-        .maybeSingle();
-
-      // SECURITY NOTE: We cannot directly create a session for another user from client-side code
-      // Without access to admin API. Instead, we need to inform the user and redirect them to email login.
-      toast({
-        title: "Passkey verified!",
-        description: "For security, passkey login requires additional backend configuration. Please use email/password for now.",
+      // Call the backend edge function to verify and create session
+      const { data: authResult, error: authError } = await supabase.functions.invoke('passkey-auth', {
+        body: {
+          credential_id: authResponse.id,
+          authenticator_data: authResponse.response.authenticatorData,
+          client_data_json: authResponse.response.clientDataJSON,
+          signature: authResponse.response.signature
+        }
       });
+
+      if (authError) {
+        console.error("Passkey auth error:", authError);
+        toast({
+          title: "Authentication failed",
+          description: "Could not verify passkey. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (authResult?.error) {
+        toast({
+          title: "Passkey verification failed",
+          description: authResult.error,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (authResult?.verification_url) {
+        // Open the magic link verification URL to complete login
+        window.location.href = authResult.verification_url;
+      } else if (authResult?.success) {
+        toast({
+          title: "Passkey verified!",
+          description: `Signed in as ${authResult.email}`,
+        });
+      }
 
     } catch (error: any) {
       if (error.name === 'NotAllowedError') {
@@ -570,6 +566,7 @@ export default function Auth() {
           variant: "destructive"
         });
       } else {
+        console.error("Passkey error:", error);
         toast({
           title: "Authentication failed",
           description: "Failed to authenticate with passkey. Please try again or use email/password.",
