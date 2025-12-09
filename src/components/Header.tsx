@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SearchBar } from "@/components/SearchBar";
 import logoColorful from "@/assets/logo-colorful.png";
+import sidewaysLivingLogo from "@/assets/sideways-living-logo.png";
 
 interface HeaderProps {
   onSearch?: (query: string) => void;
@@ -110,6 +111,7 @@ export function Header({ onSearch }: HeaderProps) {
         {/* Logo and title with tablet/desktop navigation */}
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
+            <img src={sidewaysLivingLogo} alt="Sideways Living" className="w-[100px] h-[100px] object-contain" />
             <img src="/lovable-uploads/3e0fb5d9-6b3f-4d9d-bf4c-ab3c4cc20334.png" alt="SIM Card Stash" className="w-[150px] h-[150px] object-contain" />
             <Link to="/" className="text-3xl font-bold">SIM Card Stash</Link>
           </div>
