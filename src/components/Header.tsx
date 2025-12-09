@@ -116,22 +116,9 @@ export function Header({ onSearch }: HeaderProps) {
             <Link to="/" className="text-3xl font-bold">SIM Card Stash</Link>
           </div>
           
-          {/* Tablet & Desktop navigation - vertical buttons on right with avatar */}
+          {/* Tablet & Desktop navigation - avatar on left, menu on right */}
           <div className="hidden md:flex items-center gap-6">
-            {/* Navigation buttons */}
-            <div className="flex flex-col gap-1">
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/">Dashboard</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/statistics">Statistics</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/updates">Updates</Link>
-              </Button>
-            </div>
-            
-            {/* Large Avatar Circle */}
+            {/* Large Avatar Circle - on the left */}
             {user ? (
               <Link to="/account" className="flex-shrink-0">
                 <Avatar className="h-[100px] w-[100px] border-2 border-black hover:border-primary transition-colors cursor-pointer">
@@ -148,6 +135,22 @@ export function Header({ onSearch }: HeaderProps) {
                 </div>
               </Link>
             )}
+            
+            {/* Navigation buttons */}
+            <div className="flex flex-col gap-1">
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/account">Account</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/">Dashboard</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/statistics">Statistics</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/updates">Updates</Link>
+              </Button>
+            </div>
           </div>
         </div>
         
