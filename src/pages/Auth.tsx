@@ -614,15 +614,14 @@ export default function Auth() {
         }
       } else if (data.user) {
         // Check if user has MFA enabled
-        // Temporarily disable MFA requirement to fix login issues
-        // const mfaEnabled = await checkMfaSettings(data.user.id);
+        const mfaEnabled = await checkMfaSettings(data.user.id);
         
-        // For now, allow login without MFA verification
-        // This will be re-enabled once the auth flow is stable
-        console.log("User signed in successfully, allowing access without MFA verification");
-        
-        // The user will be redirected by the auth state listener in Auth.tsx
-        // No need to manually navigate here
+        if (mfaEnabled) {
+          // User has MFA enabled, show verification screen
+          setTempUser(data.user);
+          setShowMfaVerification(true);
+        }
+        // If MFA is not enabled, the user will be redirected by the auth state listener
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
