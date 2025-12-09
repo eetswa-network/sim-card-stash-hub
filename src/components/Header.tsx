@@ -325,7 +325,7 @@ export function Header({ onSearch }: HeaderProps) {
       
       {/* Search bar - full width background strip */}
       {onSearch && (
-        <div className="w-full bg-muted/50 border-t py-3">
+        <div className="w-full bg-primary/15 border-t py-3">
           <div className="container mx-auto px-4 flex justify-center">
             <div className="w-full sm:w-auto max-w-md">
               <SearchBar onSearch={onSearch} />
