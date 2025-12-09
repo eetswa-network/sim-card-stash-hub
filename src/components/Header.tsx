@@ -126,7 +126,7 @@ export function Header({ onSearch }: HeaderProps) {
                         {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-xs">Account</span>
+                    <span>Account</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80">
@@ -202,7 +202,7 @@ export function Header({ onSearch }: HeaderProps) {
               <Button variant="ghost" size="sm" asChild className="flex flex-col items-center gap-1 h-auto py-2">
                 <Link to="/auth">
                   <User className="h-10 w-10" />
-                  <span className="text-xs">Sign In</span>
+                  <span>Sign In</span>
                 </Link>
               </Button>
             )}
@@ -230,7 +230,7 @@ export function Header({ onSearch }: HeaderProps) {
                       {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-xs">Account</span>
+                  <span>Account</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
@@ -306,7 +306,7 @@ export function Header({ onSearch }: HeaderProps) {
             <Button variant="ghost" size="sm" asChild className="flex flex-col items-center gap-1 h-auto py-2">
               <Link to="/auth">
                 <User className="h-10 w-10" />
-                <span className="text-xs">Sign In</span>
+                <span>Sign In</span>
               </Link>
             </Button>
           )}
