@@ -371,10 +371,11 @@ export default function Security() {
       }
 
       // Import crypto utilities
-      const { encryptMfaSecret, hashBackupCode } = await import("@/lib/crypto");
+      const { encryptMfaSecret, hashBackupCode, clearSaltCache } = await import("@/lib/crypto");
       
-      // Encrypt the MFA secret
-      const encryptedSecret = await encryptMfaSecret(mfaSecret, user.id);
+      // Clear salt cache and encrypt the MFA secret with a fresh random salt
+      clearSaltCache(user.id);
+      const { encrypted, salt } = await encryptMfaSecret(mfaSecret, user.id);
       
       // Hash all backup codes
       const hashedCodes = await Promise.all(
@@ -385,7 +386,8 @@ export default function Security() {
         .from("user_mfa_settings")
         .upsert({
           user_id: user.id,
-          secret_encrypted: encryptedSecret,
+          secret_encrypted: encrypted,
+          encryption_salt: salt,
           backup_codes_hashed: hashedCodes,
           is_enabled: true
         });
