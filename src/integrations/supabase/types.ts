@@ -303,6 +303,7 @@ export type Database = {
           backup_codes: string[] | null
           backup_codes_hashed: string[] | null
           created_at: string
+          encryption_salt: string | null
           id: string
           is_enabled: boolean
           secret: string | null
@@ -314,6 +315,7 @@ export type Database = {
           backup_codes?: string[] | null
           backup_codes_hashed?: string[] | null
           created_at?: string
+          encryption_salt?: string | null
           id?: string
           is_enabled?: boolean
           secret?: string | null
@@ -325,6 +327,7 @@ export type Database = {
           backup_codes?: string[] | null
           backup_codes_hashed?: string[] | null
           created_at?: string
+          encryption_salt?: string | null
           id?: string
           is_enabled?: boolean
           secret?: string | null
@@ -434,6 +437,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_random_salt: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
