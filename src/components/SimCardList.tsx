@@ -436,7 +436,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               onClick={onAddSimCard} 
               variant="outline" 
               size="sm"
-              className="flex items-center gap-2 bg-transparent border-2 border-black text-black font-semibold hover:bg-black hover:text-white h-[38px]"
+              className="flex items-center gap-2 border-2 border-foreground text-foreground font-semibold hover:bg-foreground hover:text-background h-[38px]"
             >
               <Plus className="h-4 w-4" />
               Add SIM Card
@@ -447,7 +447,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               variant="outline"
               size="sm"
               onClick={collapseAll}
-              className="px-3"
+              className="px-3 border-2 border-foreground text-foreground font-semibold hover:bg-foreground hover:text-background"
             >
               <Minimize2 className="h-4 w-4 mr-1" />
               Collapse All
