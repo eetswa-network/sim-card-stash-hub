@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EditableUsageTable } from "./EditableUsageTable";
@@ -742,48 +742,31 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             onUsageUpdate={handleUsageUpdate}
                           />
 
-                          {/* Service Checkboxes Row */}
-                          <div className="space-y-2">
-                            <span className="text-sm font-medium">Services:</span>
-                            <div className="flex justify-between items-center">
-                              <div className="flex items-center space-x-2">
-                                <Checkbox id={`ebay-mobile-${card.id}`} />
-                                <Label htmlFor={`ebay-mobile-${card.id}`} className="cursor-pointer">
-                                  <img src={ebayLogo} alt="eBay" className="h-6 w-auto" />
-                                </Label>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Checkbox id={`paypal-mobile-${card.id}`} />
-                                <Label htmlFor={`paypal-mobile-${card.id}`} className="cursor-pointer">
-                                  <img src={paypalLogo} alt="PayPal" className="h-6 w-auto" />
-                                </Label>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Checkbox id={`afterpay-mobile-${card.id}`} />
-                                <Label htmlFor={`afterpay-mobile-${card.id}`} className="cursor-pointer">
-                                  <img src={afterpayLogo} alt="Afterpay" className="h-8 w-auto" />
-                                </Label>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Checkbox id={`klarna-mobile-${card.id}`} />
-                                <Label htmlFor={`klarna-mobile-${card.id}`} className="cursor-pointer">
-                                  <img src={klarnaLogo} alt="Klarna" className="h-6 w-auto" />
-                                </Label>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Checkbox id={`auspost-mobile-${card.id}`} />
-                                <Label htmlFor={`auspost-mobile-${card.id}`} className="cursor-pointer">
-                                  <img src={auspostLogo} alt="Australia Post" className="h-6 w-auto" />
-                                </Label>
-                              </div>
+                          <div className="flex items-center gap-4">
+                            <div>
+                              <span className="text-sm font-medium">Created:</span>
+                              <span className="text-sm text-muted-foreground ml-2">
+                                {new Date(card.created_at).toLocaleString()}
+                              </span>
                             </div>
-                          </div>
-                          
-                          <div>
-                            <span className="text-sm font-medium">Created:</span>
-                            <span className="text-sm text-muted-foreground ml-2">
-                              {new Date(card.created_at).toLocaleDateString()}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium">Last Updated:</span>
+                              <span className="text-sm text-muted-foreground">
+                                {new Date(card.updated_at).toLocaleString()}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-8 h-8 p-0"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toast({ title: "History", description: "SIM card history feature coming soon." });
+                                }}
+                                title="View History"
+                              >
+                                <History className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
                           
                           {card.notes && (
@@ -959,55 +942,30 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               />
                             </div>
                             
-                            {/* Service Checkboxes Row */}
-                            <div className="md:col-span-2 space-y-2">
-                              <span className="text-sm font-medium">Services:</span>
-                              <div className="flex justify-between items-center">
-                                <div className="flex items-center space-x-2">
-                                  <Checkbox id={`ebay-desktop-${card.id}`} />
-                                  <Label htmlFor={`ebay-desktop-${card.id}`} className="cursor-pointer">
-                                    <img src={ebayLogo} alt="eBay" className="h-6 w-auto" />
-                                  </Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <Checkbox id={`paypal-desktop-${card.id}`} />
-                                  <Label htmlFor={`paypal-desktop-${card.id}`} className="cursor-pointer">
-                                    <img src={paypalLogo} alt="PayPal" className="h-6 w-auto" />
-                                  </Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <Checkbox id={`afterpay-desktop-${card.id}`} />
-                                  <Label htmlFor={`afterpay-desktop-${card.id}`} className="cursor-pointer">
-                                    <img src={afterpayLogo} alt="Afterpay" className="h-8 w-auto" />
-                                  </Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <Checkbox id={`klarna-desktop-${card.id}`} />
-                                  <Label htmlFor={`klarna-desktop-${card.id}`} className="cursor-pointer">
-                                    <img src={klarnaLogo} alt="Klarna" className="h-6 w-auto" />
-                                  </Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <Checkbox id={`auspost-desktop-${card.id}`} />
-                                  <Label htmlFor={`auspost-desktop-${card.id}`} className="cursor-pointer">
-                                    <img src={auspostLogo} alt="Australia Post" className="h-6 w-auto" />
-                                  </Label>
-                                </div>
-                              </div>
-                            </div>
-                            
                             <div className="flex items-center gap-2">
                               <span className="text-sm font-medium">Created:</span>
                               <span className="text-sm text-muted-foreground">
-                                {new Date(card.created_at).toLocaleDateString()}
+                                {new Date(card.created_at).toLocaleString()}
                               </span>
                             </div>
                             
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium">Updated:</span>
+                              <span className="text-sm font-medium">Last Updated:</span>
                               <span className="text-sm text-muted-foreground">
-                                {new Date(card.updated_at).toLocaleDateString()}
+                                {new Date(card.updated_at).toLocaleString()}
                               </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-8 h-8 p-0"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toast({ title: "History", description: "SIM card history feature coming soon." });
+                                }}
+                                title="View History"
+                              >
+                                <History className="h-4 w-4" />
+                              </Button>
                             </div>
                             
                             {card.notes && (
