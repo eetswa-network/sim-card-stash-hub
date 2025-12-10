@@ -10,6 +10,7 @@ import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Min
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EditableUsageTable } from "./EditableUsageTable";
+import { SimCardHistoryModal } from "./SimCardHistoryModal";
 import ebayLogo from "@/assets/ebay-logo.png";
 import paypalLogo from "@/assets/paypal-logo.png";
 import afterpayLogo from "@/assets/afterpay-logo.png";
@@ -58,6 +59,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   const [usageData, setUsageData] = useState<{[key: string]: UsageEntry[]}>({});
   const [sortField, setSortField] = useState<'phone_number' | 'sim_number' | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [historyModalCard, setHistoryModalCard] = useState<SimCard | null>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -760,7 +762,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                 className="w-8 h-8 p-0"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  toast({ title: "History", description: "SIM card history feature coming soon." });
+                                  setHistoryModalCard(card);
                                 }}
                                 title="View History"
                               >
@@ -960,7 +962,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                 className="w-8 h-8 p-0"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  toast({ title: "History", description: "SIM card history feature coming soon." });
+                                  setHistoryModalCard(card);
                                 }}
                                 title="View History"
                               >
@@ -986,6 +988,18 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
             )}
           </CardContent>
         </Card>
+      )}
+
+      {/* History Modal */}
+      {historyModalCard && (
+        <SimCardHistoryModal
+          isOpen={!!historyModalCard}
+          onClose={() => setHistoryModalCard(null)}
+          simCardId={historyModalCard.id}
+          phoneNumber={historyModalCard.phone_number}
+          createdAt={historyModalCard.created_at}
+          updatedAt={historyModalCard.updated_at}
+        />
       )}
     </div>
   );
