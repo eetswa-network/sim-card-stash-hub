@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, Maximize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EditableUsageTable } from "./EditableUsageTable";
@@ -442,6 +442,17 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
             >
               <Plus className="h-4 w-4" />
               Add SIM Card
+            </Button>
+          )}
+          {viewMode === 'list' && filteredSimCards.length > 0 && expandedRows.size < filteredSimCards.length && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setExpandedRows(new Set(filteredSimCards.map(card => card.id)))}
+              className="px-3 border-2 border-foreground text-foreground font-semibold hover:bg-foreground hover:text-background"
+            >
+              <Maximize2 className="h-4 w-4 mr-1" />
+              Expand All
             </Button>
           )}
           {viewMode === 'list' && expandedRows.size > 0 && (
