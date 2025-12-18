@@ -157,12 +157,15 @@ export default function Security() {
 
   const savePasskey = async (credential: RegistrationResponseJSON, challenge: string) => {
     try {
+      // The publicKey from WebAuthn is already base64url encoded - store it directly
+      const publicKeyBase64url = credential.response.publicKey;
+      
       const { error } = await supabase
         .from("user_passkeys")
         .insert({
           user_id: user.id,
           credential_id: credential.id,
-          credential_public_key: btoa(JSON.stringify(credential.response.publicKey)),
+          credential_public_key: publicKeyBase64url,
           credential_device_type: credential.response.authenticatorData ? "platform" : "cross-platform",
           credential_backed_up: false,
           transports: credential.response.transports || [],
