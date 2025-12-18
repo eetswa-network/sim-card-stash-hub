@@ -621,8 +621,11 @@ export default function Auth() {
         const mfaEnabled = await checkMfaSettings(data.user.id);
         
         if (mfaEnabled) {
-          // User has MFA enabled, show verification screen
+          // User has MFA enabled - sign out first to prevent auto-redirect
+          // Store credentials for re-authentication after MFA verification
+          await supabase.auth.signOut();
           setTempUser(data.user);
+          setTempCredentials({ email: validatedData.email, password: validatedData.password });
           setShowMfaVerification(true);
         }
         // If MFA is not enabled, the user will be redirected by the auth state listener
