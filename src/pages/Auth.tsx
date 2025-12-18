@@ -52,12 +52,18 @@ export default function Auth() {
   const [tempUser, setTempUser] = useState(null);
   const [tempCredentials, setTempCredentials] = useState<{email: string, password: string} | null>(null);
   const [copied, setCopied] = useState(false);
+  const [mfaCheckInProgress, setMfaCheckInProgress] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check for existing session
+    // Check for existing session (only on initial load, not during MFA flow)
     const checkSession = async () => {
+      // Skip if MFA verification is in progress
+      if (showMfaVerification || showMfaSetup || mfaCheckInProgress) {
+        return;
+      }
+      
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
@@ -70,6 +76,14 @@ export default function Auth() {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        // Don't navigate during MFA flow - let the MFA handlers manage navigation
+        if (showMfaVerification || showMfaSetup || mfaCheckInProgress) {
+          if (session?.user) {
+            setUser(session.user);
+          }
+          return;
+        }
+        
         if (session?.user) {
           setUser(session.user);
           navigate("/");
@@ -80,7 +94,7 @@ export default function Auth() {
     );
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, showMfaVerification, showMfaSetup, mfaCheckInProgress]);
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -307,9 +321,12 @@ export default function Auth() {
         description: "Your account is now secured with 2FA."
       });
 
+      // MFA setup complete - reset state and navigate
+      setMfaCheckInProgress(false);
       setShowMfaSetup(false);
       setTempUser(null);
       setTempCredentials(null);
+      navigate("/");
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
@@ -433,9 +450,12 @@ export default function Auth() {
         }
       }
 
+      // MFA verification complete - reset state and navigate
+      setMfaCheckInProgress(false);
       setShowMfaVerification(false);
       setTempUser(null);
       setTempCredentials(null);
+      navigate("/");
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
@@ -588,6 +608,7 @@ export default function Auth() {
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setMfaCheckInProgress(true); // Prevent auth listener from redirecting
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
@@ -603,6 +624,7 @@ export default function Auth() {
       });
 
       if (error) {
+        setMfaCheckInProgress(false);
         if (error.message.includes("Invalid login credentials")) {
           toast({
             title: "Sign in failed",
@@ -627,10 +649,15 @@ export default function Auth() {
           setTempUser(data.user);
           setTempCredentials({ email: validatedData.email, password: validatedData.password });
           setShowMfaVerification(true);
+          // Keep mfaCheckInProgress true until MFA flow completes
+        } else {
+          // No MFA, allow redirect
+          setMfaCheckInProgress(false);
+          navigate("/");
         }
-        // If MFA is not enabled, the user will be redirected by the auth state listener
       }
     } catch (error) {
+      setMfaCheckInProgress(false);
       if (error instanceof z.ZodError) {
         toast({
           title: "Validation Error",
