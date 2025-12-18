@@ -37,9 +37,13 @@ const signInSchema = z.object({
     .max(72, "Password must be less than 72 characters")
 });
 
+// Accept both 6-digit TOTP codes and 8-character alphanumeric backup codes
 const mfaCodeSchema = z.string()
   .trim()
-  .regex(/^[0-9]{6}$/, "Verification code must be 6 digits");
+  .refine(
+    (val) => /^[0-9]{6}$/.test(val) || /^[A-Z0-9]{8}$/i.test(val),
+    "Enter a 6-digit code from your authenticator app or an 8-character backup code"
+  );
 
 export default function Auth() {
   const [loading, setLoading] = useState(false);
@@ -393,8 +397,9 @@ export default function Auth() {
           }
         }
       } else if (mfaData.backup_codes) {
-        // Legacy plaintext backup codes
-        isValidBackupCode = mfaData.backup_codes.includes(validatedCode);
+        // Legacy plaintext backup codes - case insensitive comparison
+        const upperCode = validatedCode.toUpperCase();
+        isValidBackupCode = mfaData.backup_codes.some((code: string) => code.toUpperCase() === upperCode);
       }
 
       if (!isValidTotp && !isValidBackupCode) {
@@ -424,8 +429,9 @@ export default function Auth() {
             .update({ backup_codes_hashed: updatedHashes })
             .eq("user_id", tempUser.id);
         } else if (mfaData.backup_codes) {
-          // Legacy plaintext backup codes
-          const updatedCodes = mfaData.backup_codes.filter(code => code !== validatedCode);
+          // Legacy plaintext backup codes - case insensitive removal
+          const upperCode = validatedCode.toUpperCase();
+          const updatedCodes = mfaData.backup_codes.filter((code: string) => code.toUpperCase() !== upperCode);
           await supabase
             .from("user_mfa_settings")
             .update({ backup_codes: updatedCodes })
