@@ -393,7 +393,7 @@ export default function Security() {
           encryption_salt: salt,
           backup_codes_hashed: hashedCodes,
           is_enabled: true
-        });
+        }, { onConflict: 'user_id' });
 
       if (error) throw error;
       
