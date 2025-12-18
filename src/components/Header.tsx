@@ -142,6 +142,9 @@ export function Header({ onSearch }: HeaderProps) {
                 <Link to="/account">Account</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
+                <Link to="/security">Security</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
                 <Link to="/">Dashboard</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
