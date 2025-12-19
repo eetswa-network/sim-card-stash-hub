@@ -54,7 +54,6 @@ export default function Auth() {
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [tempUser, setTempUser] = useState(null);
-  const [tempCredentials, setTempCredentials] = useState<{email: string, password: string} | null>(null);
   const [copied, setCopied] = useState(false);
   const [mfaCheckInProgress, setMfaCheckInProgress] = useState(false);
   const navigate = useNavigate();
@@ -303,33 +302,15 @@ export default function Auth() {
 
       await saveMfaSettings(tempUser.id, mfaSecret, backupCodes);
       
-      // Complete the login by signing in with stored credentials
-      if (tempCredentials) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: tempCredentials.email,
-          password: tempCredentials.password
-        });
-
-        if (signInError) {
-          toast({
-            title: "Login failed",
-            description: "Failed to complete login after MFA setup.",
-            variant: "destructive"
-          });
-          return;
-        }
-      }
-      
       toast({
         title: "Two-step authentication enabled!",
         description: "Your account is now secured with 2FA."
       });
 
-      // MFA setup complete - reset state and navigate
+      // MFA setup complete - user is already logged in, just navigate
       setMfaCheckInProgress(false);
       setShowMfaSetup(false);
       setTempUser(null);
-      setTempCredentials(null);
       navigate("/");
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -439,28 +420,10 @@ export default function Auth() {
         }
       }
 
-      // Complete the login by signing in again with stored credentials
-      if (tempCredentials) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: tempCredentials.email,
-          password: tempCredentials.password
-        });
-
-        if (signInError) {
-          toast({
-            title: "Login failed",
-            description: "Failed to complete login after MFA verification.",
-            variant: "destructive"
-          });
-          return;
-        }
-      }
-
-      // MFA verification complete - reset state and navigate
+      // MFA verification complete - user is already logged in, just navigate
       setMfaCheckInProgress(false);
       setShowMfaVerification(false);
       setTempUser(null);
-      setTempCredentials(null);
       navigate("/");
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -649,11 +612,9 @@ export default function Auth() {
         const mfaEnabled = await checkMfaSettings(data.user.id);
         
         if (mfaEnabled) {
-          // User has MFA enabled - sign out first to prevent auto-redirect
-          // Store credentials for re-authentication after MFA verification
-          await supabase.auth.signOut();
+          // User has MFA enabled - keep session active but show MFA screen
+          // Don't sign out - we need the session to read MFA settings via RLS
           setTempUser(data.user);
-          setTempCredentials({ email: validatedData.email, password: validatedData.password });
           setShowMfaVerification(true);
           // Keep mfaCheckInProgress true until MFA flow completes
         } else {
@@ -829,7 +790,8 @@ export default function Auth() {
                 onClick={() => {
                   setShowMfaVerification(false);
                   setTempUser(null);
-                  setTempCredentials(null);
+                  // Sign out when canceling MFA verification since user is already logged in
+                  supabase.auth.signOut();
                 }}
               >
                 Back to Sign In
