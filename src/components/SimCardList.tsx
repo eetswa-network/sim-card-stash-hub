@@ -421,7 +421,16 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
           <div className="text-center py-8">
             <IdCard className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium text-foreground">No SIM cards yet</h3>
-            <p className="text-muted-foreground">Add your first SIM card to get started.</p>
+            <p className="text-muted-foreground mb-4">Add your first SIM card to get started.</p>
+            {!showForm && onAddSimCard && (
+              <Button 
+                onClick={onAddSimCard} 
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add SIM Card
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
