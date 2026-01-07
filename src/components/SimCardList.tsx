@@ -667,28 +667,28 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       onClick={() => toggleRowExpansion(card.id)}
                     >
                       <div className="space-y-2">
-                        {/* First line: phone icon+number, carrier - evenly spread */}
+                        {/* First line: phone icon+number, carrier and status */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
                             <span className={`font-mono text-sm break-all text-black dark:text-white ${card.status === 'inactive' || card.status === 'expired' ? 'line-through' : ''}`}>{card.phone_number}</span>
                           </div>
-                          <span className="text-sm font-medium text-right text-black dark:text-white">{card.carrier || 'No carrier'}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-right text-black dark:text-white">{card.carrier || 'No carrier'}</span>
+                            <Badge variant={getStatusColor(card.status)} className="text-xs">
+                              {card.status}
+                            </Badge>
+                          </div>
                         </div>
                         
-                        {/* Second line: SIM type icon + SIM number and active status */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            {card.sim_type === 'eSIM' ? (
-                              <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
-                            ) : (
-                              <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
-                            )}
-                            <span className={`font-mono text-sm break-all text-black dark:text-white ${card.status === 'inactive' || card.status === 'expired' ? 'line-through' : ''}`}>{card.sim_number}</span>
-                          </div>
-                          <Badge variant={getStatusColor(card.status)} className="text-xs">
-                            {card.status}
-                          </Badge>
+                        {/* Second line: SIM type icon + SIM number */}
+                        <div className="flex items-center gap-2">
+                          {card.sim_type === 'eSIM' ? (
+                            <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
+                          ) : (
+                            <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
+                          )}
+                          <span className={`font-mono text-sm break-all text-black dark:text-white ${card.status === 'inactive' || card.status === 'expired' ? 'line-through' : ''}`}>{card.sim_number}</span>
                         </div>
                         
                         {/* Third line: edit, sim swap and deactivate buttons */}
