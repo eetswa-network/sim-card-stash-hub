@@ -70,6 +70,15 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     const { data: { session } } = await supabase.auth.getSession();
     console.log("Current auth state in SimCardList:", session?.user?.id);
 
+    // Ensure user is authenticated before fetching
+    if (!session?.user?.id) {
+      console.log("No authenticated user, skipping fetch");
+      setLoading(false);
+      return;
+    }
+
+    const userId = session.user.id;
+
     try {
       console.log("Making Supabase query for sim_cards...");
       const { data, error } = await supabase
@@ -78,6 +87,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
           *,
           account:accounts(login)
         `)
+        .eq("user_id", userId)
         .order("created_at", { ascending: false });
 
       console.log("Supabase response:", { data, error });
@@ -97,6 +107,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         const { data: usageData, error: usageError } = await supabase
           .from("sim_card_usage")
           .select("*")
+          .eq("user_id", userId)
           .in("sim_card_id", data.map(card => card.id));
 
         if (usageError) {
@@ -136,11 +147,22 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
   const handleDelete = async (id: string) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to deactivate SIM cards.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Instead of deleting, mark the SIM card as inactive (soft delete)
       const { error } = await supabase
         .from("sim_cards")
         .update({ status: "inactive" })
-        .eq("id", id);
+        .eq("id", id)
+        .eq("user_id", user.id);
 
       if (error) throw error;
       
@@ -158,17 +180,19 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
   const handleSimSwap = async (card: SimCard) => {
     try {
-      // Mark the original card as swapped
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      // Mark the original card as swapped - include user_id filter for security
       const { error: updateError } = await supabase
         .from("sim_cards")
         .update({ status: "swapped" })
-        .eq("id", card.id);
+        .eq("id", card.id)
+        .eq("user_id", user.id);
 
       if (updateError) throw updateError;
 
       // Create a new card with the same data but empty sim_number
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
 
       const newCard = {
         sim_number: "", // Empty sim number for new card
@@ -195,20 +219,21 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       console.log("New card created:", insertedCard.id);
 
       // Copy usage data from the original card to the new card
-      const { data: usageData, error: usageError } = await supabase
+      const { data: usageDataToCopy, error: usageError } = await supabase
         .from("sim_card_usage")
         .select("*")
-        .eq("sim_card_id", card.id);
+        .eq("sim_card_id", card.id)
+        .eq("user_id", user.id);
 
       if (usageError) {
         console.error("Error fetching usage data:", usageError);
         throw usageError;
       }
 
-      console.log("Original usage data found:", usageData?.length || 0, "entries");
+      console.log("Original usage data found:", usageDataToCopy?.length || 0, "entries");
 
-      if (usageData && usageData.length > 0) {
-        const newUsageData = usageData.map(usage => ({
+      if (usageDataToCopy && usageDataToCopy.length > 0) {
+        const newUsageData = usageDataToCopy.map(usage => ({
           name: usage.name,
           use_purpose: usage.use_purpose,
           sim_card_id: insertedCard.id,

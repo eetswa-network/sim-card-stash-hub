@@ -261,7 +261,8 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         await supabase
           .from("sim_card_usage")
           .delete()
-          .eq("sim_card_id", editingCard.id);
+          .eq("sim_card_id", editingCard.id)
+          .eq("user_id", user.id);
       } else {
         const { data, error} = await supabase
           .from("sim_cards")
