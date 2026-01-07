@@ -681,70 +681,70 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                           </div>
                         </div>
                         
-                        {/* Second line: SIM type icon + SIM number */}
-                        <div className="flex items-center gap-2">
-                          {card.sim_type === 'eSIM' ? (
-                            <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
-                          ) : (
-                            <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
-                          )}
-                          <span className={`font-mono text-sm break-all text-black dark:text-white ${card.status === 'inactive' || card.status === 'expired' ? 'line-through' : ''}`}>{card.sim_number}</span>
-                        </div>
-                        
-                        {/* Third line: edit, sim swap and deactivate buttons */}
-                        <div className="flex justify-end gap-2 pt-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onEdit(card);
-                            }}
-                            className="w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSimSwap(card);
-                            }}
-                            className="w-8 h-8 p-0 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600"
-                            title="SIM Swap"
-                          >
-                            <RefreshCcw className="h-4 w-4" />
-                          </Button>
-                          
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button 
-                                variant="destructive" 
-                                size="sm"
-                                onClick={(e) => e.stopPropagation()}
-                                className="w-8 h-8 p-0"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Deactivate SIM Card</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Are you sure you want to deactivate the SIM card {card.sim_number}? 
-                                  The record will be kept for historical purposes but marked as inactive.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDelete(card.id)}>
-                                  Deactivate
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                        {/* Second line: SIM type icon + SIM number + action buttons */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            {card.sim_type === 'eSIM' ? (
+                              <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
+                            ) : (
+                              <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
+                            )}
+                            <span className={`font-mono text-sm break-all text-black dark:text-white ${card.status === 'inactive' || card.status === 'expired' ? 'line-through' : ''}`}>{card.sim_number}</span>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onEdit(card);
+                              }}
+                              className="w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSimSwap(card);
+                              }}
+                              className="w-8 h-8 p-0 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600"
+                              title="SIM Swap"
+                            >
+                              <RefreshCcw className="h-4 w-4" />
+                            </Button>
+                            
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button 
+                                  variant="destructive" 
+                                  size="sm"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="w-8 h-8 p-0"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Deactivate SIM Card</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to deactivate the SIM card {card.sim_number}? 
+                                    The record will be kept for historical purposes but marked as inactive.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDelete(card.id)}>
+                                    Deactivate
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
                         </div>
                       </div>
                     </div>
