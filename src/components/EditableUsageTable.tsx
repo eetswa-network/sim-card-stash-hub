@@ -28,12 +28,23 @@ export function EditableUsageTable({ simCardId, usageData, onUsageUpdate }: Edit
 
   const saveUsageEntry = async (data: { name: string; use_purpose: string }, usageId?: string) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to save usage entries.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (usageId) {
-        // Update existing entry
+        // Update existing entry - include user_id filter for security
         const { error } = await supabase
           .from("sim_card_usage")
           .update(data)
-          .eq("id", usageId);
+          .eq("id", usageId)
+          .eq("user_id", user.id);
         
         if (error) throw error;
         
@@ -49,7 +60,7 @@ export function EditableUsageTable({ simCardId, usageData, onUsageUpdate }: Edit
           .insert({ 
             sim_card_id: simCardId, 
             ...data,
-            user_id: (await supabase.auth.getUser()).data.user?.id
+            user_id: user.id
           })
           .select()
           .single();
@@ -74,10 +85,21 @@ export function EditableUsageTable({ simCardId, usageData, onUsageUpdate }: Edit
 
   const deleteUsageEntry = async (usageId: string) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to delete usage entries.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from("sim_card_usage")
         .delete()
-        .eq("id", usageId);
+        .eq("id", usageId)
+        .eq("user_id", user.id);
       
       if (error) throw error;
       
