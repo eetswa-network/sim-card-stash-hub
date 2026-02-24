@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Home, User, LogOut, Shield, Settings, Menu, X, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,6 +17,8 @@ interface HeaderProps {
 
 export function Header({ onSearch }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuTop, setMenuTop] = useState(0);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
@@ -118,32 +120,34 @@ export function Header({ onSearch }: HeaderProps) {
           </Link>
         </div>
 
-        {/* Hamburger menu button - all screen sizes */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2"
-        >
-          <Menu className="h-16 w-16" />
-        </Button>
+        {/* Hamburger menu button + dropdown */}
+        <div className="relative">
+          <Button
+            ref={menuButtonRef}
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              if (!mobileMenuOpen && menuButtonRef.current) {
+                const rect = menuButtonRef.current.getBoundingClientRect();
+                setMenuTop(rect.bottom);
+              }
+              setMobileMenuOpen(!mobileMenuOpen);
+            }}
+            className="p-2"
+          >
+            <Menu className="h-16 w-16" />
+          </Button>
+        </div>
       </div>
 
       {/* Menu overlay + panel */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[55]" onClick={() => setMobileMenuOpen(false)}>
           <div 
-            className="absolute top-0 w-1/2 md:w-1/4 z-[60] bg-muted border-l border-b shadow-lg pt-16 px-4 pb-4 rounded-bl-lg right-0 md:right-[max(0px,calc((100vw-1280px)/2))]"
+            className="absolute w-1/2 md:w-[16%] z-[60] bg-muted border border-border shadow-lg px-4 pb-4 pt-4 rounded-lg right-4 md:right-[max(1rem,calc((100vw-1280px)/2+1rem))]"
+            style={{ top: `${menuTop}px` }}
             onClick={(e) => e.stopPropagation()}
           >
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setMobileMenuOpen(false)}
-              className="absolute top-4 right-4 p-2"
-            >
-              <X className="h-8 w-8" />
-            </Button>
             <div className="flex flex-col gap-1">
               {user ? (
                 <>
