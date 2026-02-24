@@ -108,152 +108,108 @@ export function Header({ onSearch }: HeaderProps) {
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container mx-auto px-4 md:min-h-40 flex flex-col py-4 gap-0 md:gap-4">
-        {/* Logo and title with tablet/desktop navigation */}
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-2 flex-1">
-            <img src={sidewaysLivingLogo} alt="Sideways Living" className="hidden md:block h-[150px] w-auto object-contain" />
-            <img src="/lovable-uploads/3e0fb5d9-6b3f-4d9d-bf4c-ab3c4cc20334.png" alt="SIM Card Stash" className="md:w-[150px] md:h-[150px] w-[60px] h-[60px] object-contain" />
-            <Link to="/" className="md:text-3xl text-lg font-bold">
-              <span className="hidden md:inline">SIMCardSta.sh</span>
-              <span className="md:hidden">SIMCardSta.sh</span>
-            </Link>
-          </div>
-          {/* Mobile hamburger menu button - right side */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2"
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
-          
-          {/* Tablet & Desktop navigation - avatar on left, menu on right */}
-          <div className="hidden md:flex items-center gap-6">
-            {/* Large Avatar Circle - on the left */}
-            {user ? (
-              <Link to="/account" className="flex-shrink-0">
-                <Avatar className="h-[100px] w-[100px] border-2 border-black hover:border-primary transition-colors cursor-pointer">
-                  <AvatarImage src={userProfile?.avatar_url || ""} />
-                  <AvatarFallback className="text-2xl font-bold">
-                    {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
-                  </AvatarFallback>
-                </Avatar>
-              </Link>
-            ) : (
-              <Link to="/auth" className="flex-shrink-0">
-                <div className="h-[100px] w-[100px] border-2 border-black rounded-full flex items-center justify-center hover:border-primary transition-colors cursor-pointer bg-muted">
-                  <User className="h-12 w-12 text-muted-foreground" />
-                </div>
-              </Link>
-            )}
-            
-            {/* Navigation buttons */}
-              <div className="flex flex-col gap-1">
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/"><Home className="h-4 w-4 mr-1" />Home</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/account">Account</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/security">Security</Link>
-              </Button>
-               <Button variant="ghost" size="sm" asChild>
-                <Link to="/statistics">Statistics</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/devices">Devices</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/updates">Updates</Link>
-              </Button>
-            </div>
-          </div>
+      <div className="container mx-auto px-4 flex items-center justify-between py-4">
+        {/* Logo and title */}
+        <div className="flex items-center gap-2 flex-1">
+          <img src={sidewaysLivingLogo} alt="Sideways Living" className="hidden md:block h-[150px] w-auto object-contain" />
+          <img src="/lovable-uploads/3e0fb5d9-6b3f-4d9d-bf4c-ab3c4cc20334.png" alt="SIM Card Stash" className="md:w-[150px] md:h-[150px] w-[60px] h-[60px] object-contain" />
+          <Link to="/" className="md:text-3xl text-lg font-bold">
+            SIMCardSta.sh
+          </Link>
         </div>
 
-        {/* Mobile menu dropdown */}
-        {mobileMenuOpen && (
-          <div className="flex md:hidden flex-col gap-1 border-t pt-3">
-            {user ? (
-              <>
-                <div className="flex items-center gap-3 px-2 pb-3 border-b mb-2">
+        {/* Hamburger menu button - all screen sizes */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="p-2"
+        >
+          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </Button>
+      </div>
+
+      {/* Menu dropdown - all screen sizes */}
+      {mobileMenuOpen && (
+        <div className="flex flex-col gap-1 border-t pt-3 pb-3 container mx-auto px-4">
+          {user ? (
+            <>
+              <div className="flex items-center gap-3 px-2 pb-3 border-b mb-2">
+                <Link to="/account" onClick={() => setMobileMenuOpen(false)}>
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={userProfile?.avatar_url || ""} />
                     <AvatarFallback className="text-sm">
                       {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-medium truncate text-sm">
-                      {userProfile?.name || userProfile?.profile_name || user.email}
-                    </div>
-                    <div className="text-xs text-muted-foreground truncate">
-                      {user.email}
-                    </div>
+                </Link>
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium truncate text-sm">
+                    {userProfile?.name || userProfile?.profile_name || user.email}
+                  </div>
+                  <div className="text-xs text-muted-foreground truncate">
+                    {user.email}
                   </div>
                 </div>
-                <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                  <Link to="/">
-                    <Home className="h-4 w-4 mr-2" />
-                    Home
-                  </Link>
-                </Button>
-                <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                  <Link to="/account">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Account
-                  </Link>
-                </Button>
-                <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                  <Link to="/statistics">Statistics</Link>
-                </Button>
-                <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                  <Link to="/devices">
-                    <Smartphone className="h-4 w-4 mr-2" />
-                    Devices
-                  </Link>
-                </Button>
-                <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                  <Link to="/updates">Updates</Link>
-                </Button>
-                <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                  <Link to="/security">
-                    <Shield className="h-4 w-4 mr-2" />
-                    Security
-                  </Link>
-                </Button>
-                {isSuperAdmin && (
-                  <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                    <Link to="/admin">
-                      <Shield className="h-4 w-4 mr-2" />
-                      Admin Panel
-                    </Link>
-                  </Button>
-                )}
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => { handleSignOut(); setMobileMenuOpen(false); }}
-                  className="justify-start text-destructive hover:text-destructive"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              </>
-            ) : (
+              </div>
               <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                <Link to="/auth">
-                  <User className="h-4 w-4 mr-2" />
-                  Sign In
+                <Link to="/">
+                  <Home className="h-4 w-4 mr-2" />
+                  Home
                 </Link>
               </Button>
-            )}
-          </div>
-        )}
-        
-      </div>
+              <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/account">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Account
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/statistics">Statistics</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/devices">
+                  <Smartphone className="h-4 w-4 mr-2" />
+                  Devices
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/updates">Updates</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/security">
+                  <Shield className="h-4 w-4 mr-2" />
+                  Security
+                </Link>
+              </Button>
+              {isSuperAdmin && (
+                <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="/admin">
+                    <Shield className="h-4 w-4 mr-2" />
+                    Admin Panel
+                  </Link>
+                </Button>
+              )}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => { handleSignOut(); setMobileMenuOpen(false); }}
+                className="justify-start text-destructive hover:text-destructive"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+              <Link to="/auth">
+                <User className="h-4 w-4 mr-2" />
+                Sign In
+              </Link>
+            </Button>
+          )}
+        </div>
+      )}
       
       {/* Search bar - full width background strip */}
       {onSearch && (
