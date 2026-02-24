@@ -6,12 +6,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { History, UserPlus, UserMinus, FileEdit, Plus, MapPin } from "lucide-react";
+import { History, UserPlus, FileEdit, Plus, MapPin, AlertTriangle, Settings } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface HistoryEntry {
   id: string;
-  type: "created" | "updated" | "ownership_transfer" | "location_change";
+  type: "created" | "updated" | "ownership_transfer" | "location_change" | "status_change" | "field_edit";
   timestamp: string;
   details?: string;
   previousUserId?: string;
@@ -123,6 +123,10 @@ export function SimCardHistoryModal({
         return <UserPlus className="h-4 w-4" />;
       case "location_change":
         return <MapPin className="h-4 w-4" />;
+      case "status_change":
+        return <AlertTriangle className="h-4 w-4" />;
+      case "field_edit":
+        return <Settings className="h-4 w-4" />;
       default:
         return <History className="h-4 w-4" />;
     }
@@ -138,6 +142,10 @@ export function SimCardHistoryModal({
         return "Ownership Transferred";
       case "location_change":
         return "Location Changed";
+      case "status_change":
+        return "Status Changed";
+      case "field_edit":
+        return "Details Edited";
       default:
         return "Change";
     }
@@ -153,6 +161,10 @@ export function SimCardHistoryModal({
         return "bg-purple-500";
       case "location_change":
         return "bg-amber-500";
+      case "status_change":
+        return "bg-red-500";
+      case "field_edit":
+        return "bg-sky-500";
       default:
         return "bg-muted";
     }
@@ -230,6 +242,22 @@ export function SimCardHistoryModal({
                             {" → "}
                             <span className="font-medium">{entry.newValue}</span>
                           </p>
+                        </div>
+                      )}
+
+                      {entry.type === "status_change" && (
+                        <div className="mt-1 text-sm text-muted-foreground">
+                          <p>
+                            <span className="font-medium">{entry.oldValue}</span>
+                            {" → "}
+                            <span className="font-medium">{entry.newValue}</span>
+                          </p>
+                        </div>
+                      )}
+
+                      {entry.type === "field_edit" && entry.notes && (
+                        <div className="mt-1 text-sm text-muted-foreground">
+                          <p>{entry.notes}</p>
                         </div>
                       )}
 
