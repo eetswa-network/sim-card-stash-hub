@@ -250,16 +250,16 @@ export function Header({ onSearch }: HeaderProps) {
         </div>
       )}
       
-      {/* Search bar - full width background strip */}
-      {onSearch && (
-        <div className="w-full bg-primary border-t py-3">
+      {/* Orange ribbon - always visible */}
+      <div className="w-full bg-primary border-t py-3">
+        {onSearch && (
           <div className="container mx-auto px-4 flex justify-center">
-            <div className="w-full sm:w-auto max-w-md md:max-w-2xl">
+            <div className="w-full md:w-2/3">
               <SearchBar onSearch={onSearch} />
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </header>
   );
 }
