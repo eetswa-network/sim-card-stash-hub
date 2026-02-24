@@ -125,7 +125,7 @@ export function Header({ onSearch }: HeaderProps) {
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="p-2"
         >
-          {mobileMenuOpen ? <X className="h-8 w-8" /> : <Menu className="h-8 w-8" />}
+          {mobileMenuOpen ? <X className="h-16 w-16" /> : <Menu className="h-16 w-16" />}
         </Button>
       </div>
 
