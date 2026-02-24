@@ -151,10 +151,13 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         setExistingCarriers(Array.from(allCarriers).filter(Boolean));
         setExistingAccounts(accountsData.data || []);
         
-        // Set up locations - merge defaults with user-defined
+        // Set up locations from DB + defaults as fallback
         const defaultLocations = ["iPhone Air", "iPhone XR (white)", "iPhone XR (yellow)", "Moto g06", "moto g55 5G", "SIM Wallet (black)"];
         const userLocations = (locationsData.data || []).map(l => l.name);
-        const allLocations = new Set([...defaultLocations, ...userLocations]);
+        // If user has DB locations, use those; otherwise fall back to defaults
+        const allLocations = userLocations.length > 0 
+          ? new Set(userLocations) 
+          : new Set([...defaultLocations, ...userLocations]);
         setExistingLocations(Array.from(allLocations));
       }
     };
