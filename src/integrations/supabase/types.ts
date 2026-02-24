@@ -128,29 +128,38 @@ export type Database = {
       sim_card_history: {
         Row: {
           changed_at: string
-          changed_by: string
+          changed_by: string | null
+          event_type: string
           id: string
-          new_user_id: string
+          new_user_id: string | null
+          new_value: string | null
           notes: string | null
-          previous_user_id: string
+          old_value: string | null
+          previous_user_id: string | null
           sim_card_id: string
         }
         Insert: {
           changed_at?: string
-          changed_by: string
+          changed_by?: string | null
+          event_type?: string
           id?: string
-          new_user_id: string
+          new_user_id?: string | null
+          new_value?: string | null
           notes?: string | null
-          previous_user_id: string
+          old_value?: string | null
+          previous_user_id?: string | null
           sim_card_id: string
         }
         Update: {
           changed_at?: string
-          changed_by?: string
+          changed_by?: string | null
+          event_type?: string
           id?: string
-          new_user_id?: string
+          new_user_id?: string | null
+          new_value?: string | null
           notes?: string | null
-          previous_user_id?: string
+          old_value?: string | null
+          previous_user_id?: string | null
           sim_card_id?: string
         }
         Relationships: []
