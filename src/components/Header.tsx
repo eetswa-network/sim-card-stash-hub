@@ -156,7 +156,7 @@ export function Header({ onSearch }: HeaderProps) {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[55]" onClick={() => setMobileMenuOpen(false)}>
           <div 
-            className="absolute w-1/2 md:w-[20%] z-[60] bg-muted border border-border shadow-lg px-4 pb-4 pt-4 rounded-lg right-0 md:right-[max(0px,calc((100vw-1280px)/2-1.6rem))]"
+            className="absolute w-2/3 md:w-[20%] z-[60] bg-muted border border-border shadow-lg px-4 pb-4 pt-4 rounded-lg right-0 md:right-[max(0px,calc((100vw-1280px)/2-1.6rem))]"
             style={{ top: `${menuTop}px` }}
             onClick={(e) => e.stopPropagation()}
           >
