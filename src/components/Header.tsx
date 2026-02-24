@@ -107,7 +107,7 @@ export function Header({ onSearch }: HeaderProps) {
   };
 
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 relative">
       <div className="container mx-auto px-4 flex items-center justify-between py-4">
         {/* Logo and title */}
         <div className="flex items-center gap-2 flex-1">
@@ -131,7 +131,8 @@ export function Header({ onSearch }: HeaderProps) {
 
       {/* Menu dropdown - all screen sizes */}
       {mobileMenuOpen && (
-        <div className="flex flex-col gap-1 border-t pt-3 pb-3 container mx-auto px-4">
+        <div className="absolute top-full left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b shadow-lg">
+          <div className="flex flex-col gap-1 pt-3 pb-3 container mx-auto px-4">
           {user ? (
             <>
               <div className="flex items-center gap-3 px-2 pb-3 border-b mb-2">
@@ -208,6 +209,7 @@ export function Header({ onSearch }: HeaderProps) {
               </Link>
             </Button>
           )}
+          </div>
         </div>
       )}
       
