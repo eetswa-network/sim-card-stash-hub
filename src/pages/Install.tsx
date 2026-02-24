@@ -17,13 +17,6 @@ import {
   Fingerprint,
 } from "lucide-react";
 
-// Install step images
-import iosShareImg from "@/assets/install-ios-share.png";
-import iosHomescreenImg from "@/assets/install-ios-homescreen.png";
-import androidMenuImg from "@/assets/install-android-menu.png";
-import androidInstallImg from "@/assets/install-android-install.png";
-import desktopChromeImg from "@/assets/install-desktop-chrome.png";
-import desktopEdgeImg from "@/assets/install-desktop-edge.png";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -100,14 +93,14 @@ const installSteps: Record<Platform, StepProps[]> = {
       title: "Tap the Share button",
       description:
         'Look for the Share icon (a square with an upward arrow) at the bottom of the screen. Tap it to open the share menu.',
-      image: iosShareImg,
+      
     },
     {
       number: 3,
       title: 'Scroll down and tap "Add to Home Screen"',
       description:
         'In the share sheet, scroll down until you see "Add to Home Screen" with a plus (+) icon. Tap it.',
-      image: iosHomescreenImg,
+      
     },
     {
       number: 4,
@@ -129,14 +122,14 @@ const installSteps: Record<Platform, StepProps[]> = {
       title: "Tap the three-dot menu",
       description:
         "Tap the three vertical dots (⋮) in the top-right corner of Chrome to open the browser menu.",
-      image: androidMenuImg,
+      
     },
     {
       number: 3,
       title: 'Tap "Install app" or "Add to Home screen"',
       description:
         'Look for "Install app" in the menu. On some devices it may say "Add to Home screen" instead.',
-      image: androidInstallImg,
+      
     },
     {
       number: 4,
@@ -152,7 +145,7 @@ const installSteps: Record<Platform, StepProps[]> = {
       title: "Look for the install icon",
       description:
         'In the address bar, look for a small install icon (monitor with a down arrow) on the right side. You can also go to Menu (⋮) → "Install SIMCardSta.sh...".',
-      image: desktopChromeImg,
+      
     },
     {
       number: 2,
@@ -174,7 +167,7 @@ const installSteps: Record<Platform, StepProps[]> = {
       title: "Look for the install icon",
       description:
         'In the address bar, look for an install icon on the right side. You can also go to Menu (···) → Apps → "Install SIMCardSta.sh".',
-      image: desktopEdgeImg,
+      
     },
     {
       number: 2,

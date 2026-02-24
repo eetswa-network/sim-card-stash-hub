@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { X, Download, Wifi, WifiOff, Shield, RefreshCw, Smartphone } from "lucide-react";
+import { X, Download, WifiOff, Shield, RefreshCw, Smartphone, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+
 
 const STORAGE_KEY = "pwa-install-prompt";
 const DAYS_BETWEEN_PROMPTS = 5;
@@ -160,6 +162,9 @@ export function PwaInstallPrompt() {
                   </p>
                 )}
               </div>
+              <Link to="/install" className="text-primary text-sm underline font-medium inline-flex items-center gap-1">
+                How to install <ArrowRight className="h-3 w-3" />
+              </Link>
             </div>
 
             <Button
