@@ -755,6 +755,14 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             </AlertDialog>
                           </div>
                         </div>
+                        
+                        {/* Third line: Location (only if present) */}
+                        {card.location && (
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <span className="text-sm text-black dark:text-white">{card.location}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                     
