@@ -115,7 +115,7 @@ export function Header({ onSearch }: HeaderProps) {
             <img src={sidewaysLivingLogo} alt="Sideways Living" className="hidden md:block h-[150px] w-auto object-contain" />
             <img src="/lovable-uploads/3e0fb5d9-6b3f-4d9d-bf4c-ab3c4cc20334.png" alt="SIM Card Stash" className="md:w-[150px] md:h-[150px] w-[60px] h-[60px] object-contain" />
             <Link to="/" className="md:text-3xl text-lg font-bold">
-              <span className="hidden md:inline">SIM Card Stash</span>
+              <span className="hidden md:inline">SIMCardSta.sh</span>
               <span className="md:hidden">SIMCardSta.sh</span>
             </Link>
           </div>
