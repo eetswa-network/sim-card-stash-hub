@@ -139,10 +139,6 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
           </Card>
         )}
         
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-          </div>
-        </div>
 
         <div className="space-y-8">
           {showForm && (
