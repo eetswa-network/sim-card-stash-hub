@@ -122,21 +122,33 @@ export function Header({ onSearch }: HeaderProps) {
 
         {/* Hamburger menu button + dropdown */}
         <div className="relative">
-          <Button
-            ref={menuButtonRef}
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              if (!mobileMenuOpen && menuButtonRef.current) {
-                const rect = menuButtonRef.current.getBoundingClientRect();
-                setMenuTop(rect.bottom);
-              }
-              setMobileMenuOpen(!mobileMenuOpen);
-            }}
-            className="p-2"
-          >
-            <Menu className="h-16 w-16" />
-          </Button>
+          {mobileMenuOpen ? (
+            <Button
+              ref={menuButtonRef}
+              variant="ghost"
+              size="sm"
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2"
+            >
+              <X className="h-16 w-16" />
+            </Button>
+          ) : (
+            <Button
+              ref={menuButtonRef}
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                if (menuButtonRef.current) {
+                  const rect = menuButtonRef.current.getBoundingClientRect();
+                  setMenuTop(rect.bottom);
+                }
+                setMobileMenuOpen(true);
+              }}
+              className="p-2"
+            >
+              <Menu className="h-16 w-16" />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -144,7 +156,7 @@ export function Header({ onSearch }: HeaderProps) {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[55]" onClick={() => setMobileMenuOpen(false)}>
           <div 
-            className="absolute w-1/2 md:w-[16%] z-[60] bg-muted border border-border shadow-lg px-4 pb-4 pt-4 rounded-lg right-4 md:right-[max(1rem,calc((100vw-1280px)/2+1rem))]"
+            className="absolute w-1/2 md:w-[20%] z-[60] bg-muted border border-border shadow-lg px-4 pb-4 pt-4 rounded-lg right-4 md:right-[max(0px,calc((100vw-1280px)/2-0.6rem))]"
             style={{ top: `${menuTop}px` }}
             onClick={(e) => e.stopPropagation()}
           >
