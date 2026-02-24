@@ -13,6 +13,7 @@ import Security from "./pages/Security";
 import Updates from "./pages/Updates";
 import AccountDetails from "./pages/AccountDetails";
 import Statistics from "./pages/Statistics";
+import Devices from "./pages/Devices";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +36,7 @@ const AppLayout = () => {
           <Route path="/security" element={<Security />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/updates" element={<Updates />} />
+          <Route path="/devices" element={<Devices />} />
           <Route path="/account" element={<AccountDetails />} />
           <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
