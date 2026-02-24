@@ -233,7 +233,7 @@ export default function Devices() {
                     {/* Device image */}
                     <div className="relative shrink-0">
                       <Avatar className="h-16 w-16 rounded-lg">
-                        <AvatarImage src={device.image_url || ""} className="object-cover" />
+                        <AvatarImage src={device.image_url || ""} className="object-contain" />
                         <AvatarFallback className="rounded-lg bg-muted">
                           <Smartphone className="h-8 w-8 text-muted-foreground" />
                         </AvatarFallback>
