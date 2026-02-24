@@ -648,7 +648,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               <CardContent className="space-y-3">
                 {card.location && (
                   <div className="flex items-center gap-2">
-                    <TooltipIcon icon={MapPin} tooltip="Location" />
+                    <TooltipIcon icon={MapPin} tooltip="Location / Device" />
                     <span className="text-sm">{card.location}</span>
                   </div>
                 )}
@@ -857,7 +857,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         {/* Third line: Location (only if present) */}
                         {card.location && (
                           <div className="flex items-center gap-2">
-                            <TooltipIcon icon={MapPin} tooltip="Location" />
+                            <TooltipIcon icon={MapPin} tooltip="Location / Device" />
                             <span className="text-sm text-black dark:text-white">{card.location}</span>
                           </div>
                         )}
@@ -948,7 +948,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     </button>
                     <div className="flex-[1] text-center px-2 border-r border-black">Carrier</div>
                     <div className="flex-[1] text-center px-2 border-r border-black">Status</div>
-                    <div className="flex-[1] text-center px-2 border-r border-black">Location</div>
+                    <div className="flex-[1] text-center px-2 border-r border-black">Location / Device</div>
                     <div className="flex-[1.5] text-center px-2">Actions</div>
                   </div>
                 </div>
