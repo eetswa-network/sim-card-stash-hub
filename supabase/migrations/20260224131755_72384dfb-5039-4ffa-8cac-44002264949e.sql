@@ -1,0 +1,5 @@
+INSERT INTO app_updates (title, description, update_type, version, is_active) VALUES
+('Dedicated Devices Page', 'Device management has been moved to its own dedicated page with image upload support. Each device now shows its assigned SIM cards and supports inline renaming.', 'feature', '3.9.0', true),
+('Delete Confirmation Dialogs', 'All delete actions now require confirmation before proceeding, preventing accidental data loss across devices and usage entries.', 'improvement', '3.9.0', true),
+('Navigation Redesign', 'Dashboard renamed to Home with a home icon, moved to the top of the navigation menu for quicker access on both mobile and desktop.', 'improvement', '3.9.0', true),
+('Device Image Scaling', 'Device images now scale to fit their containers without being cropped, ensuring full visibility of uploaded photos.', 'bugfix', '3.9.0', true);
