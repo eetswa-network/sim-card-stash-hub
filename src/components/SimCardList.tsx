@@ -745,6 +745,19 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             >
                               <RefreshCcw className="h-4 w-4" />
                             </Button>
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setHistoryModalCard(card);
+                              }}
+                              className="w-8 h-8 p-0 bg-blue-500 hover:bg-blue-600 text-white border-blue-500 hover:border-blue-600"
+                              title="View History"
+                            >
+                              <History className="h-4 w-4" />
+                            </Button>
                             
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
@@ -833,18 +846,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               <span className="text-sm text-muted-foreground">
                                 {new Date(card.updated_at).toLocaleString()}
                               </span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="w-8 h-8 p-0"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setHistoryModalCard(card);
-                                }}
-                                title="View History"
-                              >
-                                <History className="h-4 w-4" />
-                              </Button>
                             </div>
                           </div>
                           
