@@ -1119,18 +1119,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               <span className="text-sm text-muted-foreground">
                                 {new Date(card.updated_at).toLocaleString()}
                               </span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="w-8 h-8 p-0"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setHistoryModalCard(card);
-                                }}
-                                title="View History"
-                              >
-                                <History className="h-4 w-4" />
-                              </Button>
                             </div>
                             
                             {card.notes && (
