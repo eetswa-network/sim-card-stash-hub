@@ -6,11 +6,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, Maximize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History, MapPin } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, Maximize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History, MapPin, CalendarPlus, CalendarClock } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EditableUsageTable } from "./EditableUsageTable";
 import { SimCardHistoryModal } from "./SimCardHistoryModal";
+import { TooltipIcon } from "./TooltipIcon";
 import ebayLogo from "@/assets/ebay-logo.png";
 import paypalLogo from "@/assets/paypal-logo.png";
 import afterpayLogo from "@/assets/afterpay-logo.png";
@@ -466,6 +468,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   }
 
   return (
+    <TooltipProvider delayDuration={1000}>
     <div className="space-y-4">
       {/* Add SIM Card and View Toggle */}
       <div className="flex justify-between items-center">
@@ -555,7 +558,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 {/* Row 1: Phone number with icon on left, status on right */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
+                    <TooltipIcon icon={Phone} tooltip="Phone Number" className="h-5 w-5 text-muted-foreground shrink-0" />
                     <CardTitle className={`text-lg break-all ${card.status === 'inactive' || card.status === 'expired' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.phone_number}</CardTitle>
                   </div>
                   <Badge variant={getStatusColor(card.status)}>
@@ -566,9 +569,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex items-center gap-2">
                     {card.sim_type === 'eSIM' ? (
-                      <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
+                      <TooltipIcon icon={Smartphone} tooltip="eSIM" className="h-5 w-5 text-muted-foreground shrink-0" />
                     ) : (
-                      <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
+                      <TooltipIcon icon={IdCard} tooltip="Physical SIM" className="h-5 w-5 text-muted-foreground shrink-0" />
                     )}
                     <span className={`font-mono break-all ${card.status === 'inactive' || card.status === 'expired' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.sim_number}</span>
                   </div>
@@ -578,7 +581,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               <CardContent className="space-y-3">
                 {card.location && (
                   <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <TooltipIcon icon={MapPin} tooltip="Location" />
                     <span className="text-sm">{card.location}</span>
                   </div>
                 )}
@@ -592,7 +595,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
                 {(card.login || card.account?.login) && (
                   <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <TooltipIcon icon={User} tooltip="Login" />
                     <span className="font-mono text-sm break-all">{card.account?.login || card.login}</span>
                   </div>
                 )}
@@ -600,7 +603,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 {card.password && (
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <TooltipIcon icon={Lock} tooltip="Password" />
                       <span className="font-mono text-sm break-all">
                         {showPasswords[card.id] ? card.password : "•".repeat(card.password.length)}
                       </span>
@@ -625,8 +628,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 )}
                 
                 <div className="flex items-center justify-between">
-                  <div className="text-xs text-muted-foreground">
-                    Added: {new Date(card.created_at).toLocaleDateString()}
+                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                    <TooltipIcon icon={CalendarPlus} tooltip="Date Added" className="h-3 w-3 text-muted-foreground shrink-0" />
+                    {new Date(card.created_at).toLocaleDateString()}
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -699,7 +703,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         {/* First line: phone icon+number, carrier and status */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
+                            <TooltipIcon icon={Phone} tooltip="Phone Number" className="h-5 w-5 text-muted-foreground shrink-0" />
                             <span className={`font-mono text-sm break-all text-black dark:text-white ${card.status === 'inactive' || card.status === 'expired' ? 'line-through' : ''}`}>{card.phone_number}</span>
                           </div>
                           <div className="flex items-center gap-2">
@@ -714,9 +718,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             {card.sim_type === 'eSIM' ? (
-                              <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
+                              <TooltipIcon icon={Smartphone} tooltip="eSIM" className="h-5 w-5 text-muted-foreground shrink-0" />
                             ) : (
-                              <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
+                              <TooltipIcon icon={IdCard} tooltip="Physical SIM" className="h-5 w-5 text-muted-foreground shrink-0" />
                             )}
                             <span className={`font-mono text-sm break-all text-black dark:text-white ${card.status === 'inactive' || card.status === 'expired' ? 'line-through' : ''}`}>{card.sim_number}</span>
                           </div>
@@ -779,7 +783,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         {/* Third line: Location (only if present) */}
                         {card.location && (
                           <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <TooltipIcon icon={MapPin} tooltip="Location" />
                             <span className="text-sm text-black dark:text-white">{card.location}</span>
                           </div>
                         )}
@@ -792,8 +796,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         <div className="space-y-3 pt-4">
                           {(card.login || card.account?.login) && (
                             <div className="flex items-center gap-2">
-                              <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                              <span className="text-sm font-medium">Login:</span>
+                              <TooltipIcon icon={User} tooltip="Login" />
                               <span className="font-mono text-sm break-all">{card.account?.login || card.login}</span>
                             </div>
                           )}
@@ -801,9 +804,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                           {card.password && (
                             <div className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-2">
-                                <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
-                                <span className="text-sm font-medium">Password:</span>
+                                <TooltipIcon icon={Lock} tooltip="Password" />
                                 <span className="font-mono text-sm break-all">
+                                  {showPasswords[card.id] ? card.password : "•".repeat(card.password.length)}
                                   {showPasswords[card.id] ? card.password : "•".repeat(card.password.length)}
                                 </span>
                               </div>
@@ -827,14 +830,14 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                           />
 
                           <div className="flex items-center gap-4">
-                            <div>
-                              <span className="text-sm font-medium">Created:</span>
-                              <span className="text-sm text-muted-foreground ml-2">
+                            <div className="flex items-center gap-1">
+                              <TooltipIcon icon={CalendarPlus} tooltip="Date Created" className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                              <span className="text-sm text-muted-foreground">
                                 {new Date(card.created_at).toLocaleString()}
                               </span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium">Last Updated:</span>
+                            <div className="flex items-center gap-1">
+                              <TooltipIcon icon={CalendarClock} tooltip="Last Updated" className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                               <span className="text-sm text-muted-foreground">
                                 {new Date(card.updated_at).toLocaleString()}
                               </span>
@@ -900,14 +903,14 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       >
                         <div className="flex items-center w-full">
                           <div className="flex items-center gap-2 flex-[1.5] px-2 border-r border-black">
-                            <Phone className="h-5 w-5 text-muted-foreground shrink-0" />
+                            <TooltipIcon icon={Phone} tooltip="Phone Number" className="h-5 w-5 text-muted-foreground shrink-0" />
                             <span className={`font-mono truncate text-black dark:text-white ${card.status === 'inactive' || card.status === 'expired' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.phone_number}</span>
                           </div>
                           <div className="flex items-center justify-center gap-2 flex-[2] px-2 border-r border-black">
                             {card.sim_type === 'eSIM' ? (
-                              <Smartphone className="h-5 w-5 text-muted-foreground shrink-0" />
+                              <TooltipIcon icon={Smartphone} tooltip="eSIM" className="h-5 w-5 text-muted-foreground shrink-0" />
                             ) : (
-                              <IdCard className="h-5 w-5 text-muted-foreground shrink-0" />
+                              <TooltipIcon icon={IdCard} tooltip="Physical SIM" className="h-5 w-5 text-muted-foreground shrink-0" />
                             )}
                             <span className={`font-mono font-medium truncate text-black dark:text-white ${card.status === 'inactive' || card.status === 'expired' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.sim_number}</span>
                           </div>
@@ -987,7 +990,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                             {(card.login || card.account?.login) && (
                               <div className="flex items-center gap-2">
-                                <User className="h-4 w-4 text-muted-foreground" />
+                                <TooltipIcon icon={User} tooltip="Login" />
                                 <span className="text-sm font-medium">Login:</span>
                                 <span className="font-mono text-sm break-all">{card.account?.login || card.login}</span>
                               </div>
@@ -996,7 +999,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             {card.password && (
                               <div className="flex items-center justify-between gap-2">
                                 <div className="flex items-center gap-2">
-                                  <Lock className="h-4 w-4 text-muted-foreground" />
+                                  <TooltipIcon icon={Lock} tooltip="Password" />
                                   <span className="text-sm font-medium">Password:</span>
                                   <span className="font-mono text-sm break-all">
                                     {showPasswords[card.id] ? card.password : "•".repeat(card.password.length)}
@@ -1024,7 +1027,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             
                             {card.location && (
                               <div className="flex items-center gap-2">
-                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                <TooltipIcon icon={MapPin} tooltip="Location" />
                                 <span className="text-sm font-medium">Location:</span>
                                 <span className="text-sm text-muted-foreground">{card.location}</span>
                               </div>
@@ -1039,6 +1042,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             </div>
                             
                             <div className="flex items-center gap-2">
+                              <TooltipIcon icon={CalendarPlus} tooltip="Date Created" className="h-4 w-4 text-muted-foreground shrink-0" />
                               <span className="text-sm font-medium">Created:</span>
                               <span className="text-sm text-muted-foreground">
                                 {new Date(card.created_at).toLocaleString()}
@@ -1046,6 +1050,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             </div>
                             
                             <div className="flex items-center gap-2">
+                              <TooltipIcon icon={CalendarClock} tooltip="Last Updated" className="h-4 w-4 text-muted-foreground shrink-0" />
                               <span className="text-sm font-medium">Last Updated:</span>
                               <span className="text-sm text-muted-foreground">
                                 {new Date(card.updated_at).toLocaleString()}
@@ -1096,5 +1101,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         />
       )}
     </div>
+    </TooltipProvider>
   );
 }
