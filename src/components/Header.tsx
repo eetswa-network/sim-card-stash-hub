@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Home, User, LogOut, Shield, Settings, Menu, X, Smartphone } from "lucide-react";
+import { Home, User, LogOut, Shield, ShieldCheck, Settings, Menu, X, Smartphone, BarChart3, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -156,7 +156,7 @@ export function Header({ onSearch }: HeaderProps) {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-[55]" onClick={() => setMobileMenuOpen(false)}>
           <div 
-            className="absolute w-1/2 md:w-[20%] z-[60] bg-muted border border-border shadow-lg px-4 pb-4 pt-4 rounded-lg right-4 md:right-[max(0px,calc((100vw-1280px)/2-0.6rem))]"
+            className="absolute w-1/2 md:w-[20%] z-[60] bg-muted border border-border shadow-lg px-4 pb-4 pt-4 rounded-lg right-0 md:right-[max(0px,calc((100vw-1280px)/2-1.6rem))]"
             style={{ top: `${menuTop}px` }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -194,7 +194,10 @@ export function Header({ onSearch }: HeaderProps) {
                     </Link>
                   </Button>
                   <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                    <Link to="/statistics">Statistics</Link>
+                    <Link to="/statistics">
+                      <BarChart3 className="h-4 w-4 mr-2" />
+                      Statistics
+                    </Link>
                   </Button>
                   <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
                     <Link to="/devices">
@@ -203,7 +206,10 @@ export function Header({ onSearch }: HeaderProps) {
                     </Link>
                   </Button>
                   <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                    <Link to="/updates">Updates</Link>
+                    <Link to="/updates">
+                      <Bell className="h-4 w-4 mr-2" />
+                      Updates
+                    </Link>
                   </Button>
                   <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
                     <Link to="/security">
@@ -214,20 +220,22 @@ export function Header({ onSearch }: HeaderProps) {
                   {isSuperAdmin && (
                     <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
                       <Link to="/admin">
-                        <Shield className="h-4 w-4 mr-2" />
+                        <ShieldCheck className="h-4 w-4 mr-2" />
                         Admin Panel
                       </Link>
                     </Button>
                   )}
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => { handleSignOut(); setMobileMenuOpen(false); }}
-                    className="justify-start text-destructive hover:text-destructive"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
-                  </Button>
+                  <div className="border-t mt-2 pt-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => { handleSignOut(); setMobileMenuOpen(false); }}
+                      className="w-full justify-center border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  </div>
                 </>
               ) : (
                 <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
