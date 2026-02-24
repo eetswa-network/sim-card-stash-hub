@@ -481,7 +481,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               Add SIM Card
             </Button>
           )}
-          {viewMode === 'list' && filteredSimCards.length > 0 && expandedRows.size < filteredSimCards.length && (
+          {viewMode === 'list' && filteredSimCards.length > 0 && !isMobile && expandedRows.size < filteredSimCards.length && (
             <Button
               variant="outline"
               size="sm"
@@ -492,7 +492,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               Expand All
             </Button>
           )}
-          {viewMode === 'list' && expandedRows.size > 0 && (
+          {viewMode === 'list' && !isMobile && expandedRows.size > 0 && (
             <Button
               variant="outline"
               size="sm"
@@ -501,6 +501,26 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
             >
               <Minimize2 className="h-4 w-4 mr-1" />
               Collapse All
+            </Button>
+          )}
+          {viewMode === 'list' && filteredSimCards.length > 0 && isMobile && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (expandedRows.size === filteredSimCards.length) {
+                  collapseAll();
+                } else {
+                  setExpandedRows(new Set(filteredSimCards.map(card => card.id)));
+                }
+              }}
+              className="px-3 border-2 border-foreground text-foreground font-semibold hover:bg-foreground hover:text-background"
+            >
+              {expandedRows.size === filteredSimCards.length ? (
+                <><Minimize2 className="h-4 w-4 mr-1" />Collapse All</>
+              ) : (
+                <><Maximize2 className="h-4 w-4 mr-1" />Expand All</>
+              )}
             </Button>
           )}
         </div>

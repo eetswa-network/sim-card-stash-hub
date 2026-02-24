@@ -113,8 +113,20 @@ export function Header({ onSearch }: HeaderProps) {
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
             <img src={sidewaysLivingLogo} alt="Sideways Living" className="hidden md:block h-[150px] w-auto object-contain" />
-            <img src="/lovable-uploads/3e0fb5d9-6b3f-4d9d-bf4c-ab3c4cc20334.png" alt="SIM Card Stash" className="w-[150px] h-[150px] md:w-[150px] md:h-[150px] w-[80px] h-[80px] object-contain" />
-            <Link to="/" className="text-3xl font-bold">SIM Card Stash</Link>
+            <img src="/lovable-uploads/3e0fb5d9-6b3f-4d9d-bf4c-ab3c4cc20334.png" alt="SIM Card Stash" className="md:w-[150px] md:h-[150px] w-[60px] h-[60px] object-contain" />
+            <Link to="/" className="md:text-3xl text-lg font-bold">
+              <span className="hidden md:inline">SIM Card Stash</span>
+              <span className="md:hidden">SIMCardSta.sh</span>
+            </Link>
+            {/* Mobile hamburger menu button - on same line */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 ml-auto"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
           </div>
           
           {/* Tablet & Desktop navigation - avatar on left, menu on right */}
@@ -156,18 +168,6 @@ export function Header({ onSearch }: HeaderProps) {
               </Button>
             </div>
           </div>
-        </div>
-        
-        {/* Mobile hamburger menu button */}
-        <div className="flex md:hidden items-center justify-end">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2"
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
         </div>
 
         {/* Mobile menu dropdown */}
