@@ -108,26 +108,26 @@ export function Header({ onSearch }: HeaderProps) {
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container mx-auto px-4 min-h-40 flex flex-col py-4 gap-4">
+      <div className="container mx-auto px-4 md:min-h-40 flex flex-col py-4 gap-0 md:gap-4">
         {/* Logo and title with tablet/desktop navigation */}
         <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-1">
             <img src={sidewaysLivingLogo} alt="Sideways Living" className="hidden md:block h-[150px] w-auto object-contain" />
             <img src="/lovable-uploads/3e0fb5d9-6b3f-4d9d-bf4c-ab3c4cc20334.png" alt="SIM Card Stash" className="md:w-[150px] md:h-[150px] w-[60px] h-[60px] object-contain" />
             <Link to="/" className="md:text-3xl text-lg font-bold">
               <span className="hidden md:inline">SIM Card Stash</span>
               <span className="md:hidden">SIMCardSta.sh</span>
             </Link>
-            {/* Mobile hamburger menu button - on same line */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 ml-auto"
-            >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
           </div>
+          {/* Mobile hamburger menu button - right side */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2"
+          >
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
           
           {/* Tablet & Desktop navigation - avatar on left, menu on right */}
           <div className="hidden md:flex items-center gap-6">
