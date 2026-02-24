@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { cacheSimCards, getCachedSimCards, cacheUsageData, getCachedUsageData, isOnline } from "@/lib/offlineDb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -83,6 +84,29 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     const userId = session.user.id;
 
     try {
+      if (!isOnline()) {
+        // Offline mode: load from IndexedDB
+        console.log("Offline mode: loading cached data");
+        const cachedCards = await getCachedSimCards();
+        setSimCards(cachedCards);
+
+        // Load cached usage data
+        const groupedUsage: {[key: string]: UsageEntry[]} = {};
+        for (const card of cachedCards) {
+          const usage = await getCachedUsageData(card.id);
+          if (usage.length > 0) {
+            groupedUsage[card.id] = usage;
+          }
+        }
+        setUsageData(groupedUsage);
+
+        toast({
+          title: "Offline Mode",
+          description: "Showing cached data. Changes will sync when you're back online.",
+        });
+        return;
+      }
+
       console.log("Making Supabase query for sim_cards...");
       const { data, error } = await supabase
         .from("sim_cards")
@@ -100,14 +124,16 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         throw error;
       }
       
-      console.log("Raw data from query:", data);
       setSimCards(data || []);
-      console.log("Set sim cards data:", data?.length || 0, "cards");
+
+      // Cache sim cards for offline use
+      if (data) {
+        await cacheSimCards(data);
+      }
 
       // Fetch usage data for all sim cards
       if (data && data.length > 0) {
-        console.log("Fetching usage data for", data.length, "cards");
-        const { data: usageData, error: usageError } = await supabase
+        const { data: usageResult, error: usageError } = await supabase
           .from("sim_card_usage")
           .select("*")
           .eq("user_id", userId)
@@ -116,9 +142,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         if (usageError) {
           console.error("Error fetching usage data:", usageError);
         } else {
-          console.log("Usage data fetched:", usageData?.length || 0, "entries");
-          // Group usage data by sim_card_id
-          const groupedUsage = (usageData || []).reduce((acc, usage) => {
+          const groupedUsage = (usageResult || []).reduce((acc, usage) => {
             if (!acc[usage.sim_card_id]) {
               acc[usage.sim_card_id] = [];
             }
@@ -126,17 +150,39 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
             return acc;
           }, {} as {[key: string]: UsageEntry[]});
           setUsageData(groupedUsage);
+
+          // Cache usage data per sim card for offline use
+          for (const [simCardId, entries] of Object.entries(groupedUsage)) {
+            await cacheUsageData(simCardId, entries as UsageEntry[]);
+          }
         }
-      } else {
-        console.log("No sim cards found, skipping usage data fetch");
       }
     } catch (error) {
       console.error("Error fetching SIM cards:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load SIM cards. Please try again.",
-        variant: "destructive",
-      });
+      
+      // Try loading cached data on network failure
+      const cachedCards = await getCachedSimCards();
+      if (cachedCards.length > 0) {
+        setSimCards(cachedCards);
+        const groupedUsage: {[key: string]: UsageEntry[]} = {};
+        for (const card of cachedCards) {
+          const usage = await getCachedUsageData(card.id);
+          if (usage.length > 0) {
+            groupedUsage[card.id] = usage;
+          }
+        }
+        setUsageData(groupedUsage);
+        toast({
+          title: "Offline Mode",
+          description: "Showing cached data. Some information may be outdated.",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to load SIM cards and no cached data available.",
+          variant: "destructive",
+        });
+      }
     } finally {
       console.log("Setting loading to false");
       setLoading(false);
