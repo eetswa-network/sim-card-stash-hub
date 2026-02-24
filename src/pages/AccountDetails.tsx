@@ -85,31 +85,12 @@ export default function AccountDetails() {
         }));
       }
 
-      // Load locations and seed defaults if needed
-      const defaultLocations = ["iPhone Air", "iPhone XR (white)", "iPhone XR (yellow)", "Moto g06", "moto g55 5G", "SIM Wallet (black)"];
-      
-      let { data: locationsData } = await supabase
+      // Load locations from DB only (no hardcoded defaults)
+      const { data: locationsData } = await supabase
         .from("sim_card_locations")
         .select("id, name")
         .eq("user_id", session.user.id)
         .order("name");
-      
-      const existingNames = new Set((locationsData || []).map(l => l.name));
-      const missingDefaults = defaultLocations.filter(d => !existingNames.has(d));
-      
-      if (missingDefaults.length > 0) {
-        await supabase
-          .from("sim_card_locations")
-          .insert(missingDefaults.map(name => ({ name, user_id: session.user.id })));
-        
-        // Reload after seeding
-        const { data: refreshed } = await supabase
-          .from("sim_card_locations")
-          .select("id, name")
-          .eq("user_id", session.user.id)
-          .order("name");
-        locationsData = refreshed;
-      }
       
       setLocations(locationsData || []);
     } catch (error) {
