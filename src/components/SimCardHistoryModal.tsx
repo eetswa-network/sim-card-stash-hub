@@ -6,20 +6,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { History, UserPlus, UserMinus, FileEdit, Plus } from "lucide-react";
+import { History, UserPlus, UserMinus, FileEdit, Plus, MapPin } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface HistoryEntry {
   id: string;
-  type: "created" | "updated" | "ownership_transfer";
+  type: "created" | "updated" | "ownership_transfer" | "location_change";
   timestamp: string;
   details?: string;
   previousUserId?: string;
   newUserId?: string;
   changedBy?: string;
   notes?: string;
+  oldValue?: string;
+  newValue?: string;
 }
-
 interface SimCardHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -68,12 +69,14 @@ export function SimCardHistoryModal({
         transfers.forEach((transfer) => {
           entries.push({
             id: transfer.id,
-            type: "ownership_transfer",
+            type: (transfer.event_type || "ownership_transfer") as HistoryEntry["type"],
             timestamp: transfer.changed_at,
             previousUserId: transfer.previous_user_id,
             newUserId: transfer.new_user_id,
             changedBy: transfer.changed_by,
             notes: transfer.notes,
+            oldValue: transfer.old_value,
+            newValue: transfer.new_value,
           });
         });
       }
@@ -118,6 +121,8 @@ export function SimCardHistoryModal({
         return <FileEdit className="h-4 w-4" />;
       case "ownership_transfer":
         return <UserPlus className="h-4 w-4" />;
+      case "location_change":
+        return <MapPin className="h-4 w-4" />;
       default:
         return <History className="h-4 w-4" />;
     }
@@ -131,6 +136,8 @@ export function SimCardHistoryModal({
         return "Details Updated";
       case "ownership_transfer":
         return "Ownership Transferred";
+      case "location_change":
+        return "Location Changed";
       default:
         return "Change";
     }
@@ -144,6 +151,8 @@ export function SimCardHistoryModal({
         return "bg-blue-500";
       case "ownership_transfer":
         return "bg-purple-500";
+      case "location_change":
+        return "bg-amber-500";
       default:
         return "bg-muted";
     }
@@ -211,6 +220,16 @@ export function SimCardHistoryModal({
                           {entry.notes && (
                             <p className="mt-1 italic">Note: {entry.notes}</p>
                           )}
+                        </div>
+                      )}
+
+                      {entry.type === "location_change" && (
+                        <div className="mt-1 text-sm text-muted-foreground">
+                          <p>
+                            <span className="font-medium">{entry.oldValue}</span>
+                            {" → "}
+                            <span className="font-medium">{entry.newValue}</span>
+                          </p>
                         </div>
                       )}
 
