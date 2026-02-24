@@ -78,7 +78,7 @@ const installSteps: Record<Platform, StepProps[]> = {
       number: 1,
       title: "Open in Safari",
       description:
-        "Make sure you're viewing SIM Card Stash in Safari. Other browsers on iOS don't support installing web apps.",
+        "Make sure you're viewing SIMCardSta.sh in Safari. Other browsers on iOS don't support installing web apps.",
       tip: "If you're in Chrome or another browser, copy the URL and paste it into Safari.",
     },
     {
@@ -106,7 +106,7 @@ const installSteps: Record<Platform, StepProps[]> = {
       number: 1,
       title: "Open in Chrome",
       description:
-        "Make sure you're viewing SIM Card Stash in Google Chrome for the best install experience.",
+        "Make sure you're viewing SIMCardSta.sh in Google Chrome for the best install experience.",
     },
     {
       number: 2,
@@ -133,7 +133,7 @@ const installSteps: Record<Platform, StepProps[]> = {
       number: 1,
       title: "Look for the install icon",
       description:
-        'In the address bar, look for a small install icon (monitor with a down arrow) on the right side. You can also go to Menu (⋮) → "Install SIM Card Stash...".',
+        'In the address bar, look for a small install icon (monitor with a down arrow) on the right side. You can also go to Menu (⋮) → "Install SIMCardSta.sh...".',
     },
     {
       number: 2,
@@ -154,7 +154,7 @@ const installSteps: Record<Platform, StepProps[]> = {
       number: 1,
       title: "Look for the install icon",
       description:
-        'In the address bar, look for an install icon on the right side. You can also go to Menu (···) → Apps → "Install SIM Card Stash".',
+        'In the address bar, look for an install icon on the right side. You can also go to Menu (···) → Apps → "Install SIMCardSta.sh".',
     },
     {
       number: 2,
@@ -174,7 +174,7 @@ const installSteps: Record<Platform, StepProps[]> = {
       number: 1,
       title: "Use Chrome or Edge",
       description:
-        "For the best installation experience, open SIM Card Stash in Google Chrome or Microsoft Edge.",
+        "For the best installation experience, open SIMCardSta.sh in Google Chrome or Microsoft Edge.",
       tip: "Firefox and Safari on desktop don't fully support installing web apps yet.",
     },
     {
@@ -223,7 +223,7 @@ export default function Install() {
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-2">
           <Download className="h-8 w-8 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold">Install SIM Card Stash</h1>
+        <h1 className="text-3xl font-bold">Install SIMCardSta.sh</h1>
         <p className="text-muted-foreground max-w-lg mx-auto">
           Install the app on your device for the best experience — faster loading,
           offline access, and seamless multi-device sync.
@@ -379,7 +379,7 @@ export default function Install() {
               Is this the same as downloading from an app store?
             </h4>
             <p className="text-sm text-muted-foreground mt-1">
-              SIM Card Stash is a Progressive Web App (PWA). It installs directly
+              SIMCardSta.sh is a Progressive Web App (PWA). It installs directly
               from your browser — no app store needed. It works just like a native
               app with offline support, home screen icon, and full-screen mode.
             </p>

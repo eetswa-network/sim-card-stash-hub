@@ -114,7 +114,7 @@ export default function Security() {
         optionsJSON: {
           challenge: challenge,
           rp: {
-            name: "SIM Card Stash",
+            name: "SIMCardSta.sh",
             id: window.location.hostname,
           },
           user: {
@@ -288,7 +288,7 @@ export default function Security() {
 
   const generateMfaSecret = () => {
     const totp = new TOTP({
-      issuer: "SIM Card Stash",
+      issuer: "SIMCardSta.sh",
       label: user?.email || "User",
       algorithm: "SHA1",
       digits: 6,
@@ -310,7 +310,7 @@ export default function Security() {
     const codes = generateBackupCodes();
     
     const totp = new TOTP({
-      issuer: "SIM Card Stash",
+      issuer: "SIMCardSta.sh",
       label: user.email,
       algorithm: "SHA1",
       digits: 6,
@@ -336,7 +336,7 @@ export default function Security() {
 
   const verifyTotp = (secret: string, token: string) => {
     const totp = new TOTP({
-      issuer: "SIM Card Stash",
+      issuer: "SIMCardSta.sh",
       algorithm: "SHA1",
       digits: 6,
       period: 30,
@@ -345,7 +345,7 @@ export default function Security() {
 
     const currentToken = totp.generate();
     const previousTotp = new TOTP({
-      issuer: "SIM Card Stash",
+      issuer: "SIMCardSta.sh",
       algorithm: "SHA1",
       digits: 6,
       period: 30,
