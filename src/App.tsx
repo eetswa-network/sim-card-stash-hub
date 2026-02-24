@@ -2,8 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { useState, useCallback } from "react";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { OfflineBanner } from "@/components/OfflineBanner";
@@ -22,13 +22,19 @@ const queryClient = new QueryClient();
 const AppLayout = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
   
-  const showSearch = location.pathname === "/";
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+    if (location.pathname !== "/") {
+      navigate("/");
+    }
+  }, [location.pathname, navigate]);
   
   return (
     <div className="min-h-screen flex flex-col">
       <OfflineBanner />
-      <Header onSearch={showSearch ? setSearchQuery : undefined} />
+      <Header onSearch={handleSearch} />
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Index searchQuery={searchQuery} />} />
