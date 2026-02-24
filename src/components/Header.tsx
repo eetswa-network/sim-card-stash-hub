@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CreditCard, User, LogOut, Shield, Settings, Menu, X } from "lucide-react";
+import { CreditCard, User, LogOut, Shield, Settings, Menu, X, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -160,8 +160,11 @@ export function Header({ onSearch }: HeaderProps) {
               <Button variant="ghost" size="sm" asChild>
                 <Link to="/">Dashboard</Link>
               </Button>
-              <Button variant="ghost" size="sm" asChild>
+               <Button variant="ghost" size="sm" asChild>
                 <Link to="/statistics">Statistics</Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/devices">Devices</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
                 <Link to="/updates">Updates</Link>
@@ -205,6 +208,12 @@ export function Header({ onSearch }: HeaderProps) {
                 </Button>
                 <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
                   <Link to="/statistics">Statistics</Link>
+                </Button>
+                <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="/devices">
+                    <Smartphone className="h-4 w-4 mr-2" />
+                    Devices
+                  </Link>
                 </Button>
                 <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
                   <Link to="/updates">Updates</Link>
