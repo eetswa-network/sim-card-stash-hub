@@ -866,6 +866,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     </button>
                     <div className="flex-[1] text-center px-2 border-r border-black">Carrier</div>
                     <div className="flex-[1] text-center px-2 border-r border-black">Status</div>
+                    <div className="flex-[1] text-center px-2 border-r border-black">Location</div>
                     <div className="flex-[1.5] text-center px-2">Actions</div>
                   </div>
                 </div>
@@ -896,6 +897,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             <Badge variant={getStatusColor(card.status)}>
                               {card.status}
                             </Badge>
+                          </div>
+                          <div className="flex-[1] text-center px-2 border-r border-black">
+                            <span className="text-black dark:text-white text-sm">{card.location || '-'}</span>
                           </div>
                           <div className="flex-[1.5] flex justify-center items-center px-2">
                             <div className="flex gap-2">
