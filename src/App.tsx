@@ -6,6 +6,7 @@ import { useState } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Security from "./pages/Security";
@@ -25,6 +26,7 @@ const AppLayout = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
+      <OfflineBanner />
       <Header onSearch={showSearch ? setSearchQuery : undefined} />
       <main className="flex-1">
         <Routes>
