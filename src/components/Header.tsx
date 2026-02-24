@@ -189,8 +189,8 @@ export function Header({ onSearch }: HeaderProps) {
                   </Button>
                   <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
                     <Link to="/account">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Account
+                      <User className="h-4 w-4 mr-2" />
+                      Account Details
                     </Link>
                   </Button>
                   <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
