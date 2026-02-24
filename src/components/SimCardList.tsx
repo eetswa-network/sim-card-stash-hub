@@ -770,13 +770,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     {expandedRows.has(card.id) && (
                       <div className="px-4 pb-4 bg-table-green-light border-t border-table-divider animate-accordion-down">
                         <div className="space-y-3 pt-4">
-                          {card.location && (
-                            <div className="flex items-center gap-2">
-                              <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
-                              <span className="text-sm font-medium">Location:</span>
-                              <span className="text-sm">{card.location}</span>
-                            </div>
-                          )}
                           {(card.login || card.account?.login) && (
                             <div className="flex items-center gap-2">
                               <User className="h-4 w-4 text-muted-foreground shrink-0" />
