@@ -64,6 +64,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   const [sortField, setSortField] = useState<'phone_number' | 'sim_number' | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [historyModalCard, setHistoryModalCard] = useState<SimCard | null>(null);
+  const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -456,6 +457,49 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
   const filteredSimCards = filteredAndSortedCards;
 
+  // Find the replacement card for a swapped SIM (same phone_number, created after)
+  const navigateToSwappedCard = (card: SimCard) => {
+    const replacement = simCards.find(
+      c => c.phone_number === card.phone_number && c.id !== card.id && new Date(c.created_at) > new Date(card.created_at)
+    );
+    if (replacement) {
+      // If the replacement isn't in the filtered list, clear search first
+      const isVisible = filteredSimCards.some(c => c.id === replacement.id);
+      if (!isVisible) {
+        toast({
+          title: "Replacement card not visible",
+          description: "The replacement SIM card may be hidden by current filters. Try clearing your search.",
+        });
+        return;
+      }
+      // Expand and scroll to the replacement card
+      setExpandedRows(prev => new Set(prev).add(replacement.id));
+      setHighlightedCardId(replacement.id);
+      setTimeout(() => {
+        document.getElementById(`sim-card-${replacement.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => setHighlightedCardId(null), 2000);
+      }, 100);
+    } else {
+      toast({
+        title: "No replacement found",
+        description: "Could not find the SIM card this was swapped to.",
+      });
+    }
+  };
+
+  const renderStatusBadge = (card: SimCard, className?: string) => {
+    const badge = (
+      <Badge 
+        variant={getStatusColor(card.status)} 
+        className={`${className || ''} ${card.status === 'swapped' ? 'cursor-pointer hover:ring-2 hover:ring-primary' : ''}`}
+        onClick={card.status === 'swapped' ? (e: React.MouseEvent) => { e.stopPropagation(); navigateToSwappedCard(card); } : undefined}
+      >
+        {card.status}
+      </Badge>
+    );
+    return badge;
+  };
+
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -578,7 +622,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       {viewMode === 'grid' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredSimCards.map((card) => (
-            <Card key={card.id} className="hover:shadow-md transition-shadow animate-fade-in border border-border">
+            <Card key={card.id} id={`sim-card-${card.id}`} className={`hover:shadow-md transition-shadow animate-fade-in border border-border ${highlightedCardId === card.id ? 'ring-2 ring-primary' : ''}`}>
               <CardHeader className="pb-3">
                 {/* Row 1: Phone number with icon on left, status on right */}
                 <div className="flex items-center justify-between">
@@ -586,9 +630,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     <TooltipIcon icon={Phone} tooltip="Phone Number" className="h-5 w-5 text-muted-foreground shrink-0" />
                     <CardTitle className={`text-lg break-all ${card.status === 'inactive' || card.status === 'expired' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.phone_number}</CardTitle>
                   </div>
-                  <Badge variant={getStatusColor(card.status)}>
-                    {card.status}
-                  </Badge>
+                  {renderStatusBadge(card)}
                 </div>
                 {/* Row 2: SIM number with icon on left, carrier on right */}
                 <div className="flex items-center justify-between mt-2">
@@ -715,7 +757,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               /* Mobile List View - Simplified Card Layout */
               <div className="divide-y divide-table-divider">
                 {filteredSimCards.map((card) => (
-                  <div key={card.id} className="animate-fade-in">
+                  <div key={card.id} id={`sim-card-${card.id}`} className={`animate-fade-in ${highlightedCardId === card.id ? 'ring-2 ring-primary' : ''}`}>
                     <div 
                       className="p-4 hover:bg-muted/50 transition-colors cursor-pointer"
                       onClick={() => toggleRowExpansion(card.id)}
@@ -729,9 +771,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-right text-black dark:text-white">{card.carrier || 'No carrier'}</span>
-                            <Badge variant={getStatusColor(card.status)} className="text-xs">
-                              {card.status}
-                            </Badge>
+                            {renderStatusBadge(card, "text-xs")}
                           </div>
                         </div>
                         
@@ -914,7 +954,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 </div>
                 <div className="divide-y divide-table-divider">
                   {filteredSimCards.map((card) => (
-                    <div key={card.id} className="animate-fade-in">
+                    <div key={card.id} id={`sim-card-${card.id}`} className={`animate-fade-in ${highlightedCardId === card.id ? 'ring-2 ring-primary' : ''}`}>
                       <div 
                         className="p-4 hover:bg-muted/50 transition-colors cursor-pointer"
                         onClick={() => toggleRowExpansion(card.id)}
@@ -936,9 +976,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             <span className="text-black dark:text-white">{card.carrier || '-'}</span>
                           </div>
                           <div className="flex-[1] text-center px-2 border-r border-black">
-                            <Badge variant={getStatusColor(card.status)}>
-                              {card.status}
-                            </Badge>
+                            {renderStatusBadge(card)}
                           </div>
                           <div className="flex-[1] text-center px-2 border-r border-black">
                             <span className="text-black dark:text-white text-sm">{card.location || '-'}</span>
