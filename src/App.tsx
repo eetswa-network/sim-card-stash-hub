@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Security from "./pages/Security";
 import Updates from "./pages/Updates";
+import Install from "./pages/Install";
 import AccountDetails from "./pages/AccountDetails";
 import Statistics from "./pages/Statistics";
 import Devices from "./pages/Devices";
@@ -42,6 +43,7 @@ const AppLayout = () => {
           <Route path="/security" element={<Security />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/updates" element={<Updates />} />
+          <Route path="/install" element={<Install />} />
           <Route path="/devices" element={<Devices />} />
           <Route path="/account" element={<AccountDetails />} />
           <Route path="/admin" element={<Admin />} />

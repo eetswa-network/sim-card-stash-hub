@@ -242,9 +242,13 @@ export function Header({ onSearch }: HeaderProps) {
                         <Download className="h-4 w-4 shrink-0 text-primary" />
                         <span>
                           Install the app for offline access & multi-device sync.{" "}
-                          {/iPad|iPhone|iPod/.test(navigator.userAgent)
-                            ? "Tap Share → Add to Home Screen."
-                            : "Use browser menu → Install app."}
+                          <Link
+                            to="/install"
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="text-primary underline font-medium"
+                          >
+                            More info
+                          </Link>
                         </span>
                       </div>
                     </div>
