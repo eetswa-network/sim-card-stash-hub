@@ -474,42 +474,34 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           {!showForm && onAddSimCard && (
-            <Button 
-              onClick={onAddSimCard} 
-              variant="outline" 
-              size="sm"
-              className="flex items-center gap-2 border-2 border-foreground text-foreground font-semibold hover:bg-foreground hover:text-background h-[38px]"
-            >
-              <Plus className="h-4 w-4" />
-              Add SIM Card
-            </Button>
+            <TooltipIcon 
+              icon={Plus} 
+              tooltip="Add SIM Card" 
+              className="h-5 w-5 cursor-pointer text-foreground hover:text-primary transition-colors"
+              onClick={onAddSimCard}
+            />
           )}
           {viewMode === 'list' && filteredSimCards.length > 0 && !isMobile && expandedRows.size < filteredSimCards.length && (
-            <Button
-              variant="outline"
-              size="sm"
+            <TooltipIcon 
+              icon={Maximize2} 
+              tooltip="Expand All" 
+              className="h-5 w-5 cursor-pointer text-foreground hover:text-primary transition-colors"
               onClick={() => setExpandedRows(new Set(filteredSimCards.map(card => card.id)))}
-              className="px-3 border-2 border-foreground text-foreground font-semibold hover:bg-foreground hover:text-background"
-            >
-              <Maximize2 className="h-4 w-4 mr-1" />
-              Expand All
-            </Button>
+            />
           )}
           {viewMode === 'list' && !isMobile && expandedRows.size > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
+            <TooltipIcon 
+              icon={Minimize2} 
+              tooltip="Collapse All" 
+              className="h-5 w-5 cursor-pointer text-foreground hover:text-primary transition-colors"
               onClick={collapseAll}
-              className="px-3 border-2 border-foreground text-foreground font-semibold hover:bg-foreground hover:text-background"
-            >
-              <Minimize2 className="h-4 w-4 mr-1" />
-              Collapse All
-            </Button>
+            />
           )}
           {viewMode === 'list' && filteredSimCards.length > 0 && isMobile && (
-            <Button
-              variant="outline"
-              size="sm"
+            <TooltipIcon 
+              icon={expandedRows.size === filteredSimCards.length ? Minimize2 : Maximize2} 
+              tooltip={expandedRows.size === filteredSimCards.length ? "Collapse All" : "Expand All"} 
+              className="h-5 w-5 cursor-pointer text-foreground hover:text-primary transition-colors"
               onClick={() => {
                 if (expandedRows.size === filteredSimCards.length) {
                   collapseAll();
@@ -517,35 +509,22 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                   setExpandedRows(new Set(filteredSimCards.map(card => card.id)));
                 }
               }}
-              className="px-3 border-2 border-foreground text-foreground font-semibold hover:bg-foreground hover:text-background"
-            >
-              {expandedRows.size === filteredSimCards.length ? (
-                <><Minimize2 className="h-4 w-4 mr-1" />Collapse All</>
-              ) : (
-                <><Maximize2 className="h-4 w-4 mr-1" />Expand All</>
-              )}
-            </Button>
+            />
           )}
         </div>
-        <div className="flex bg-muted rounded-lg p-1 border-2 border-black">
-          <Button
-            variant={viewMode === 'grid' ? 'default' : 'ghost'}
-            size="sm"
+        <div className="flex items-center gap-2">
+          <TooltipIcon 
+            icon={Grid3X3} 
+            tooltip="Grid View" 
+            className={`h-5 w-5 cursor-pointer transition-colors ${viewMode === 'grid' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
             onClick={() => onViewModeChange('grid')}
-            className="px-3"
-          >
-            <Grid3X3 className="h-4 w-4 mr-1" />
-            Grid
-          </Button>
-          <Button
-            variant={viewMode === 'list' ? 'default' : 'ghost'}
-            size="sm"
+          />
+          <TooltipIcon 
+            icon={List} 
+            tooltip="List View" 
+            className={`h-5 w-5 cursor-pointer transition-colors ${viewMode === 'list' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
             onClick={() => onViewModeChange('list')}
-            className="px-3"
-          >
-            <List className="h-4 w-4 mr-1" />
-            List
-          </Button>
+          />
         </div>
       </div>
 
@@ -700,7 +679,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <TooltipIcon icon={Phone} tooltip="Phone Number" className="h-5 w-5 text-muted-foreground shrink-0" />
-                            <span className={`font-mono text-sm break-all text-black dark:text-white ${card.status === 'inactive' || card.status === 'expired' ? 'line-through' : ''}`}>{card.phone_number}</span>
+                            <span className={`font-mono text-sm break-all text-black dark:text-white ${card.status === 'inactive' || card.status === 'expired' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.phone_number}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-right text-black dark:text-white">{card.carrier || 'No carrier'}</span>
@@ -718,7 +697,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             ) : (
                               <TooltipIcon icon={IdCard} tooltip="Physical SIM" className="h-5 w-5 text-muted-foreground shrink-0" />
                             )}
-                            <span className={`font-mono text-sm break-all text-black dark:text-white ${card.status === 'inactive' || card.status === 'expired' ? 'line-through' : ''}`}>{card.sim_number}</span>
+                            <span className={`font-mono text-sm break-all text-black dark:text-white ${card.status === 'inactive' || card.status === 'expired' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.sim_number}</span>
                           </div>
                           <div className="flex gap-2">
                             <Button
