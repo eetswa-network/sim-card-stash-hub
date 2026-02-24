@@ -129,94 +129,99 @@ export function Header({ onSearch }: HeaderProps) {
         </Button>
       </div>
 
-      {/* Menu dropdown - all screen sizes */}
+      {/* Menu overlay + panel */}
       {mobileMenuOpen && (
-        <div className="fixed top-0 right-0 w-1/2 md:w-1/4 z-[60] bg-background/95 backdrop-blur-md border-l border-b shadow-lg pt-20 px-4 pb-4 rounded-bl-lg">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setMobileMenuOpen(false)}
-            className="absolute top-4 right-4 p-2"
+        <div className="fixed inset-0 z-[55]" onClick={() => setMobileMenuOpen(false)}>
+          <div 
+            className="absolute top-0 w-1/2 md:w-1/4 z-[60] bg-muted border-l border-b shadow-lg pt-16 px-4 pb-4 rounded-bl-lg right-0 md:right-[max(0px,calc((100vw-1280px)/2))]"
+            onClick={(e) => e.stopPropagation()}
           >
-            <X className="h-8 w-8" />
-          </Button>
-          <div className="flex flex-col gap-1">
-          {user ? (
-            <>
-              <div className="flex items-center gap-3 px-2 pb-3 border-b mb-2">
-                <Link to="/account" onClick={() => setMobileMenuOpen(false)}>
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={userProfile?.avatar_url || ""} />
-                    <AvatarFallback className="text-sm">
-                      {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
-                    </AvatarFallback>
-                  </Avatar>
-                </Link>
-                <div className="min-w-0 flex-1">
-                  <div className="font-medium truncate text-sm">
-                    {userProfile?.name || userProfile?.profile_name || user.email}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMobileMenuOpen(false)}
+              className="absolute top-4 right-4 p-2"
+            >
+              <X className="h-8 w-8" />
+            </Button>
+            <div className="flex flex-col gap-1">
+              {user ? (
+                <>
+                  <div className="flex items-center gap-3 px-2 pb-3 border-b mb-2">
+                    <Link to="/account" onClick={() => setMobileMenuOpen(false)}>
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={userProfile?.avatar_url || ""} />
+                        <AvatarFallback className="text-sm">
+                          {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Link>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium truncate text-sm">
+                        {userProfile?.name || userProfile?.profile_name || user.email}
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {user.email}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-muted-foreground truncate">
-                    {user.email}
-                  </div>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                <Link to="/">
-                  <Home className="h-4 w-4 mr-2" />
-                  Home
-                </Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                <Link to="/account">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Account
-                </Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                <Link to="/statistics">Statistics</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                <Link to="/devices">
-                  <Smartphone className="h-4 w-4 mr-2" />
-                  Devices
-                </Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                <Link to="/updates">Updates</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                <Link to="/security">
-                  <Shield className="h-4 w-4 mr-2" />
-                  Security
-                </Link>
-              </Button>
-              {isSuperAdmin && (
+                  <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to="/">
+                      <Home className="h-4 w-4 mr-2" />
+                      Home
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to="/account">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Account
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to="/statistics">Statistics</Link>
+                  </Button>
+                  <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to="/devices">
+                      <Smartphone className="h-4 w-4 mr-2" />
+                      Devices
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to="/updates">Updates</Link>
+                  </Button>
+                  <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to="/security">
+                      <Shield className="h-4 w-4 mr-2" />
+                      Security
+                    </Link>
+                  </Button>
+                  {isSuperAdmin && (
+                    <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                      <Link to="/admin">
+                        <Shield className="h-4 w-4 mr-2" />
+                        Admin Panel
+                      </Link>
+                    </Button>
+                  )}
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => { handleSignOut(); setMobileMenuOpen(false); }}
+                    className="justify-start text-destructive hover:text-destructive"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
                 <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                  <Link to="/admin">
-                    <Shield className="h-4 w-4 mr-2" />
-                    Admin Panel
+                  <Link to="/auth">
+                    <User className="h-4 w-4 mr-2" />
+                    Sign In
                   </Link>
                 </Button>
               )}
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => { handleSignOut(); setMobileMenuOpen(false); }}
-                className="justify-start text-destructive hover:text-destructive"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
-            </>
-          ) : (
-            <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-              <Link to="/auth">
-                <User className="h-4 w-4 mr-2" />
-                Sign In
-              </Link>
-            </Button>
-          )}
+            </div>
           </div>
         </div>
       )}
