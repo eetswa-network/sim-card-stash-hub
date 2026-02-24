@@ -55,7 +55,7 @@ export default function Security() {
 
       const { data, error } = await supabase
         .from("user_mfa_settings")
-        .select("*")
+        .select("is_enabled, backup_codes, backup_codes_hashed, encryption_salt")
         .eq("user_id", session.user.id)
         .maybeSingle();
 

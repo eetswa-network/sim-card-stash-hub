@@ -61,12 +61,36 @@ function decodePublicKey(storedKey: any): Uint8Array {
   throw new Error('Unknown public key format');
 }
 
+// Simple in-memory rate limiting
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(identifier: string, maxAttempts = 10, windowMs = 60000): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(identifier);
+  
+  if (!record || now > record.resetAt) {
+    rateLimitMap.set(identifier, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  
+  record.count++;
+  return record.count <= maxAttempts;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Rate limit by IP
+    const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    if (!checkRateLimit(clientIp)) {
+      return new Response(
+        JSON.stringify({ error: "Too many attempts, please try again later" }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
@@ -108,8 +132,8 @@ Deno.serve(async (req) => {
     if (!passkey) {
       console.log("Passkey not found for credential:", credential_id);
       return new Response(
-        JSON.stringify({ error: "Passkey not found" }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: "Authentication failed" }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -190,7 +214,7 @@ Deno.serve(async (req) => {
       console.error("Signature verification error:", verifyError);
       console.error("Error details:", verifyError.message, verifyError.stack);
       return new Response(
-        JSON.stringify({ error: "Authentication verification failed", details: verifyError.message }),
+        JSON.stringify({ error: "Authentication failed" }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -241,7 +265,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error("Passkey auth error:", error);
     return new Response(
-      JSON.stringify({ error: "Internal server error", details: error.message }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
