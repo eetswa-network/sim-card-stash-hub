@@ -586,7 +586,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location">Location / Device</Label>
               {showCustomLocation ? (
                 <div className="flex gap-2">
                   <Input
