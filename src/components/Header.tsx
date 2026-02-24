@@ -131,7 +131,7 @@ export function Header({ onSearch }: HeaderProps) {
 
       {/* Menu dropdown - all screen sizes */}
       {mobileMenuOpen && (
-        <div className="fixed top-0 right-0 w-1/2 md:w-1/4 h-screen z-[60] bg-background/95 backdrop-blur-md border-l shadow-lg pt-20 px-4 overflow-y-auto">
+        <div className="fixed top-0 right-0 w-1/2 md:w-1/4 z-[60] bg-background/95 backdrop-blur-md border-l border-b shadow-lg pt-20 px-4 pb-4 rounded-bl-lg">
           <Button
             variant="ghost"
             size="sm"
