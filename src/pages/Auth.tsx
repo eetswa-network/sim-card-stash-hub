@@ -164,7 +164,7 @@ export default function Auth() {
 
   const generateMfaSecret = () => {
     const totp = new TOTP({
-      issuer: "SIM Card Stash",
+      issuer: "SIMCardSta.sh",
       label: tempUser?.email || "User",
       algorithm: "SHA1",
       digits: 6,
@@ -186,7 +186,7 @@ export default function Auth() {
     const codes = generateBackupCodes();
     
     const totp = new TOTP({
-      issuer: "SIM Card Stash",
+      issuer: "SIMCardSta.sh",
       label: email,
       algorithm: "SHA1",
       digits: 6,
@@ -260,7 +260,7 @@ export default function Auth() {
 
   const verifyTotp = (secret: string, token: string) => {
     const totp = new TOTP({
-      issuer: "SIM Card Stash",
+      issuer: "SIMCardSta.sh",
       algorithm: "SHA1",
       digits: 6,
       period: 30,
@@ -269,7 +269,7 @@ export default function Auth() {
 
     const currentToken = totp.generate();
     const previousTotp = new TOTP({
-      issuer: "SIM Card Stash",
+      issuer: "SIMCardSta.sh",
       algorithm: "SHA1",
       digits: 6,
       period: 30,
@@ -807,7 +807,7 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Welcome to SIM Card Stash</CardTitle>
+          <CardTitle>Welcome to SIMCardSta.sh</CardTitle>
           <CardDescription>Sign in to your account or create a new one</CardDescription>
         </CardHeader>
         <CardContent>
