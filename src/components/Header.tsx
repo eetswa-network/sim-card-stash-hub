@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Home, User, LogOut, Shield, ShieldCheck, Settings, Menu, X, Smartphone, BarChart3, Bell } from "lucide-react";
+import { Home, User, LogOut, Shield, ShieldCheck, Settings, Menu, X, Smartphone, BarChart3, Bell, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -236,6 +236,19 @@ export function Header({ onSearch }: HeaderProps) {
                       Sign Out
                     </Button>
                   </div>
+                  {!window.matchMedia("(display-mode: standalone)").matches && !(navigator as any).standalone && (
+                    <div className="border-t mt-2 pt-2">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-md p-2">
+                        <Download className="h-4 w-4 shrink-0 text-primary" />
+                        <span>
+                          Install the app for offline access & multi-device sync.{" "}
+                          {/iPad|iPhone|iPod/.test(navigator.userAgent)
+                            ? "Tap Share → Add to Home Screen."
+                            : "Use browser menu → Install app."}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </>
               ) : (
                 <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
