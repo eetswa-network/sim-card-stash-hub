@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, Maximize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History, MapPin, CalendarPlus, CalendarClock } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, Maximize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History, MapPin, CalendarPlus, CalendarClock, Eye, EyeOff } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -608,16 +608,12 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                         {showPasswords[card.id] ? card.password : "•".repeat(card.password.length)}
                       </span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`show-password-grid-${card.id}`}
-                        checked={!!showPasswords[card.id]}
-                        onCheckedChange={() => togglePasswordVisibility(card.id)}
-                      />
-                      <Label htmlFor={`show-password-grid-${card.id}`} className="text-xs font-normal">
-                        Show password
-                      </Label>
-                    </div>
+                    <TooltipIcon
+                      icon={showPasswords[card.id] ? EyeOff : Eye}
+                      tooltip={showPasswords[card.id] ? "Hide password" : "Show password"}
+                      className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                      onClick={() => togglePasswordVisibility(card.id)}
+                    />
                   </div>
                 )}
                 
@@ -810,16 +806,12 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                   {showPasswords[card.id] ? card.password : "•".repeat(card.password.length)}
                                 </span>
                               </div>
-                              <div className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={`show-password-mobile-${card.id}`}
-                                  checked={!!showPasswords[card.id]}
-                                  onCheckedChange={() => togglePasswordVisibility(card.id)}
-                                />
-                                <Label htmlFor={`show-password-mobile-${card.id}`} className="text-sm font-normal">
-                                  Show password
-                                </Label>
-                              </div>
+                              <TooltipIcon
+                                icon={showPasswords[card.id] ? EyeOff : Eye}
+                                tooltip={showPasswords[card.id] ? "Hide password" : "Show password"}
+                                className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                                onClick={() => togglePasswordVisibility(card.id)}
+                              />
                             </div>
                           )}
                           
@@ -1005,16 +997,12 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                     {showPasswords[card.id] ? card.password : "•".repeat(card.password.length)}
                                   </span>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={`show-password-list-${card.id}`}
-                                    checked={!!showPasswords[card.id]}
-                                    onCheckedChange={() => togglePasswordVisibility(card.id)}
-                                  />
-                                  <Label htmlFor={`show-password-list-${card.id}`} className="text-xs font-normal">
-                                    Show password
-                                  </Label>
-                                </div>
+                                <TooltipIcon
+                                  icon={showPasswords[card.id] ? EyeOff : Eye}
+                                  tooltip={showPasswords[card.id] ? "Hide password" : "Show password"}
+                                  className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                                  onClick={() => togglePasswordVisibility(card.id)}
+                                />
                               </div>
                             )}
                             

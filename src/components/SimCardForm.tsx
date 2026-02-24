@@ -9,7 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Plus, Trash2, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, AlertTriangle, Eye, EyeOff } from "lucide-react";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipIcon } from "./TooltipIcon";
 import { z } from "zod";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -711,16 +713,15 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="show-password-new"
-                      checked={showPassword}
-                      onCheckedChange={(checked) => setShowPassword(checked === true)}
-                      className={isMobile ? "w-5 h-5" : ""}
-                    />
-                    <Label htmlFor="show-password-new" className={`font-normal ${isMobile ? 'text-base' : 'text-sm'}`}>
-                      Show password
-                    </Label>
+                  <div className="flex items-center">
+                    <TooltipProvider>
+                      <TooltipIcon
+                        icon={showPassword ? EyeOff : Eye}
+                        tooltip={showPassword ? "Hide password" : "Show password"}
+                        className={`cursor-pointer text-muted-foreground hover:text-foreground transition-colors ${isMobile ? 'h-5 w-5' : 'h-4 w-4'}`}
+                        onClick={() => setShowPassword(!showPassword)}
+                      />
+                    </TooltipProvider>
                   </div>
                   <Button
                     type="button"
