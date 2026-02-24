@@ -125,14 +125,22 @@ export function Header({ onSearch }: HeaderProps) {
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="p-2"
         >
-          {mobileMenuOpen ? <X className="h-16 w-16" /> : <Menu className="h-16 w-16" />}
+          <Menu className="h-16 w-16" />
         </Button>
       </div>
 
       {/* Menu dropdown - all screen sizes */}
       {mobileMenuOpen && (
-        <div className="absolute top-full left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b shadow-lg">
-          <div className="flex flex-col gap-1 pt-3 pb-3 container mx-auto px-4">
+        <div className="fixed top-0 right-0 w-1/2 md:w-1/4 h-screen z-[60] bg-background/95 backdrop-blur-md border-l shadow-lg pt-20 px-4 overflow-y-auto">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setMobileMenuOpen(false)}
+            className="absolute top-4 right-4 p-2"
+          >
+            <X className="h-8 w-8" />
+          </Button>
+          <div className="flex flex-col gap-1">
           {user ? (
             <>
               <div className="flex items-center gap-3 px-2 pb-3 border-b mb-2">
