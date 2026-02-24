@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CreditCard, User, LogOut, Shield, Settings } from "lucide-react";
+import { CreditCard, User, LogOut, Shield, Settings, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -16,6 +16,7 @@ interface HeaderProps {
 }
 
 export function Header({ onSearch }: HeaderProps) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
@@ -111,8 +112,8 @@ export function Header({ onSearch }: HeaderProps) {
         {/* Logo and title with tablet/desktop navigation */}
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
-            <img src={sidewaysLivingLogo} alt="Sideways Living" className="h-[150px] w-auto object-contain" />
-            <img src="/lovable-uploads/3e0fb5d9-6b3f-4d9d-bf4c-ab3c4cc20334.png" alt="SIM Card Stash" className="w-[150px] h-[150px] object-contain" />
+            <img src={sidewaysLivingLogo} alt="Sideways Living" className="hidden md:block h-[150px] w-auto object-contain" />
+            <img src="/lovable-uploads/3e0fb5d9-6b3f-4d9d-bf4c-ab3c4cc20334.png" alt="SIM Card Stash" className="w-[150px] h-[150px] md:w-[150px] md:h-[150px] w-[80px] h-[80px] object-contain" />
             <Link to="/" className="text-3xl font-bold">SIM Card Stash</Link>
           </div>
           
@@ -157,108 +158,91 @@ export function Header({ onSearch }: HeaderProps) {
           </div>
         </div>
         
-        {/* Mobile navigation - horizontal buttons under logo */}
-        <div className="flex md:hidden items-center justify-center gap-2 flex-wrap">
-          {user ? (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex flex-col items-center gap-1 h-auto py-2">
+        {/* Mobile hamburger menu button */}
+        <div className="flex md:hidden items-center justify-end">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2"
+          >
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
+        </div>
+
+        {/* Mobile menu dropdown */}
+        {mobileMenuOpen && (
+          <div className="flex md:hidden flex-col gap-1 border-t pt-3">
+            {user ? (
+              <>
+                <div className="flex items-center gap-3 px-2 pb-3 border-b mb-2">
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={userProfile?.avatar_url || ""} />
                     <AvatarFallback className="text-sm">
                       {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
                     </AvatarFallback>
                   </Avatar>
-                  <span>Account</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium truncate text-sm">
+                      {userProfile?.name || userProfile?.profile_name || user.email}
+                    </div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {user.email}
+                    </div>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="/account">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Account
+                  </Link>
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={userProfile?.avatar_url || ""} />
-                        <AvatarFallback>
-                          {getInitials(userProfile?.name || userProfile?.profile_name, user.email)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-medium truncate">
-                          {userProfile?.name || userProfile?.profile_name || user.email}
-                        </div>
-                        <div className="text-sm text-muted-foreground truncate">
-                          {user.email}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        asChild
-                        className="w-full gap-2"
-                      >
-                        <Link to="/account">
-                          <Settings className="h-4 w-4" />
-                          Account Details
-                        </Link>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        asChild
-                        className="w-full gap-2"
-                      >
-                        <Link to="/security">
-                          <Shield className="h-4 w-4" />
-                          Security Settings
-                        </Link>
-                      </Button>
-                      {isSuperAdmin && (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          asChild
-                          className="w-full gap-2 border-orange-300 text-orange-800 hover:bg-orange-100 dark:border-orange-700 dark:text-orange-200 dark:hover:bg-orange-900"
-                        >
-                          <Link to="/admin">
-                            <Shield className="h-4 w-4" />
-                            Admin Panel
-                          </Link>
-                        </Button>
-                      )}
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={handleSignOut}
-                        className="w-full gap-2"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Sign Out
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </PopoverContent>
-            </Popover>
-          ) : (
-            <Button variant="ghost" size="sm" asChild className="flex flex-col items-center gap-1 h-auto py-2">
-              <Link to="/auth">
-                <User className="h-10 w-10" />
-                <span>Sign In</span>
-              </Link>
-            </Button>
-          )}
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/">Dashboard</Link>
-          </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/statistics">Statistics</Link>
-          </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/updates">Updates</Link>
-          </Button>
-        </div>
+                <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="/">
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Dashboard
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="/statistics">Statistics</Link>
+                </Button>
+                <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="/updates">Updates</Link>
+                </Button>
+                <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="/security">
+                    <Shield className="h-4 w-4 mr-2" />
+                    Security
+                  </Link>
+                </Button>
+                {isSuperAdmin && (
+                  <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to="/admin">
+                      <Shield className="h-4 w-4 mr-2" />
+                      Admin Panel
+                    </Link>
+                  </Button>
+                )}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => { handleSignOut(); setMobileMenuOpen(false); }}
+                  className="justify-start text-destructive hover:text-destructive"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/auth">
+                  <User className="h-4 w-4 mr-2" />
+                  Sign In
+                </Link>
+              </Button>
+            )}
+          </div>
+        )}
         
       </div>
       
