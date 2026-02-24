@@ -950,6 +950,18 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                 size="sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  setHistoryModalCard(card);
+                                }}
+                                className="w-8 h-8 p-0 bg-blue-500 hover:bg-blue-600 text-white border-blue-500 hover:border-blue-600"
+                                title="View History"
+                              >
+                                <History className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   onEdit(card);
                                 }}
                                 className="w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
