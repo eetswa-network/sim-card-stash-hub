@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, Maximize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, Maximize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History, MapPin } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EditableUsageTable } from "./EditableUsageTable";
@@ -30,6 +30,7 @@ interface SimCard {
   created_at: string;
   updated_at: string;
   account_id?: string;
+  location?: string;
   account?: {
     login: string;
   };
@@ -204,6 +205,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         login: card.login,
         password: card.password,
         account_id: card.account_id,
+        location: card.location,
         user_id: user.id
       };
 
@@ -372,6 +374,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         const notesMatch = card.notes?.toLowerCase().includes(searchLower) || false;
         const loginMatch = card.login?.toLowerCase().includes(searchLower) || false;
         const accountMatch = card.account?.login?.toLowerCase().includes(searchLower) || false;
+        const locationMatch = card.location?.toLowerCase().includes(searchLower) || false;
         
         // Search in usage data
         const usageMatch = usageData[card.id]?.some(usage => 
@@ -381,7 +384,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         
         // If any field matches, show the card (even if inactive/swapped/expired)
         return phoneMatch || simNumberMatch || carrierMatch || statusMatch || 
-               simTypeMatch || notesMatch || loginMatch || accountMatch || usageMatch;
+               simTypeMatch || notesMatch || loginMatch || accountMatch || locationMatch || usageMatch;
       })
     : simCards.filter(card => 
         card.status !== 'inactive' && 
@@ -553,6 +556,12 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
+                {card.location && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="text-sm">{card.location}</span>
+                  </div>
+                )}
 
                 <EditableUsageTable
                   simCardId={card.id}
@@ -753,6 +762,13 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     {expandedRows.has(card.id) && (
                       <div className="px-4 pb-4 bg-table-green-light border-t border-table-divider animate-accordion-down">
                         <div className="space-y-3 pt-4">
+                          {card.location && (
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+                              <span className="text-sm font-medium">Location:</span>
+                              <span className="text-sm">{card.location}</span>
+                            </div>
+                          )}
                           {(card.login || card.account?.login) && (
                             <div className="flex items-center gap-2">
                               <User className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -978,6 +994,14 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               <div className="flex items-center gap-2">
                                 <span className="text-sm font-medium">Carrier:</span>
                                 <span className="text-sm text-muted-foreground">{card.carrier}</span>
+                              </div>
+                            )}
+                            
+                            {card.location && (
+                              <div className="flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">Location:</span>
+                                <span className="text-sm text-muted-foreground">{card.location}</span>
                               </div>
                             )}
                             

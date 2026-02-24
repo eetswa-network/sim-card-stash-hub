@@ -82,6 +82,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
     sim_type: editingCard?.sim_type || "Physical SIM",
     notes: editingCard?.notes || "",
     account_id: editingCard?.account_id || "",
+    location: editingCard?.location || "",
   });
   const [isExpiredSim, setIsExpiredSim] = useState(false);
   const [usedForEntries, setUsedForEntries] = useState([{ name: "", use_purpose: "" }]);
@@ -95,6 +96,9 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
   const [showNewAccount, setShowNewAccount] = useState(false);
   const [newAccount, setNewAccount] = useState({ login: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [existingLocations, setExistingLocations] = useState<string[]>([]);
+  const [showCustomLocation, setShowCustomLocation] = useState(false);
+  const [customLocation, setCustomLocation] = useState("");
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -113,7 +117,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         setProfile(profileData);
 
         // Load existing carriers and accounts for this user
-        const [carriersFromSims, carriersFromTable, accountsData] = await Promise.all([
+        const [carriersFromSims, carriersFromTable, accountsData, locationsData] = await Promise.all([
           supabase
             .from("sim_cards")
             .select("carrier")
@@ -127,6 +131,10 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
           supabase
             .from("accounts")
             .select("*")
+            .eq("user_id", user.id),
+          supabase
+            .from("sim_card_locations")
+            .select("name")
             .eq("user_id", user.id)
         ]);
         
@@ -140,6 +148,12 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         
         setExistingCarriers(Array.from(allCarriers).filter(Boolean));
         setExistingAccounts(accountsData.data || []);
+        
+        // Set up locations - merge defaults with user-defined
+        const defaultLocations = ["iPhone Air", "iPhone XR (white)", "iPhone XR (yellow)", "Moto g06", "moto g55 5G", "SIM Wallet (black)"];
+        const userLocations = (locationsData.data || []).map(l => l.name);
+        const allLocations = new Set([...defaultLocations, ...userLocations]);
+        setExistingLocations(Array.from(allLocations));
       }
     };
     getUser();
@@ -251,7 +265,8 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             status: validatedData.status,
             sim_type: validatedData.sim_type,
             notes: validatedData.notes || null,
-            account_id: validatedData.account_id || null
+            account_id: validatedData.account_id || null,
+            location: formData.location || null
           })
           .eq("id", editingCard.id);
 
@@ -275,7 +290,8 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             notes: validatedData.notes || null,
             user_id: user.id, 
             profile_id: profile?.id,
-            account_id: validatedData.account_id || null
+            account_id: validatedData.account_id || null,
+            location: formData.location || null
           }])
           .select()
           .single();
@@ -308,6 +324,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         sim_type: "Physical SIM",
         notes: "",
         account_id: "",
+        location: "",
       });
       setUsedForEntries([{ name: "", use_purpose: "" }]);
       onSuccess();
@@ -565,6 +582,83 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                   <SelectItem value="expired">Expired</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              {showCustomLocation ? (
+                <div className="flex gap-2">
+                  <Input
+                    value={customLocation}
+                    onChange={(e) => setCustomLocation(e.target.value)}
+                    placeholder="Enter new location name"
+                    className={`flex-1 ${isMobile ? "min-h-[44px]" : ""}`}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={async () => {
+                      if (customLocation.trim()) {
+                        const newLoc = customLocation.trim();
+                        setFormData({ ...formData, location: newLoc });
+                        
+                        if (!existingLocations.includes(newLoc)) {
+                          setExistingLocations(prev => [...prev, newLoc]);
+                        }
+                        
+                        if (user) {
+                          try {
+                            await supabase
+                              .from("sim_card_locations")
+                              .insert([{ name: newLoc, user_id: user.id }]);
+                          } catch (error) {
+                            console.log("Location might already exist:", error);
+                          }
+                        }
+                        
+                        setCustomLocation("");
+                        setShowCustomLocation(false);
+                      }
+                    }}
+                    className={isMobile ? "min-h-[44px]" : ""}
+                  >
+                    Add
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowCustomLocation(false);
+                      setCustomLocation("");
+                    }}
+                    className={isMobile ? "min-h-[44px]" : ""}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <Select 
+                  value={formData.location} 
+                  onValueChange={(value) => {
+                    if (value === "add_other") {
+                      setShowCustomLocation(true);
+                    } else {
+                      setFormData({ ...formData, location: value });
+                    }
+                  }}
+                >
+                  <SelectTrigger className={isMobile ? "min-h-[44px]" : ""}>
+                    <SelectValue placeholder="Select location..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {existingLocations.sort((a, b) => a.localeCompare(b)).map((loc) => (
+                      <SelectItem key={loc} value={loc}>
+                        {loc}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="add_other">+ Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
 
