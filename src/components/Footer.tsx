@@ -21,7 +21,7 @@ export function Footer() {
               <Github className="h-5 w-5" />
             </a>
             <span className="text-sm text-muted-foreground">
-              © 2024 SIM Manager. All rights reserved.
+              © 2026 SIMCardSta.sh. All rights reserved.
             </span>
           </div>
         </div>
