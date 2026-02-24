@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Save, User, Mail, Sun, Moon, Monitor, MapPin, Plus, Trash2, X } from "lucide-react";
+import { Camera, Save, User, Mail, Sun, Moon, Monitor, MapPin, Plus, Trash2, Pencil, Check, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
@@ -43,6 +43,8 @@ export default function AccountDetails() {
   const [locations, setLocations] = useState<Array<{ id: string; name: string }>>([]);
   const [newLocationName, setNewLocationName] = useState("");
   const [addingLocation, setAddingLocation] = useState(false);
+  const [editingLocationId, setEditingLocationId] = useState<string | null>(null);
+  const [editingLocationName, setEditingLocationName] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
   const { theme, setTheme } = useTheme();
@@ -306,6 +308,24 @@ export default function AccountDetails() {
     }
   };
 
+  const handleRenameLocation = async (id: string) => {
+    const trimmed = editingLocationName.trim();
+    if (!trimmed) return;
+    try {
+      const { error } = await supabase
+        .from("sim_card_locations")
+        .update({ name: trimmed })
+        .eq("id", id);
+      if (error) throw error;
+      setLocations(prev => prev.map(l => l.id === id ? { ...l, name: trimmed } : l).sort((a, b) => a.name.localeCompare(b.name)));
+      setEditingLocationId(null);
+      setEditingLocationName("");
+      toast({ title: "Location updated" });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to rename location.", variant: "destructive" });
+    }
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -513,19 +533,57 @@ export default function AccountDetails() {
             ) : (
               <div className="space-y-2">
                 {locations.map((loc) => (
-                  <div key={loc.id} className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{loc.name}</span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteLocation(loc.id)}
-                      className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                  <div key={loc.id} className="flex items-center justify-between p-3 rounded-lg border bg-muted/30 gap-2">
+                    {editingLocationId === loc.id ? (
+                      <>
+                        <div className="flex items-center gap-2 flex-1">
+                          <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <Input
+                            value={editingLocationName}
+                            onChange={(e) => setEditingLocationName(e.target.value)}
+                            className="h-8 text-sm"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") { e.preventDefault(); handleRenameLocation(loc.id); }
+                              if (e.key === "Escape") { setEditingLocationId(null); }
+                            }}
+                          />
+                        </div>
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="sm" onClick={() => handleRenameLocation(loc.id)} className="h-8 w-8 p-0 text-primary">
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => setEditingLocationId(null)} className="h-8 w-8 p-0">
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">{loc.name}</span>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => { setEditingLocationId(loc.id); setEditingLocationName(loc.name); }}
+                            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteLocation(loc.id)}
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
