@@ -96,10 +96,10 @@ export function SimCardHistoryModal({
         details: "SIM card was added to the system",
       });
 
-      // Sort by timestamp descending
+      // Sort by timestamp ascending (oldest first)
       entries.sort(
         (a, b) =>
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
       );
 
       setHistory(entries);
