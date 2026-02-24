@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CreditCard, User, LogOut, Shield, Settings, Menu, X, Smartphone } from "lucide-react";
+import { Home, User, LogOut, Shield, Settings, Menu, X, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -150,15 +150,15 @@ export function Header({ onSearch }: HeaderProps) {
             )}
             
             {/* Navigation buttons */}
-            <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1">
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/"><Home className="h-4 w-4 mr-1" />Home</Link>
+              </Button>
               <Button variant="ghost" size="sm" asChild>
                 <Link to="/account">Account</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
                 <Link to="/security">Security</Link>
-              </Button>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/">Dashboard</Link>
               </Button>
                <Button variant="ghost" size="sm" asChild>
                 <Link to="/statistics">Statistics</Link>
@@ -195,15 +195,15 @@ export function Header({ onSearch }: HeaderProps) {
                   </div>
                 </div>
                 <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                  <Link to="/account">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Account
+                  <Link to="/">
+                    <Home className="h-4 w-4 mr-2" />
+                    Home
                   </Link>
                 </Button>
                 <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
-                  <Link to="/">
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Dashboard
+                  <Link to="/account">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Account
                   </Link>
                 </Button>
                 <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
