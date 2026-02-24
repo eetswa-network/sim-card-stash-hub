@@ -173,7 +173,7 @@ export function PwaInstallPrompt() {
           </div>
 
           <div className="flex justify-end">
-            <Button variant="ghost" size="sm" onClick={dismiss} className="text-muted-foreground text-xs">
+            <Button variant="outline" size="sm" onClick={dismiss}>
               Remind me later
             </Button>
           </div>
