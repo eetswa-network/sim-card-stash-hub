@@ -17,6 +17,14 @@ import {
   Fingerprint,
 } from "lucide-react";
 
+// Install step images
+import iosShareImg from "@/assets/install-ios-share.png";
+import iosHomescreenImg from "@/assets/install-ios-homescreen.png";
+import androidMenuImg from "@/assets/install-android-menu.png";
+import androidInstallImg from "@/assets/install-android-install.png";
+import desktopChromeImg from "@/assets/install-desktop-chrome.png";
+import desktopEdgeImg from "@/assets/install-desktop-edge.png";
+
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
@@ -53,17 +61,23 @@ interface StepProps {
   title: string;
   description: string;
   tip?: string;
+  image?: string;
 }
 
-function Step({ number, title, description, tip }: StepProps) {
+function Step({ number, title, description, tip, image }: StepProps) {
   return (
     <div className="flex gap-4">
       <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
         {number}
       </div>
-      <div className="flex-1 space-y-1">
+      <div className="flex-1 space-y-2">
         <h4 className="font-medium text-foreground">{title}</h4>
         <p className="text-sm text-muted-foreground">{description}</p>
+        {image && (
+          <div className="mt-2 rounded-lg border overflow-hidden bg-muted/30 max-w-xs">
+            <img src={image} alt={title} className="w-full h-auto object-contain" loading="lazy" />
+          </div>
+        )}
         {tip && (
           <p className="text-xs text-primary italic mt-1">💡 {tip}</p>
         )}
@@ -86,12 +100,14 @@ const installSteps: Record<Platform, StepProps[]> = {
       title: "Tap the Share button",
       description:
         'Look for the Share icon (a square with an upward arrow) at the bottom of the screen. Tap it to open the share menu.',
+      image: iosShareImg,
     },
     {
       number: 3,
       title: 'Scroll down and tap "Add to Home Screen"',
       description:
         'In the share sheet, scroll down until you see "Add to Home Screen" with a plus (+) icon. Tap it.',
+      image: iosHomescreenImg,
     },
     {
       number: 4,
@@ -113,12 +129,14 @@ const installSteps: Record<Platform, StepProps[]> = {
       title: "Tap the three-dot menu",
       description:
         "Tap the three vertical dots (⋮) in the top-right corner of Chrome to open the browser menu.",
+      image: androidMenuImg,
     },
     {
       number: 3,
       title: 'Tap "Install app" or "Add to Home screen"',
       description:
         'Look for "Install app" in the menu. On some devices it may say "Add to Home screen" instead.',
+      image: androidInstallImg,
     },
     {
       number: 4,
@@ -134,6 +152,7 @@ const installSteps: Record<Platform, StepProps[]> = {
       title: "Look for the install icon",
       description:
         'In the address bar, look for a small install icon (monitor with a down arrow) on the right side. You can also go to Menu (⋮) → "Install SIMCardSta.sh...".',
+      image: desktopChromeImg,
     },
     {
       number: 2,
@@ -155,6 +174,7 @@ const installSteps: Record<Platform, StepProps[]> = {
       title: "Look for the install icon",
       description:
         'In the address bar, look for an install icon on the right side. You can also go to Menu (···) → Apps → "Install SIMCardSta.sh".',
+      image: desktopEdgeImg,
     },
     {
       number: 2,
