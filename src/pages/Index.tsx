@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CreditCard, Plus, Shield, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { UpdateNotifications } from "@/components/UpdateNotifications";
+import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 
 interface IndexProps {
   searchQuery?: string;
@@ -101,6 +102,9 @@ const Index = ({ searchQuery = "" }: IndexProps) => {
       <div className="container mx-auto py-4 px-4">
         {/* Update Notifications */}
         <UpdateNotifications userId={user.id} />
+        
+        {/* PWA Install Prompt */}
+        <PwaInstallPrompt />
         
         {/* MFA Warning Banner */}
         {showMfaWarning && (
