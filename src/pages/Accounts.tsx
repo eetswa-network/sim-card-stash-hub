@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { KeyRound, Plus, Pencil, Trash2, Save, X, Eye, EyeOff, User, Lock } from "lucide-react";
+import { KeyRound, Plus, Pencil, Trash2, Save, X, Eye, EyeOff, User, Lock, ExternalLink, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -22,6 +22,7 @@ interface Account {
   id: string;
   login: string;
   password: string | null;
+  login_url: string | null;
 }
 
 export default function Accounts() {
@@ -29,9 +30,9 @@ export default function Accounts() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ login: "", password: "" });
+  const [editForm, setEditForm] = useState({ login: "", password: "", login_url: "" });
   const [showNewForm, setShowNewForm] = useState(false);
-  const [newForm, setNewForm] = useState({ login: "", password: "" });
+  const [newForm, setNewForm] = useState({ login: "", password: "", login_url: "" });
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set());
@@ -53,7 +54,7 @@ export default function Accounts() {
 
       const { data, error } = await supabase
         .from("accounts")
-        .select("id, login, password")
+        .select("id, login, password, login_url")
         .eq("user_id", session.user.id)
         .order("login");
 
@@ -75,6 +76,15 @@ export default function Accounts() {
     });
   };
 
+  const handleOpenLogin = (account: Account) => {
+    if (!account.login_url) return;
+    let url = account.login_url.trim();
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = `https://${url}`;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   const handleCreate = async () => {
     if (!userId || !newForm.login.trim()) return;
     setSaving(true);
@@ -83,10 +93,11 @@ export default function Accounts() {
         user_id: userId,
         login: newForm.login.trim(),
         password: newForm.password.trim() || null,
+        login_url: newForm.login_url.trim() || null,
       });
       if (error) throw error;
       toast({ title: "Account created", description: "New carrier account added." });
-      setNewForm({ login: "", password: "" });
+      setNewForm({ login: "", password: "", login_url: "" });
       setShowNewForm(false);
       await loadAccounts();
     } catch (error: any) {
@@ -98,7 +109,7 @@ export default function Accounts() {
 
   const startEdit = (account: Account) => {
     setEditingId(account.id);
-    setEditForm({ login: account.login, password: account.password || "" });
+    setEditForm({ login: account.login, password: account.password || "", login_url: account.login_url || "" });
   };
 
   const handleUpdate = async () => {
@@ -107,7 +118,11 @@ export default function Accounts() {
     try {
       const { error } = await supabase
         .from("accounts")
-        .update({ login: editForm.login.trim(), password: editForm.password.trim() || null })
+        .update({
+          login: editForm.login.trim(),
+          password: editForm.password.trim() || null,
+          login_url: editForm.login_url.trim() || null,
+        })
         .eq("id", editingId);
       if (error) throw error;
       toast({ title: "Account updated", description: "Carrier account has been updated." });
@@ -186,8 +201,18 @@ export default function Accounts() {
                     placeholder="Enter account password"
                   />
                 </div>
+                <div>
+                  <Label htmlFor="new-login-url">Login Page URL (optional)</Label>
+                  <Input
+                    id="new-login-url"
+                    type="url"
+                    value={newForm.login_url}
+                    onChange={(e) => setNewForm(prev => ({ ...prev, login_url: e.target.value }))}
+                    placeholder="https://mycarrier.com/login"
+                  />
+                </div>
                 <div className="flex gap-2 justify-end">
-                  <Button variant="outline" size="sm" onClick={() => { setShowNewForm(false); setNewForm({ login: "", password: "" }); }}>
+                  <Button variant="outline" size="sm" onClick={() => { setShowNewForm(false); setNewForm({ login: "", password: "", login_url: "" }); }}>
                     <X className="h-4 w-4 mr-1" /> Cancel
                   </Button>
                   <Button size="sm" onClick={handleCreate} disabled={saving || !newForm.login.trim()}>
@@ -220,6 +245,15 @@ export default function Accounts() {
                           type="password"
                           value={editForm.password}
                           onChange={(e) => setEditForm(prev => ({ ...prev, password: e.target.value }))}
+                        />
+                      </div>
+                      <div>
+                        <Label>Login Page URL</Label>
+                        <Input
+                          type="url"
+                          value={editForm.login_url}
+                          onChange={(e) => setEditForm(prev => ({ ...prev, login_url: e.target.value }))}
+                          placeholder="https://mycarrier.com/login"
                         />
                       </div>
                       <div className="flex gap-2 justify-end">
@@ -270,6 +304,26 @@ export default function Accounts() {
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
+                      </div>
+                      {/* Login URL row */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Globe className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <p className="text-sm text-muted-foreground truncate">
+                            {account.login_url || <span className="italic">No login URL</span>}
+                          </p>
+                        </div>
+                        {account.login_url && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="shrink-0 gap-1 ml-2"
+                            onClick={() => handleOpenLogin(account)}
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            Log in
+                          </Button>
+                        )}
                       </div>
                     </div>
                   )}
