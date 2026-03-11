@@ -232,36 +232,40 @@ export default function Accounts() {
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <p className="font-medium">{account.login}</p>
-                        {account.password && (
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm text-muted-foreground">
-                              {visiblePasswords.has(account.id) ? account.password : "••••••••"}
-                            </p>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() => togglePasswordVisibility(account.id)}
-                            >
-                              {visiblePasswords.has(account.id) ? (
-                                <EyeOff className="h-3 w-3" />
-                              ) : (
-                                <Eye className="h-3 w-3" />
-                              )}
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => startEdit(account)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(account.id)} className="text-destructive hover:text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                    <div className="space-y-1">
+                      <p className="font-medium truncate">{account.login}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {account.password ? (
+                            <>
+                              <p className="text-sm text-muted-foreground">
+                                {visiblePasswords.has(account.id) ? account.password : "••••••••"}
+                              </p>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => togglePasswordVisibility(account.id)}
+                              >
+                                {visiblePasswords.has(account.id) ? (
+                                  <EyeOff className="h-3 w-3" />
+                                ) : (
+                                  <Eye className="h-3 w-3" />
+                                )}
+                              </Button>
+                            </>
+                          ) : (
+                            <p className="text-sm text-muted-foreground italic">No password</p>
+                          )}
+                        </div>
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => startEdit(account)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(account.id)} className="text-destructive hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   )}
