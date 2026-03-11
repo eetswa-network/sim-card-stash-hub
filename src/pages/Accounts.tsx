@@ -240,7 +240,7 @@ export default function Accounts() {
                             ? (visiblePasswords.has(account.id) ? account.password : "••••••••")
                             : <span className="italic">No password</span>}
                         </p>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1">
                           {account.password ? (
                             <Button
                               variant="ghost"
