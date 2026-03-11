@@ -288,7 +288,7 @@ export default function Accounts() {
                           <Copy className="h-3 w-3" />
                         </Button>
                       </div>
-                      <div className="flex items-center justify-end">
+                      <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
                           <p className="text-sm text-muted-foreground">
