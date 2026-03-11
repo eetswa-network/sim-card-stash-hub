@@ -240,25 +240,27 @@ export default function Accounts() {
                             ? (visiblePasswords.has(account.id) ? account.password : "••••••••")
                             : <span className="italic">No password</span>}
                         </p>
-                        <div className="flex gap-1">
-                          {account.password && (
+                        <div className="flex items-center gap-3">
+                          {account.password ? (
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-6 w-6"
+                              className="h-8 w-8"
                               onClick={() => togglePasswordVisibility(account.id)}
                             >
                               {visiblePasswords.has(account.id) ? (
-                                <EyeOff className="h-3 w-3" />
+                                <EyeOff className="h-4 w-4" />
                               ) : (
-                                <Eye className="h-3 w-3" />
+                                <Eye className="h-4 w-4" />
                               )}
                             </Button>
+                          ) : (
+                            <div className="h-8 w-8" />
                           )}
-                          <Button variant="ghost" size="icon" onClick={() => startEdit(account)}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(account)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(account.id)} className="text-destructive hover:text-destructive">
+                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(account.id)} className="h-8 w-8 text-destructive hover:text-destructive">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
