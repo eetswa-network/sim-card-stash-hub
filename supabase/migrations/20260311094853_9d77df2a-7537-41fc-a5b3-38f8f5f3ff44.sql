@@ -1,0 +1,1 @@
+ALTER TABLE public.accounts ADD COLUMN login_url text DEFAULT NULL;
