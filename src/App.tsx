@@ -47,6 +47,7 @@ const AppLayout = () => {
           <Route path="/install" element={<Install />} />
           <Route path="/devices" element={<Devices />} />
           <Route path="/account" element={<AccountDetails />} />
+          <Route path="/accounts" element={<Accounts />} />
           <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
