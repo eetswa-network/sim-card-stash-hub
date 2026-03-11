@@ -296,6 +296,16 @@ export default function Accounts() {
                               ? (visiblePasswords.has(account.id) ? account.password : "••••••••")
                               : <span className="italic">No password</span>}
                           </p>
+                          {account.password && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 shrink-0"
+                              onClick={() => copyToClipboard(account.password!, "Password")}
+                            >
+                              <Copy className="h-3 w-3" />
+                            </Button>
+                          )}
                         </div>
                         <div className="flex items-center gap-1">
                           {account.password ? (
