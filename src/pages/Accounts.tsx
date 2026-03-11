@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { KeyRound, Plus, Pencil, Trash2, Save, X, Eye, EyeOff, User, Lock, ExternalLink, Globe } from "lucide-react";
+import { KeyRound, Plus, Pencil, Trash2, Save, X, Eye, EyeOff, User, Lock, ExternalLink, Globe, Copy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -83,6 +83,15 @@ export default function Accounts() {
       url = `https://${url}`;
     }
     window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({ title: "Copied", description: `${label} copied to clipboard.` });
+    } catch {
+      toast({ title: "Error", description: "Failed to copy to clipboard.", variant: "destructive" });
+    }
   };
 
   const handleCreate = async () => {
@@ -270,6 +279,14 @@ export default function Accounts() {
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-muted-foreground shrink-0" />
                         <p className="font-medium truncate">{account.login}</p>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 shrink-0"
+                          onClick={() => copyToClipboard(account.login, "Username")}
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -279,6 +296,16 @@ export default function Accounts() {
                               ? (visiblePasswords.has(account.id) ? account.password : "••••••••")
                               : <span className="italic">No password</span>}
                           </p>
+                          {account.password && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 shrink-0"
+                              onClick={() => copyToClipboard(account.password!, "Password")}
+                            >
+                              <Copy className="h-3 w-3" />
+                            </Button>
+                          )}
                         </div>
                         <div className="flex items-center gap-1">
                           {account.password ? (
