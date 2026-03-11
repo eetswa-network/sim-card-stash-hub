@@ -300,30 +300,20 @@ export default function Accounts() {
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(account)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
+                          {account.login_url && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => handleOpenLogin(account)}
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Button>
+                          )}
                           <Button variant="ghost" size="icon" onClick={() => setDeleteId(account.id)} className="h-8 w-8 text-destructive hover:text-destructive">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
-                      </div>
-                      {/* Login URL row */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <Globe className="h-4 w-4 text-muted-foreground shrink-0" />
-                          <p className="text-sm text-muted-foreground truncate">
-                            {account.login_url || <span className="italic">No login URL</span>}
-                          </p>
-                        </div>
-                        {account.login_url && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="shrink-0 gap-1 ml-2"
-                            onClick={() => handleOpenLogin(account)}
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            Log in
-                          </Button>
-                        )}
                       </div>
                     </div>
                   )}
