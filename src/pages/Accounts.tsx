@@ -260,7 +260,7 @@ export default function Accounts() {
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(account)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDeleteId(account.id)} className="h-8 w-8 text-destructive hover:text-destructive">
+                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(account.id)} className="h-8 w-8 text-destructive hover:text-destructive">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
