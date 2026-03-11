@@ -279,6 +279,14 @@ export default function Accounts() {
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-muted-foreground shrink-0" />
                         <p className="font-medium truncate">{account.login}</p>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 shrink-0"
+                          onClick={() => copyToClipboard(account.login, "Username")}
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
