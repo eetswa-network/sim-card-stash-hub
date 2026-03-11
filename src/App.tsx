@@ -15,6 +15,7 @@ import Install from "./pages/Install";
 import AccountDetails from "./pages/AccountDetails";
 import Statistics from "./pages/Statistics";
 import Devices from "./pages/Devices";
+import Accounts from "./pages/Accounts";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
