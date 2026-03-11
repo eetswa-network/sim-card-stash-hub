@@ -85,6 +85,15 @@ export default function Accounts() {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({ title: "Copied", description: `${label} copied to clipboard.` });
+    } catch {
+      toast({ title: "Error", description: "Failed to copy to clipboard.", variant: "destructive" });
+    }
+  };
+
   const handleCreate = async () => {
     if (!userId || !newForm.login.trim()) return;
     setSaving(true);
