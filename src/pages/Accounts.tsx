@@ -238,9 +238,9 @@ export default function Accounts() {
               </p>
             ) : (
               accounts.map((account) => (
-                <div key={account.id} className="border rounded-lg p-4">
+                <div key={account.id} className="border rounded-lg overflow-hidden">
                   {editingId === account.id ? (
-                    <div className="space-y-3">
+                    <div className="space-y-3 p-4">
                       <div>
                         <Label>Login / Username</Label>
                         <Input
@@ -275,20 +275,20 @@ export default function Accounts() {
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <p className="font-medium truncate">{account.login}</p>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 shrink-0"
-                          onClick={() => copyToClipboard(account.login, "Username")}
-                        >
-                          <Copy className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <div className="flex items-center justify-between">
+                    <div className="flex">
+                      <div className="flex-1 p-4 space-y-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <p className="font-medium truncate">{account.login}</p>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 shrink-0"
+                            onClick={() => copyToClipboard(account.login, "Username")}
+                          >
+                            <Copy className="h-3 w-3" />
+                          </Button>
+                        </div>
                         <div className="flex items-center gap-2">
                           <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
                           <p className="text-sm text-muted-foreground">
@@ -296,55 +296,50 @@ export default function Accounts() {
                               ? (visiblePasswords.has(account.id) ? account.password : "••••••••")
                               : <span className="italic">No password</span>}
                           </p>
-                        </div>
-                        <div className="flex items-center gap-0">
-                          {account.password ? (
+                          {account.password && (
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8"
+                              className="h-6 w-6 shrink-0"
                               onClick={() => togglePasswordVisibility(account.id)}
                             >
                               {visiblePasswords.has(account.id) ? (
-                                <EyeOff className="h-4 w-4" />
+                                <EyeOff className="h-3 w-3" />
                               ) : (
-                                <Eye className="h-4 w-4" />
+                                <Eye className="h-3 w-3" />
                               )}
                             </Button>
-                          ) : (
-                            <div className="h-8 w-8" />
                           )}
-                          {account.password ? (
+                          {account.password && (
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8"
+                              className="h-6 w-6 shrink-0"
                               onClick={() => copyToClipboard(account.password!, "Password")}
                             >
-                              <Copy className="h-4 w-4" />
+                              <Copy className="h-3 w-3" />
                             </Button>
-                          ) : (
-                            <div className="h-8 w-8" />
                           )}
-                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(account)}>
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          {account.login_url ? (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => handleOpenLogin(account)}
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                            </Button>
-                          ) : (
-                            <div className="h-8 w-8" />
-                          )}
-                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(account.id)} className="h-8 w-8 text-destructive hover:text-destructive">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
                         </div>
+                      </div>
+                      <div className="border-l border-border" />
+                      <div className="flex flex-col items-center justify-center gap-1 px-2">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(account)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        {account.login_url && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleOpenLogin(account)}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(account.id)} className="h-8 w-8 text-destructive hover:text-destructive">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   )}
