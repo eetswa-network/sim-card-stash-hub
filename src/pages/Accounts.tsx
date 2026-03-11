@@ -233,13 +233,19 @@ export default function Accounts() {
                     </div>
                   ) : (
                     <div className="space-y-1">
-                      <p className="font-medium truncate">{account.login}</p>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <p className="font-medium truncate">{account.login}</p>
+                      </div>
                       <div className="flex items-center justify-between">
-                        <p className="text-sm text-muted-foreground">
-                          {account.password
-                            ? (visiblePasswords.has(account.id) ? account.password : "••••••••")
-                            : <span className="italic">No password</span>}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <p className="text-sm text-muted-foreground">
+                            {account.password
+                              ? (visiblePasswords.has(account.id) ? account.password : "••••••••")
+                              : <span className="italic">No password</span>}
+                          </p>
+                        </div>
                         <div className="flex items-center gap-1">
                           {account.password ? (
                             <Button
