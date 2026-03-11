@@ -297,7 +297,7 @@ export default function Accounts() {
                               : <span className="italic">No password</span>}
                           </p>
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-0">
                           {account.password ? (
                             <Button
                               variant="ghost"
