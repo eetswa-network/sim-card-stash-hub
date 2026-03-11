@@ -235,30 +235,26 @@ export default function Accounts() {
                     <div className="space-y-1">
                       <p className="font-medium truncate">{account.login}</p>
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          {account.password ? (
-                            <>
-                              <p className="text-sm text-muted-foreground">
-                                {visiblePasswords.has(account.id) ? account.password : "••••••••"}
-                              </p>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6"
-                                onClick={() => togglePasswordVisibility(account.id)}
-                              >
-                                {visiblePasswords.has(account.id) ? (
-                                  <EyeOff className="h-3 w-3" />
-                                ) : (
-                                  <Eye className="h-3 w-3" />
-                                )}
-                              </Button>
-                            </>
-                          ) : (
-                            <p className="text-sm text-muted-foreground italic">No password</p>
-                          )}
-                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {account.password
+                            ? (visiblePasswords.has(account.id) ? account.password : "••••••••")
+                            : <span className="italic">No password</span>}
+                        </p>
                         <div className="flex gap-1">
+                          {account.password && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => togglePasswordVisibility(account.id)}
+                            >
+                              {visiblePasswords.has(account.id) ? (
+                                <EyeOff className="h-3 w-3" />
+                              ) : (
+                                <Eye className="h-3 w-3" />
+                              )}
+                            </Button>
+                          )}
                           <Button variant="ghost" size="icon" onClick={() => startEdit(account)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
