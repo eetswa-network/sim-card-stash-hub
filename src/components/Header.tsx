@@ -146,7 +146,7 @@ export function Header({ onSearch }: HeaderProps) {
               }}
               className="p-2"
             >
-              <Menu className="h-16 w-16" />
+              <Menu className="h-9 w-9 md:h-12 md:w-12 lg:h-[4.5rem] lg:w-[4.5rem]" />
             </Button>
           )}
         </div>
