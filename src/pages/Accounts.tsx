@@ -296,16 +296,6 @@ export default function Accounts() {
                               ? (visiblePasswords.has(account.id) ? account.password : "••••••••")
                               : <span className="italic">No password</span>}
                           </p>
-                          {account.password && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 shrink-0"
-                              onClick={() => copyToClipboard(account.password!, "Password")}
-                            >
-                              <Copy className="h-3 w-3" />
-                            </Button>
-                          )}
                         </div>
                         <div className="flex items-center gap-1">
                           {account.password ? (
@@ -324,10 +314,22 @@ export default function Accounts() {
                           ) : (
                             <div className="h-8 w-8" />
                           )}
+                          {account.password ? (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => copyToClipboard(account.password!, "Password")}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <div className="h-8 w-8" />
+                          )}
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(account)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          {account.login_url && (
+                          {account.login_url ? (
                             <Button
                               variant="ghost"
                               size="icon"
@@ -336,6 +338,8 @@ export default function Accounts() {
                             >
                               <ExternalLink className="h-4 w-4" />
                             </Button>
+                          ) : (
+                            <div className="h-8 w-8" />
                           )}
                           <Button variant="ghost" size="icon" onClick={() => setDeleteId(account.id)} className="h-8 w-8 text-destructive hover:text-destructive">
                             <Trash2 className="h-4 w-4" />
