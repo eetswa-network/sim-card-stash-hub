@@ -98,6 +98,33 @@ export type Database = {
         }
         Relationships: []
       }
+      friendships: {
+        Row: {
+          addressee_id: string
+          created_at: string
+          id: string
+          requester_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          addressee_id: string
+          created_at?: string
+          id?: string
+          requester_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          addressee_id?: string
+          created_at?: string
+          id?: string
+          requester_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -190,6 +217,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      sim_card_shares: {
+        Row: {
+          created_at: string
+          id: string
+          owner_id: string
+          shared_with_id: string
+          sim_card_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          owner_id: string
+          shared_with_id: string
+          sim_card_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          owner_id?: string
+          shared_with_id?: string
+          sim_card_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sim_card_shares_sim_card_id_fkey"
+            columns: ["sim_card_id"]
+            isOneToOne: false
+            referencedRelation: "sim_cards"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sim_card_usage: {
         Row: {
@@ -476,6 +535,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      find_user_by_email: {
+        Args: { search_email: string }
+        Returns: {
+          email: string
+          profile_name: string
+          user_id: string
+        }[]
+      }
       generate_random_salt: { Args: never; Returns: string }
       has_role: {
         Args: {
