@@ -1244,6 +1244,16 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
           updatedAt={historyModalCard.updated_at}
         />
       )}
+
+      {/* Share Modal */}
+      {shareModalCard && (
+        <ShareSimCardModal
+          isOpen={!!shareModalCard}
+          onClose={() => setShareModalCard(null)}
+          simCardId={shareModalCard.id}
+          phoneNumber={shareModalCard.phone_number}
+        />
+      )}
     </div>
     </TooltipProvider>
   );
