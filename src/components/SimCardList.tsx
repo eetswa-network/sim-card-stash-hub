@@ -822,6 +822,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-right text-black dark:text-white">{card.carrier || 'No carrier'}</span>
                             {renderStatusBadge(card, "text-xs")}
+                            {card.isShared && <Badge variant="secondary" className="text-xs">Shared</Badge>}
                           </div>
                         </div>
                         
