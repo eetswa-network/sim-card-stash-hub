@@ -728,14 +728,27 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     {new Date(card.created_at).toLocaleDateString()}
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onEdit(card)}
-                      className="min-h-[32px] w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    {!card.isShared && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShareModalCard(card)}
+                        className="min-h-[32px] w-8 h-8 p-0 bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600"
+                        title="Share"
+                      >
+                        <Share2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {!card.isShared && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onEdit(card)}
+                        className="min-h-[32px] w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
                     
                     <Button
                       variant="outline"
