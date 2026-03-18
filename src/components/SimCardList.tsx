@@ -67,6 +67,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   const [sortField, setSortField] = useState<'phone_number' | 'sim_number' | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [historyModalCard, setHistoryModalCard] = useState<SimCard | null>(null);
+  const [shareModalCard, setShareModalCard] = useState<SimCard | null>(null);
   const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
