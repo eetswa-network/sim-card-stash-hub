@@ -399,6 +399,58 @@ export default function Devices() {
             ))}
           </div>
         )}
+
+        {/* Friend Devices Section */}
+        {friendDevices.length > 0 && (
+          <div className="mt-10">
+            <div className="mb-4">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                Friend Devices
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Devices your friends have assigned your shared SIM cards to.
+              </p>
+            </div>
+            <div className="space-y-4">
+              {friendDevices.map((fd, idx) => (
+                <Card key={idx} className="border-primary/20">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Smartphone className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">{fd.deviceName}</CardTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="secondary" className="text-xs">
+                            <Users className="h-3 w-3 mr-1" />
+                            {fd.friendName}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Your Shared SIM Cards</p>
+                      {fd.simCards.map(sim => (
+                        <div key={sim.id} className="flex items-center gap-3 p-2 rounded-md bg-muted/40 text-sm">
+                          <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <span className="font-mono">{sim.phone_number}</span>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-muted-foreground truncate">{sim.carrier || "No carrier"}</span>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-muted-foreground">{sim.sim_type}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
