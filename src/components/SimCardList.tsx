@@ -15,6 +15,7 @@ import { EditableUsageTable } from "./EditableUsageTable";
 import { SimCardHistoryModal } from "./SimCardHistoryModal";
 import { ShareSimCardModal } from "./ShareSimCardModal";
 import { TooltipIcon } from "./TooltipIcon";
+import { SharedDeviceAssign } from "./SharedDeviceAssign";
 import ebayLogo from "@/assets/ebay-logo.png";
 import paypalLogo from "@/assets/paypal-logo.png";
 import afterpayLogo from "@/assets/afterpay-logo.png";
@@ -40,6 +41,7 @@ interface SimCard {
   };
   isShared?: boolean;
   sharedByName?: string;
+  shareDeviceName?: string;
 }
 
 interface UsageEntry {
@@ -139,7 +141,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       // Fetch shared SIM cards
       const { data: shares } = await supabase
         .from("sim_card_shares")
-        .select("sim_card_id, owner_id")
+        .select("sim_card_id, owner_id, device_name")
         .eq("shared_with_id", userId);
 
       if (shares && shares.length > 0) {
@@ -152,14 +154,18 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         ]);
 
         const profileMap = new Map((ownerProfiles.data || []).map(p => [p.user_id, p.profile_name || p.name || "Someone"]));
-        const shareOwnerMap = new Map(shares.map(s => [s.sim_card_id, s.owner_id]));
+        const shareMap = new Map(shares.map(s => [s.sim_card_id, s]));
 
         if (sharedCardsResult.data) {
-          const sharedCards = sharedCardsResult.data.map(card => ({
-            ...card,
-            isShared: true,
-            sharedByName: profileMap.get(shareOwnerMap.get(card.id) || "") || "Someone",
-          }));
+          const sharedCards = sharedCardsResult.data.map(card => {
+            const share = shareMap.get(card.id);
+            return {
+              ...card,
+              isShared: true,
+              sharedByName: profileMap.get(share?.owner_id || "") || "Someone",
+              shareDeviceName: share?.device_name || undefined,
+            };
+          });
           setSimCards(prev => [...prev, ...sharedCards]);
         }
       }
@@ -991,6 +997,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               <p className="text-sm text-muted-foreground mt-1 break-words">{card.notes}</p>
                             </div>
                           )}
+                          
+                          {card.isShared && (
+                            <SharedDeviceAssign simCardId={card.id} currentDevice={card.shareDeviceName} />
+                          )}
                         </div>
                       </div>
                     )}
@@ -1187,6 +1197,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                                 <span className="text-sm font-medium">Location:</span>
                                 <span className="text-sm text-muted-foreground">{card.location}</span>
                               </div>
+                            )}
+                            
+                            {card.isShared && (
+                              <SharedDeviceAssign simCardId={card.id} currentDevice={card.shareDeviceName} />
                             )}
                             
                             <div className="md:col-span-2">

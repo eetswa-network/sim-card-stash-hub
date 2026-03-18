@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { Smartphone, Plus, Trash2, Pencil, Check, X, Camera, Phone } from "lucide-react";
+import { Smartphone, Plus, Trash2, Pencil, Check, X, Camera, Phone, Users } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 
 interface DeviceLocation {
   id: string;
@@ -24,11 +25,18 @@ interface SimCardOnDevice {
   sim_type: string;
 }
 
+interface FriendDeviceEntry {
+  deviceName: string;
+  friendName: string;
+  simCards: SimCardOnDevice[];
+}
+
 export default function Devices() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [devices, setDevices] = useState<DeviceLocation[]>([]);
   const [simCardsByDevice, setSimCardsByDevice] = useState<Record<string, SimCardOnDevice[]>>({});
+  const [friendDevices, setFriendDevices] = useState<FriendDeviceEntry[]>([]);
   const [newDeviceName, setNewDeviceName] = useState("");
   const [addingDevice, setAddingDevice] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -50,7 +58,7 @@ export default function Devices() {
       }
       setUser(session.user);
 
-      const [devicesResult, simCardsResult] = await Promise.all([
+      const [devicesResult, simCardsResult, sharesResult] = await Promise.all([
         supabase
           .from("sim_card_locations")
           .select("id, name, image_url")
@@ -59,7 +67,13 @@ export default function Devices() {
         supabase
           .from("sim_cards")
           .select("id, phone_number, sim_number, carrier, status, sim_type, location")
-          .eq("user_id", session.user.id)
+          .eq("user_id", session.user.id),
+        // Get shares where I'm the owner and the friend has assigned a device
+        supabase
+          .from("sim_card_shares")
+          .select("sim_card_id, shared_with_id, device_name")
+          .eq("owner_id", session.user.id)
+          .not("device_name", "is", null)
       ]);
 
       const deviceList = devicesResult.data || [];
@@ -76,6 +90,41 @@ export default function Devices() {
         }
       }
       setSimCardsByDevice(grouped);
+
+      // Build friend device entries
+      const shares = sharesResult.data || [];
+      if (shares.length > 0) {
+        const friendIds = [...new Set(shares.map(s => s.shared_with_id))];
+        const simCardIds = [...new Set(shares.map(s => s.sim_card_id))];
+
+        const [profilesResult, sharedSimsResult] = await Promise.all([
+          supabase.from("profiles").select("user_id, profile_name, name").in("user_id", friendIds),
+          supabase.from("sim_cards").select("id, phone_number, sim_number, carrier, status, sim_type").in("id", simCardIds)
+        ]);
+
+        const profileMap = new Map((profilesResult.data || []).map(p => [p.user_id, p.profile_name || p.name || "Friend"]));
+        const simMap = new Map((sharedSimsResult.data || []).map(s => [s.id, s]));
+
+        // Group by device_name + friend
+        const deviceMap = new Map<string, FriendDeviceEntry>();
+        for (const share of shares) {
+          const key = `${share.device_name}__${share.shared_with_id}`;
+          if (!deviceMap.has(key)) {
+            deviceMap.set(key, {
+              deviceName: share.device_name!,
+              friendName: profileMap.get(share.shared_with_id) || "Friend",
+              simCards: [],
+            });
+          }
+          const sim = simMap.get(share.sim_card_id);
+          if (sim) {
+            deviceMap.get(key)!.simCards.push(sim);
+          }
+        }
+        setFriendDevices(Array.from(deviceMap.values()));
+      } else {
+        setFriendDevices([]);
+      }
     } catch (error) {
       console.error("Error loading devices:", error);
     } finally {
@@ -348,6 +397,58 @@ export default function Devices() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        )}
+
+        {/* Friend Devices Section */}
+        {friendDevices.length > 0 && (
+          <div className="mt-10">
+            <div className="mb-4">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                Friend Devices
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Devices your friends have assigned your shared SIM cards to.
+              </p>
+            </div>
+            <div className="space-y-4">
+              {friendDevices.map((fd, idx) => (
+                <Card key={idx} className="border-primary/20">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Smartphone className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">{fd.deviceName}</CardTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="secondary" className="text-xs">
+                            <Users className="h-3 w-3 mr-1" />
+                            {fd.friendName}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Your Shared SIM Cards</p>
+                      {fd.simCards.map(sim => (
+                        <div key={sim.id} className="flex items-center gap-3 p-2 rounded-md bg-muted/40 text-sm">
+                          <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <span className="font-mono">{sim.phone_number}</span>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-muted-foreground truncate">{sim.carrier || "No carrier"}</span>
+                          <span className="text-muted-foreground">•</span>
+                          <span className="text-muted-foreground">{sim.sim_type}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         )}
       </div>

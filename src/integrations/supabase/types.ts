@@ -221,6 +221,7 @@ export type Database = {
       sim_card_shares: {
         Row: {
           created_at: string
+          device_name: string | null
           id: string
           owner_id: string
           shared_with_id: string
@@ -228,6 +229,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          device_name?: string | null
           id?: string
           owner_id: string
           shared_with_id: string
@@ -235,6 +237,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          device_name?: string | null
           id?: string
           owner_id?: string
           shared_with_id?: string
