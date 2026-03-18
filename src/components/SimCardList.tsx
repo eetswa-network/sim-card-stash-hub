@@ -15,6 +15,7 @@ import { EditableUsageTable } from "./EditableUsageTable";
 import { SimCardHistoryModal } from "./SimCardHistoryModal";
 import { ShareSimCardModal } from "./ShareSimCardModal";
 import { TooltipIcon } from "./TooltipIcon";
+import { SharedDeviceAssign } from "./SharedDeviceAssign";
 import ebayLogo from "@/assets/ebay-logo.png";
 import paypalLogo from "@/assets/paypal-logo.png";
 import afterpayLogo from "@/assets/afterpay-logo.png";
