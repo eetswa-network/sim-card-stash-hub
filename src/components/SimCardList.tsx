@@ -41,6 +41,7 @@ interface SimCard {
   };
   isShared?: boolean;
   sharedByName?: string;
+  shareDeviceName?: string;
 }
 
 interface UsageEntry {
