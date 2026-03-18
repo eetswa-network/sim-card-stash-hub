@@ -7,12 +7,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, Maximize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History, MapPin, CalendarPlus, CalendarClock, Eye, EyeOff } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, Maximize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History, MapPin, CalendarPlus, CalendarClock, Eye, EyeOff, Share2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EditableUsageTable } from "./EditableUsageTable";
 import { SimCardHistoryModal } from "./SimCardHistoryModal";
+import { ShareSimCardModal } from "./ShareSimCardModal";
 import { TooltipIcon } from "./TooltipIcon";
 import ebayLogo from "@/assets/ebay-logo.png";
 import paypalLogo from "@/assets/paypal-logo.png";
@@ -37,6 +38,8 @@ interface SimCard {
   account?: {
     login: string;
   };
+  isShared?: boolean;
+  sharedByName?: string;
 }
 
 interface UsageEntry {
@@ -64,6 +67,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   const [sortField, setSortField] = useState<'phone_number' | 'sim_number' | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [historyModalCard, setHistoryModalCard] = useState<SimCard | null>(null);
+  const [shareModalCard, setShareModalCard] = useState<SimCard | null>(null);
   const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -130,6 +134,34 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       // Cache sim cards for offline use
       if (data) {
         await cacheSimCards(data);
+      }
+
+      // Fetch shared SIM cards
+      const { data: shares } = await supabase
+        .from("sim_card_shares")
+        .select("sim_card_id, owner_id")
+        .eq("shared_with_id", userId);
+
+      if (shares && shares.length > 0) {
+        const sharedCardIds = shares.map(s => s.sim_card_id);
+        const ownerIds = [...new Set(shares.map(s => s.owner_id))];
+        
+        const [sharedCardsResult, ownerProfiles] = await Promise.all([
+          supabase.from("sim_cards").select("*, account:accounts(login)").in("id", sharedCardIds),
+          supabase.from("profiles").select("user_id, profile_name, name").in("user_id", ownerIds)
+        ]);
+
+        const profileMap = new Map((ownerProfiles.data || []).map(p => [p.user_id, p.profile_name || p.name || "Someone"]));
+        const shareOwnerMap = new Map(shares.map(s => [s.sim_card_id, s.owner_id]));
+
+        if (sharedCardsResult.data) {
+          const sharedCards = sharedCardsResult.data.map(card => ({
+            ...card,
+            isShared: true,
+            sharedByName: profileMap.get(shareOwnerMap.get(card.id) || "") || "Someone",
+          }));
+          setSimCards(prev => [...prev, ...sharedCards]);
+        }
       }
 
       // Fetch usage data for all sim cards
@@ -631,6 +663,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     <CardTitle className={`text-lg break-all ${card.status === 'inactive' || card.status === 'expired' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.phone_number}</CardTitle>
                   </div>
                   {renderStatusBadge(card)}
+                  {card.isShared && <Badge variant="secondary" className="text-xs">Shared by {card.sharedByName}</Badge>}
                 </div>
                 {/* Row 2: SIM number with icon on left, carrier on right */}
                 <div className="flex items-center justify-between mt-2">
@@ -696,51 +729,68 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     {new Date(card.created_at).toLocaleDateString()}
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onEdit(card)}
-                      className="min-h-[32px] w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    {!card.isShared && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShareModalCard(card)}
+                        className="min-h-[32px] w-8 h-8 p-0 bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600"
+                        title="Share"
+                      >
+                        <Share2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {!card.isShared && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onEdit(card)}
+                        className="min-h-[32px] w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
                     
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleSimSwap(card)}
-                      className="min-h-[32px] w-8 h-8 p-0 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600"
-                      title="SIM Swap"
-                    >
-                      <RefreshCcw className="h-4 w-4" />
-                    </Button>
+                    {!card.isShared && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSimSwap(card)}
+                        className="min-h-[32px] w-8 h-8 p-0 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600"
+                        title="SIM Swap"
+                      >
+                        <RefreshCcw className="h-4 w-4" />
+                      </Button>
+                    )}
                     
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button 
-                          variant="destructive" 
-                          size="sm"
-                          className="min-h-[32px] w-8 h-8 p-0"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Deactivate SIM Card</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to deactivate the SIM card {card.sim_number}? 
-                            The record will be kept for historical purposes but marked as inactive.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(card.id)}>
-                            Deactivate
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    {!card.isShared && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            className="min-h-[32px] w-8 h-8 p-0"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Deactivate SIM Card</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to deactivate the SIM card {card.sim_number}? 
+                              The record will be kept for historical purposes but marked as inactive.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(card.id)}>
+                              Deactivate
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -772,6 +822,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-right text-black dark:text-white">{card.carrier || 'No carrier'}</span>
                             {renderStatusBadge(card, "text-xs")}
+                            {card.isShared && <Badge variant="secondary" className="text-xs">Shared</Badge>}
                           </div>
                         </div>
                         
@@ -798,59 +849,79 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                             >
                               <History className="h-4 w-4" />
                             </Button>
+                            {!card.isShared && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setShareModalCard(card);
+                                }}
+                                className="w-8 h-8 p-0 bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600"
+                                title="Share"
+                              >
+                                <Share2 className="h-4 w-4" />
+                              </Button>
+                            )}
 
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onEdit(card);
-                              }}
-                              className="w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
+                            {!card.isShared && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onEdit(card);
+                                }}
+                                className="w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            )}
                             
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSimSwap(card);
-                              }}
-                              className="w-8 h-8 p-0 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600"
-                              title="SIM Swap"
-                            >
-                              <RefreshCcw className="h-4 w-4" />
-                            </Button>
+                            {!card.isShared && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSimSwap(card);
+                                }}
+                                className="w-8 h-8 p-0 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600"
+                                title="SIM Swap"
+                              >
+                                <RefreshCcw className="h-4 w-4" />
+                              </Button>
+                            )}
                             
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button 
-                                  variant="destructive" 
-                                  size="sm"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="w-8 h-8 p-0"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Deactivate SIM Card</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to deactivate the SIM card {card.sim_number}? 
-                                    The record will be kept for historical purposes but marked as inactive.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleDelete(card.id)}>
-                                    Deactivate
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
+                            {!card.isShared && (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button 
+                                    variant="destructive" 
+                                    size="sm"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="w-8 h-8 p-0"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Deactivate SIM Card</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to deactivate the SIM card {card.sim_number}? 
+                                      The record will be kept for historical purposes but marked as inactive.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDelete(card.id)}>
+                                      Deactivate
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            )}
                           </div>
                         </div>
                         
@@ -975,8 +1046,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                           <div className="flex-[1] text-center px-2 border-r border-black">
                             <span className="text-black dark:text-white">{card.carrier || '-'}</span>
                           </div>
-                          <div className="flex-[1] text-center px-2 border-r border-black">
+                          <div className="flex-[1] text-center px-2 border-r border-black flex flex-col items-center gap-1">
                             {renderStatusBadge(card)}
+                            {card.isShared && <Badge variant="secondary" className="text-xs">Shared</Badge>}
                           </div>
                           <div className="flex-[1] text-center px-2 border-r border-black">
                             <span className="text-black dark:text-white text-sm">{card.location || '-'}</span>
@@ -995,58 +1067,78 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               >
                                 <History className="h-4 w-4" />
                               </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onEdit(card);
-                                }}
-                                className="w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
+                              {!card.isShared && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShareModalCard(card);
+                                  }}
+                                  className="w-8 h-8 p-0 bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600"
+                                  title="Share"
+                                >
+                                  <Share2 className="h-4 w-4" />
+                                </Button>
+                              )}
+                              {!card.isShared && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onEdit(card);
+                                  }}
+                                  className="w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              )}
                               
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleSimSwap(card);
-                                }}
-                                className="w-8 h-8 p-0 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600"
-                                title="SIM Swap"
-                              >
-                                <RefreshCcw className="h-4 w-4" />
-                              </Button>
+                              {!card.isShared && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleSimSwap(card);
+                                  }}
+                                  className="w-8 h-8 p-0 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600"
+                                  title="SIM Swap"
+                                >
+                                  <RefreshCcw className="h-4 w-4" />
+                                </Button>
+                              )}
                               
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button 
-                                    variant="destructive" 
-                                    size="sm"
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="w-8 h-8 p-0"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Deactivate SIM Card</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Are you sure you want to deactivate the SIM card {card.sim_number}? 
-                                      The record will be kept for historical purposes but marked as inactive.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDelete(card.id)}>
-                                      Deactivate
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
+                              {!card.isShared && (
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button 
+                                      variant="destructive" 
+                                      size="sm"
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="w-8 h-8 p-0"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Deactivate SIM Card</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to deactivate the SIM card {card.sim_number}? 
+                                        The record will be kept for historical purposes but marked as inactive.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleDelete(card.id)}>
+                                        Deactivate
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -1150,6 +1242,16 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
           phoneNumber={historyModalCard.phone_number}
           createdAt={historyModalCard.created_at}
           updatedAt={historyModalCard.updated_at}
+        />
+      )}
+
+      {/* Share Modal */}
+      {shareModalCard && (
+        <ShareSimCardModal
+          isOpen={!!shareModalCard}
+          onClose={() => setShareModalCard(null)}
+          simCardId={shareModalCard.id}
+          phoneNumber={shareModalCard.phone_number}
         />
       )}
     </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Home, User, LogOut, Shield, ShieldCheck, Settings, Menu, X, Smartphone, BarChart3, Bell, Download, KeyRound } from "lucide-react";
+import { Home, User, LogOut, Shield, ShieldCheck, Settings, Menu, X, Smartphone, BarChart3, Bell, Download, KeyRound, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -209,6 +209,12 @@ export function Header({ onSearch }: HeaderProps) {
                     <Link to="/devices">
                       <Smartphone className="h-4 w-4 mr-2" />
                       Devices
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to="/friends">
+                      <Users className="h-4 w-4 mr-2" />
+                      Friends
                     </Link>
                   </Button>
                   <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>

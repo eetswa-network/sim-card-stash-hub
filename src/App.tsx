@@ -16,6 +16,7 @@ import AccountDetails from "./pages/AccountDetails";
 import Statistics from "./pages/Statistics";
 import Devices from "./pages/Devices";
 import Accounts from "./pages/Accounts";
+import Friends from "./pages/Friends";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -48,6 +49,7 @@ const AppLayout = () => {
           <Route path="/devices" element={<Devices />} />
           <Route path="/account" element={<AccountDetails />} />
           <Route path="/accounts" element={<Accounts />} />
+          <Route path="/friends" element={<Friends />} />
           <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
