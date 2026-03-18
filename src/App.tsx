@@ -16,6 +16,7 @@ import AccountDetails from "./pages/AccountDetails";
 import Statistics from "./pages/Statistics";
 import Devices from "./pages/Devices";
 import Accounts from "./pages/Accounts";
+import Friends from "./pages/Friends";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
