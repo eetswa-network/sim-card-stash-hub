@@ -212,6 +212,12 @@ export function Header({ onSearch }: HeaderProps) {
                     </Link>
                   </Button>
                   <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
+                    <Link to="/friends">
+                      <Users className="h-4 w-4 mr-2" />
+                      Friends
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" size="sm" asChild className="justify-start" onClick={() => setMobileMenuOpen(false)}>
                     <Link to="/updates">
                       <Bell className="h-4 w-4 mr-2" />
                       Updates
