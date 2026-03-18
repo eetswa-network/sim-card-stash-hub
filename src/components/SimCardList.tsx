@@ -38,6 +38,8 @@ interface SimCard {
   account?: {
     login: string;
   };
+  isShared?: boolean;
+  sharedByName?: string;
 }
 
 interface UsageEntry {
