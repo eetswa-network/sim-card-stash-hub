@@ -136,6 +136,34 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         await cacheSimCards(data);
       }
 
+      // Fetch shared SIM cards
+      const { data: shares } = await supabase
+        .from("sim_card_shares")
+        .select("sim_card_id, owner_id")
+        .eq("shared_with_id", userId);
+
+      if (shares && shares.length > 0) {
+        const sharedCardIds = shares.map(s => s.sim_card_id);
+        const ownerIds = [...new Set(shares.map(s => s.owner_id))];
+        
+        const [sharedCardsResult, ownerProfiles] = await Promise.all([
+          supabase.from("sim_cards").select("*, account:accounts(login)").in("id", sharedCardIds),
+          supabase.from("profiles").select("user_id, profile_name, name").in("user_id", ownerIds)
+        ]);
+
+        const profileMap = new Map((ownerProfiles.data || []).map(p => [p.user_id, p.profile_name || p.name || "Someone"]));
+        const shareOwnerMap = new Map(shares.map(s => [s.sim_card_id, s.owner_id]));
+
+        if (sharedCardsResult.data) {
+          const sharedCards = sharedCardsResult.data.map(card => ({
+            ...card,
+            isShared: true,
+            sharedByName: profileMap.get(shareOwnerMap.get(card.id) || "") || "Someone",
+          }));
+          setSimCards(prev => [...prev, ...sharedCards]);
+        }
+      }
+
       // Fetch usage data for all sim cards
       if (data && data.length > 0) {
         const { data: usageResult, error: usageError } = await supabase
