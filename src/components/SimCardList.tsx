@@ -664,6 +664,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                   </div>
                   {renderStatusBadge(card)}
                   {card.isShared && <Badge variant="secondary" className="text-xs">Shared by {card.sharedByName}</Badge>}
+                </div>
                 {/* Row 2: SIM number with icon on left, carrier on right */}
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex items-center gap-2">
