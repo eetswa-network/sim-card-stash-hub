@@ -997,6 +997,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               <p className="text-sm text-muted-foreground mt-1 break-words">{card.notes}</p>
                             </div>
                           )}
+                          
+                          {card.isShared && (
+                            <SharedDeviceAssign simCardId={card.id} currentDevice={card.shareDeviceName} />
+                          )}
                         </div>
                       </div>
                     )}
