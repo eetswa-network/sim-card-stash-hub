@@ -13,6 +13,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EditableUsageTable } from "./EditableUsageTable";
 import { SimCardHistoryModal } from "./SimCardHistoryModal";
+import { ShareSimCardModal } from "./ShareSimCardModal";
 import { TooltipIcon } from "./TooltipIcon";
 import ebayLogo from "@/assets/ebay-logo.png";
 import paypalLogo from "@/assets/paypal-logo.png";
