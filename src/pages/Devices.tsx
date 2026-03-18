@@ -25,11 +25,18 @@ interface SimCardOnDevice {
   sim_type: string;
 }
 
+interface FriendDeviceEntry {
+  deviceName: string;
+  friendName: string;
+  simCards: SimCardOnDevice[];
+}
+
 export default function Devices() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [devices, setDevices] = useState<DeviceLocation[]>([]);
   const [simCardsByDevice, setSimCardsByDevice] = useState<Record<string, SimCardOnDevice[]>>({});
+  const [friendDevices, setFriendDevices] = useState<FriendDeviceEntry[]>([]);
   const [newDeviceName, setNewDeviceName] = useState("");
   const [addingDevice, setAddingDevice] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -51,7 +58,7 @@ export default function Devices() {
       }
       setUser(session.user);
 
-      const [devicesResult, simCardsResult] = await Promise.all([
+      const [devicesResult, simCardsResult, sharesResult] = await Promise.all([
         supabase
           .from("sim_card_locations")
           .select("id, name, image_url")
@@ -60,7 +67,13 @@ export default function Devices() {
         supabase
           .from("sim_cards")
           .select("id, phone_number, sim_number, carrier, status, sim_type, location")
-          .eq("user_id", session.user.id)
+          .eq("user_id", session.user.id),
+        // Get shares where I'm the owner and the friend has assigned a device
+        supabase
+          .from("sim_card_shares")
+          .select("sim_card_id, shared_with_id, device_name")
+          .eq("owner_id", session.user.id)
+          .not("device_name", "is", null)
       ]);
 
       const deviceList = devicesResult.data || [];
@@ -77,6 +90,41 @@ export default function Devices() {
         }
       }
       setSimCardsByDevice(grouped);
+
+      // Build friend device entries
+      const shares = sharesResult.data || [];
+      if (shares.length > 0) {
+        const friendIds = [...new Set(shares.map(s => s.shared_with_id))];
+        const simCardIds = [...new Set(shares.map(s => s.sim_card_id))];
+
+        const [profilesResult, sharedSimsResult] = await Promise.all([
+          supabase.from("profiles").select("user_id, profile_name, name").in("user_id", friendIds),
+          supabase.from("sim_cards").select("id, phone_number, sim_number, carrier, status, sim_type").in("id", simCardIds)
+        ]);
+
+        const profileMap = new Map((profilesResult.data || []).map(p => [p.user_id, p.profile_name || p.name || "Friend"]));
+        const simMap = new Map((sharedSimsResult.data || []).map(s => [s.id, s]));
+
+        // Group by device_name + friend
+        const deviceMap = new Map<string, FriendDeviceEntry>();
+        for (const share of shares) {
+          const key = `${share.device_name}__${share.shared_with_id}`;
+          if (!deviceMap.has(key)) {
+            deviceMap.set(key, {
+              deviceName: share.device_name!,
+              friendName: profileMap.get(share.shared_with_id) || "Friend",
+              simCards: [],
+            });
+          }
+          const sim = simMap.get(share.sim_card_id);
+          if (sim) {
+            deviceMap.get(key)!.simCards.push(sim);
+          }
+        }
+        setFriendDevices(Array.from(deviceMap.values()));
+      } else {
+        setFriendDevices([]);
+      }
     } catch (error) {
       console.error("Error loading devices:", error);
     } finally {
