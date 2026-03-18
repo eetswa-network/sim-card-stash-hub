@@ -1199,6 +1199,10 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               </div>
                             )}
                             
+                            {card.isShared && (
+                              <SharedDeviceAssign simCardId={card.id} currentDevice={card.shareDeviceName} />
+                            )}
+                            
                             <div className="md:col-span-2">
                               <EditableUsageTable
                                 simCardId={card.id}
