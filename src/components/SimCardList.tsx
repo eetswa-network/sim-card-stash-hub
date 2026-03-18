@@ -1066,58 +1066,78 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               >
                                 <History className="h-4 w-4" />
                               </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onEdit(card);
-                                }}
-                                className="w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
+                              {!card.isShared && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShareModalCard(card);
+                                  }}
+                                  className="w-8 h-8 p-0 bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600"
+                                  title="Share"
+                                >
+                                  <Share2 className="h-4 w-4" />
+                                </Button>
+                              )}
+                              {!card.isShared && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onEdit(card);
+                                  }}
+                                  className="w-8 h-8 p-0 bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-500 hover:border-yellow-600"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              )}
                               
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleSimSwap(card);
-                                }}
-                                className="w-8 h-8 p-0 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600"
-                                title="SIM Swap"
-                              >
-                                <RefreshCcw className="h-4 w-4" />
-                              </Button>
+                              {!card.isShared && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleSimSwap(card);
+                                  }}
+                                  className="w-8 h-8 p-0 bg-orange-500 hover:bg-orange-600 text-white border-orange-500 hover:border-orange-600"
+                                  title="SIM Swap"
+                                >
+                                  <RefreshCcw className="h-4 w-4" />
+                                </Button>
+                              )}
                               
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button 
-                                    variant="destructive" 
-                                    size="sm"
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="w-8 h-8 p-0"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Deactivate SIM Card</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Are you sure you want to deactivate the SIM card {card.sim_number}? 
-                                      The record will be kept for historical purposes but marked as inactive.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDelete(card.id)}>
-                                      Deactivate
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
+                              {!card.isShared && (
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button 
+                                      variant="destructive" 
+                                      size="sm"
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="w-8 h-8 p-0"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Deactivate SIM Card</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to deactivate the SIM card {card.sim_number}? 
+                                        The record will be kept for historical purposes but marked as inactive.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleDelete(card.id)}>
+                                        Deactivate
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              )}
                             </div>
                           </div>
                         </div>
