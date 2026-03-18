@@ -663,7 +663,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                     <CardTitle className={`text-lg break-all ${card.status === 'inactive' || card.status === 'expired' || card.status === 'swapped' ? 'line-through' : ''}`}>{card.phone_number}</CardTitle>
                   </div>
                   {renderStatusBadge(card)}
-                </div>
+                  {card.isShared && <Badge variant="secondary" className="text-xs">Shared by {card.sharedByName}</Badge>}
                 {/* Row 2: SIM number with icon on left, carrier on right */}
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex items-center gap-2">
