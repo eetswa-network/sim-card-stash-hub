@@ -141,7 +141,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       // Fetch shared SIM cards
       const { data: shares } = await supabase
         .from("sim_card_shares")
-        .select("sim_card_id, owner_id")
+        .select("sim_card_id, owner_id, device_name")
         .eq("shared_with_id", userId);
 
       if (shares && shares.length > 0) {
@@ -154,14 +154,18 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         ]);
 
         const profileMap = new Map((ownerProfiles.data || []).map(p => [p.user_id, p.profile_name || p.name || "Someone"]));
-        const shareOwnerMap = new Map(shares.map(s => [s.sim_card_id, s.owner_id]));
+        const shareMap = new Map(shares.map(s => [s.sim_card_id, s]));
 
         if (sharedCardsResult.data) {
-          const sharedCards = sharedCardsResult.data.map(card => ({
-            ...card,
-            isShared: true,
-            sharedByName: profileMap.get(shareOwnerMap.get(card.id) || "") || "Someone",
-          }));
+          const sharedCards = sharedCardsResult.data.map(card => {
+            const share = shareMap.get(card.id);
+            return {
+              ...card,
+              isShared: true,
+              sharedByName: profileMap.get(share?.owner_id || "") || "Someone",
+              shareDeviceName: share?.device_name || undefined,
+            };
+          });
           setSimCards(prev => [...prev, ...sharedCards]);
         }
       }
