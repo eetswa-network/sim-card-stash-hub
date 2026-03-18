@@ -1046,8 +1046,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                           <div className="flex-[1] text-center px-2 border-r border-black">
                             <span className="text-black dark:text-white">{card.carrier || '-'}</span>
                           </div>
-                          <div className="flex-[1] text-center px-2 border-r border-black">
+                          <div className="flex-[1] text-center px-2 border-r border-black flex flex-col items-center gap-1">
                             {renderStatusBadge(card)}
+                            {card.isShared && <Badge variant="secondary" className="text-xs">Shared</Badge>}
                           </div>
                           <div className="flex-[1] text-center px-2 border-r border-black">
                             <span className="text-black dark:text-white text-sm">{card.location || '-'}</span>
