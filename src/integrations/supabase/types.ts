@@ -302,7 +302,7 @@ export type Database = {
           login: string | null
           notes: string | null
           password: string | null
-          phone_number: string
+          phone_number: string | null
           profile_id: string | null
           sim_number: string
           sim_type: string
@@ -321,7 +321,7 @@ export type Database = {
           login?: string | null
           notes?: string | null
           password?: string | null
-          phone_number: string
+          phone_number?: string | null
           profile_id?: string | null
           sim_number: string
           sim_type?: string
@@ -340,7 +340,7 @@ export type Database = {
           login?: string | null
           notes?: string | null
           password?: string | null
-          phone_number?: string
+          phone_number?: string | null
           profile_id?: string | null
           sim_number?: string
           sim_type?: string

@@ -22,9 +22,10 @@ const simCardSchema = z.object({
     .max(100, "SIM number must be less than 100 characters"),
   phone_number: z.string()
     .trim()
-    .min(1, "Phone number is required")
     .max(20, "Phone number must be less than 20 characters")
-    .regex(/^[0-9+\-() ]+$/, "Phone number must contain only digits and valid separators"),
+    .refine(val => !val || /^[0-9+\-() ]+$/.test(val), "Phone number must contain only digits and valid separators")
+    .optional()
+    .or(z.literal("")),
   carrier: z.string()
     .trim()
     .max(100, "Carrier name must be less than 100 characters")
@@ -40,7 +41,13 @@ const simCardSchema = z.object({
     .max(1000, "Notes must be less than 1000 characters")
     .optional(),
   account_id: z.string().uuid("Invalid account ID").optional().or(z.literal(""))
-});
+}).refine(data => {
+  // Phone number is required for non-stored SIM cards
+  if (data.status !== 'stored' && (!data.phone_number || data.phone_number.trim() === '')) {
+    return false;
+  }
+  return true;
+}, { message: "Phone number is required for non-stored SIM cards", path: ["phone_number"] });
 
 const accountSchema = z.object({
   login: z.string()
@@ -220,8 +227,8 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
           checks.push(Promise.resolve({ data: [] }));
         }
         
-        // Only check phone_number if it's new or changed
-        if (!editingCard || formData.phone_number !== editingCard.phone_number) {
+        // Only check phone_number if it's new or changed and not empty
+        if (formData.phone_number && (!editingCard || formData.phone_number !== editingCard.phone_number)) {
           checks.push(
             supabase
               .from("sim_cards")
@@ -475,13 +482,13 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="phone_number">Phone Number *</Label>
+              <Label htmlFor="phone_number">Phone Number {formData.status !== 'stored' ? '*' : '(optional)'}</Label>
               <Input
                 id="phone_number"
                 value={formData.phone_number}
                 onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
                 placeholder="Enter phone number"
-                required
+                required={formData.status !== 'stored'}
                 className={isMobile ? "min-h-[44px]" : ""}
               />
             </div>
