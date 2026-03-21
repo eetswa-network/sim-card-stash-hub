@@ -85,6 +85,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
     notes: editingCard?.notes || "",
     account_id: editingCard?.account_id || "",
     location: editingCard?.location || "",
+    value: editingCard?.value?.toString() || "",
   });
   const [isExpiredSim, setIsExpiredSim] = useState(false);
   const [usedForEntries, setUsedForEntries] = useState([{ name: "", use_purpose: "" }]);
