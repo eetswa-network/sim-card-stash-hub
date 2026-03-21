@@ -1337,6 +1337,29 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                               />
                             </div>
                             
+                            {card.value != null && (
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <TooltipIcon icon={DollarSign} tooltip="Value" />
+                                  <span className="text-sm font-medium">Value:</span>
+                                  <span className="text-sm">${card.value.toFixed(2)}</span>
+                                </div>
+                                {!card.isShared && (
+                                  <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); setRechargeCard(card); }} className="h-7 text-xs">
+                                    <BatteryCharging className="h-3 w-3 mr-1" /> Recharge
+                                  </Button>
+                                )}
+                              </div>
+                            )}
+
+                            {card.activated_at && (
+                              <div className="flex items-center gap-2">
+                                <TooltipIcon icon={Zap} tooltip="Activated" className="h-4 w-4 text-muted-foreground shrink-0" />
+                                <span className="text-sm font-medium">Activated:</span>
+                                <span className="text-sm text-muted-foreground">{new Date(card.activated_at).toLocaleString()}</span>
+                              </div>
+                            )}
+                            
                             <div className="flex items-center gap-2">
                               <TooltipIcon icon={CalendarPlus} tooltip="Date Created" className="h-4 w-4 text-muted-foreground shrink-0" />
                               <span className="text-sm font-medium">Created:</span>
