@@ -599,6 +599,19 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
               </Select>
             </div>
             <div className="space-y-2">
+              <Label htmlFor="value">Value ($)</Label>
+              <Input
+                id="value"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.value}
+                onChange={(e) => setFormData({ ...formData, value: e.target.value })}
+                placeholder="e.g. 35"
+                className={isMobile ? "min-h-[44px]" : ""}
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="location">Device</Label>
               {showCustomLocation ? (
                 <div className="flex gap-2">
