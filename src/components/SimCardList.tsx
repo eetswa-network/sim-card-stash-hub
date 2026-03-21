@@ -1442,6 +1442,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                       {card.carrier && (
                         <span className="text-xs text-muted-foreground hidden sm:inline">{card.carrier}</span>
                       )}
+                      {card.value != null && (
+                        <span className="text-xs font-medium text-muted-foreground hidden sm:inline">${card.value.toFixed(2)}</span>
+                      )}
                       {card.location && (
                         <div className="flex items-center gap-1 text-xs text-muted-foreground hidden sm:flex">
                           <MapPin className="h-3 w-3" />
