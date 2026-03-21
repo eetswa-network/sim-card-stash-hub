@@ -338,6 +338,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
         notes: "",
         account_id: "",
         location: "",
+        value: "",
       });
       setUsedForEntries([{ name: "", use_purpose: "" }]);
       onSuccess();
