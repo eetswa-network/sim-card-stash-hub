@@ -295,7 +295,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       } else {
         const insertData: any = { 
             sim_number: validatedData.sim_number,
-            phone_number: validatedData.phone_number,
+            phone_number: validatedData.phone_number || '',
             carrier: validatedData.carrier || null,
             status: validatedData.status,
             sim_type: validatedData.sim_type,
