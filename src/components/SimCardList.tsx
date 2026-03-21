@@ -71,6 +71,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   const [historyModalCard, setHistoryModalCard] = useState<SimCard | null>(null);
   const [shareModalCard, setShareModalCard] = useState<SimCard | null>(null);
   const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
+  const [showStoredSection, setShowStoredSection] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
