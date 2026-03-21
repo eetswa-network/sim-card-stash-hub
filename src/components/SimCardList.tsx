@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, Maximize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History, MapPin, CalendarPlus, CalendarClock, Eye, EyeOff, Share2, Package, ChevronDown, ChevronRight, Zap } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, Maximize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History, MapPin, CalendarPlus, CalendarClock, Eye, EyeOff, Share2, Package, ChevronDown, ChevronRight, Zap, DollarSign, BatteryCharging } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
