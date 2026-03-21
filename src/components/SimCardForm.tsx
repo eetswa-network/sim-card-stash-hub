@@ -286,9 +286,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
           .eq("sim_card_id", editingCard.id)
           .eq("user_id", user.id);
       } else {
-        const { data, error} = await supabase
-          .from("sim_cards")
-          .insert([{ 
+        const insertData: any = { 
             sim_number: validatedData.sim_number,
             phone_number: validatedData.phone_number,
             carrier: validatedData.carrier || null,
@@ -298,8 +296,16 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             user_id: user.id, 
             profile_id: profile?.id,
             account_id: validatedData.account_id || null,
-            location: formData.location || null
-          }])
+            location: formData.location || null,
+            value: formData.value ? parseFloat(formData.value) : null,
+        };
+        // Set activated_at if creating as active
+        if (validatedData.status === 'active') {
+          insertData.activated_at = new Date().toISOString();
+        }
+        const { data, error} = await supabase
+          .from("sim_cards")
+          .insert([insertData])
           .select()
           .single();
 
