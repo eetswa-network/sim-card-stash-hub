@@ -257,9 +257,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
       let simCardId = editingCard?.id;
 
       if (editingCard) {
-        const { error } = await supabase
-          .from("sim_cards")
-          .update({
+        const updateData: any = {
             sim_number: validatedData.sim_number,
             phone_number: validatedData.phone_number,
             carrier: validatedData.carrier || null,
@@ -267,8 +265,16 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             sim_type: validatedData.sim_type,
             notes: validatedData.notes || null,
             account_id: validatedData.account_id || null,
-            location: formData.location || null
-          })
+            location: formData.location || null,
+            value: formData.value ? parseFloat(formData.value) : null,
+        };
+        // Set activated_at when changing status to active for the first time
+        if (validatedData.status === 'active' && editingCard.status !== 'active' && !editingCard.activated_at) {
+          updateData.activated_at = new Date().toISOString();
+        }
+        const { error } = await supabase
+          .from("sim_cards")
+          .update(updateData)
           .eq("id", editingCard.id);
 
         if (error) throw error;
