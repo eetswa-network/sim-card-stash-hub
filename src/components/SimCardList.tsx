@@ -478,8 +478,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     : simCards.filter(card => 
         card.status !== 'inactive' && 
         card.status !== 'swapped' && 
-        card.status !== 'expired'
-      ); // Hide inactive, swapped, and expired cards when no search query
+        card.status !== 'expired' &&
+        card.status !== 'stored'
+      ); // Hide inactive, swapped, expired, and stored cards when no search query
 
   // Apply sorting if in list view and sort field is selected
   if (viewMode === 'list' && sortField) {

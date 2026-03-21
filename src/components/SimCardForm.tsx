@@ -577,6 +577,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="stored">Stored</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
                   <SelectItem value="suspended">Suspended</SelectItem>
                   <SelectItem value="expired">Expired</SelectItem>
