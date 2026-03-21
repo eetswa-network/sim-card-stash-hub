@@ -29,8 +29,8 @@ const simCardSchema = z.object({
     .trim()
     .max(100, "Carrier name must be less than 100 characters")
     .optional(),
-  status: z.enum(["active", "inactive", "expired"], { 
-    errorMap: () => ({ message: "Status must be active, inactive, or expired" })
+  status: z.enum(["active", "inactive", "expired", "stored"], { 
+    errorMap: () => ({ message: "Status must be active, inactive, expired, or stored" })
   }),
   sim_type: z.string()
     .trim()
@@ -577,6 +577,7 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="stored">Stored</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
                   <SelectItem value="suspended">Suspended</SelectItem>
                   <SelectItem value="expired">Expired</SelectItem>

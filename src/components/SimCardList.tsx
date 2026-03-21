@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, Maximize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History, MapPin, CalendarPlus, CalendarClock, Eye, EyeOff, Share2 } from "lucide-react";
+import { Edit, Trash2, Phone, IdCard, User, Lock, Grid3X3, List, Smartphone, Minimize2, Maximize2, ArrowUpDown, ArrowUp, ArrowDown, Plus, RefreshCcw, History, MapPin, CalendarPlus, CalendarClock, Eye, EyeOff, Share2, Package, ChevronDown, ChevronRight, Zap } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -71,6 +71,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   const [historyModalCard, setHistoryModalCard] = useState<SimCard | null>(null);
   const [shareModalCard, setShareModalCard] = useState<SimCard | null>(null);
   const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
+  const [showStoredSection, setShowStoredSection] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -372,6 +373,8 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         return "outline";
       case "swapped":
         return "swapped" as any;
+      case "stored":
+        return "secondary";
       default:
         return "outline";
     }
@@ -476,8 +479,9 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     : simCards.filter(card => 
         card.status !== 'inactive' && 
         card.status !== 'swapped' && 
-        card.status !== 'expired'
-      ); // Hide inactive, swapped, and expired cards when no search query
+        card.status !== 'expired' &&
+        card.status !== 'stored'
+      ); // Hide inactive, swapped, expired, and stored cards when no search query
 
   // Apply sorting if in list view and sort field is selected
   if (viewMode === 'list' && sortField) {
@@ -494,6 +498,38 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   }
 
   const filteredSimCards = filteredAndSortedCards;
+
+  // Stored SIM cards (shown in separate collapsible section)
+  const storedSimCards = simCards.filter(card => card.status === 'stored' && !card.isShared);
+
+  const handleActivateStored = async (card: SimCard) => {
+    try {
+      const { error } = await supabase
+        .from("sim_cards")
+        .update({ status: "active", updated_at: new Date().toISOString() })
+        .eq("id", card.id);
+
+      if (error) throw error;
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await supabase.from("sim_card_history").insert({
+          sim_card_id: card.id,
+          event_type: "status_change",
+          old_value: "stored",
+          new_value: "active",
+          changed_by: session.user.id,
+          notes: "Activated from stored",
+        });
+      }
+
+      toast({ title: "SIM Card Activated", description: `${card.phone_number} is now active.` });
+      fetchSimCards();
+    } catch (error) {
+      console.error("Error activating SIM card:", error);
+      toast({ title: "Error", description: "Failed to activate SIM card.", variant: "destructive" });
+    }
+  };
 
   // Find the replacement card for a swapped SIM (same phone_number, created after)
   const navigateToSwappedCard = (card: SimCard) => {
@@ -1244,6 +1280,86 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
               </>
             )}
           </CardContent>
+        </Card>
+      )}
+
+      {/* Stored SIM Cards Section */}
+      {storedSimCards.length > 0 && !searchQuery && (
+        <Card className="border-dashed">
+          <CardHeader 
+            className="cursor-pointer pb-3" 
+            onClick={() => setShowStoredSection(!showStoredSection)}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Package className="h-5 w-5 text-muted-foreground" />
+                <CardTitle className="text-base">Stored SIM Cards</CardTitle>
+                <Badge variant="secondary" className="text-xs">{storedSimCards.length}</Badge>
+              </div>
+              {showStoredSection ? (
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Pre-registered SIM cards ready to be activated
+            </p>
+          </CardHeader>
+          {showStoredSection && (
+            <CardContent className="pt-0">
+              <div className="space-y-2">
+                {storedSimCards.map((card) => (
+                  <div 
+                    key={card.id}
+                    className="flex items-center justify-between p-3 rounded-md border bg-muted/30"
+                  >
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="flex items-center gap-2 min-w-0">
+                        {card.sim_type === 'eSIM' ? (
+                          <Smartphone className="h-4 w-4 text-muted-foreground shrink-0" />
+                        ) : (
+                          <IdCard className="h-4 w-4 text-muted-foreground shrink-0" />
+                        )}
+                        <div className="min-w-0">
+                          <div className="font-medium text-sm truncate">{card.phone_number}</div>
+                          <div className="text-xs text-muted-foreground font-mono truncate">{card.sim_number}</div>
+                        </div>
+                      </div>
+                      {card.carrier && (
+                        <span className="text-xs text-muted-foreground hidden sm:inline">{card.carrier}</span>
+                      )}
+                      {card.location && (
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground hidden sm:flex">
+                          <MapPin className="h-3 w-3" />
+                          {card.location}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onEdit(card)}
+                        className="h-8"
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => handleActivateStored(card)}
+                        className="h-8"
+                      >
+                        <Zap className="h-3 w-3 mr-1" />
+                        Activate
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          )}
         </Card>
       )}
 
