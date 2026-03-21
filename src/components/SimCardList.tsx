@@ -74,6 +74,8 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
   const [shareModalCard, setShareModalCard] = useState<SimCard | null>(null);
   const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
   const [showStoredSection, setShowStoredSection] = useState(false);
+  const [rechargeCard, setRechargeCard] = useState<SimCard | null>(null);
+  const [rechargeAmount, setRechargeAmount] = useState("");
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
