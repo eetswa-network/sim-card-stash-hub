@@ -294,6 +294,7 @@ export type Database = {
       sim_cards: {
         Row: {
           account_id: string | null
+          activated_at: string | null
           carrier: string | null
           created_at: string
           id: string
@@ -308,9 +309,11 @@ export type Database = {
           status: string | null
           updated_at: string
           user_id: string
+          value: number | null
         }
         Insert: {
           account_id?: string | null
+          activated_at?: string | null
           carrier?: string | null
           created_at?: string
           id?: string
@@ -325,9 +328,11 @@ export type Database = {
           status?: string | null
           updated_at?: string
           user_id: string
+          value?: number | null
         }
         Update: {
           account_id?: string | null
+          activated_at?: string | null
           carrier?: string | null
           created_at?: string
           id?: string
@@ -342,6 +347,7 @@ export type Database = {
           status?: string | null
           updated_at?: string
           user_id?: string
+          value?: number | null
         }
         Relationships: [
           {
