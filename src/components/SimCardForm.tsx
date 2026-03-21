@@ -227,8 +227,8 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
           checks.push(Promise.resolve({ data: [] }));
         }
         
-        // Only check phone_number if it's new or changed
-        if (!editingCard || formData.phone_number !== editingCard.phone_number) {
+        // Only check phone_number if it's new or changed and not empty
+        if (formData.phone_number && (!editingCard || formData.phone_number !== editingCard.phone_number)) {
           checks.push(
             supabase
               .from("sim_cards")
