@@ -36,6 +36,8 @@ interface SimCard {
   updated_at: string;
   account_id?: string;
   location?: string;
+  value?: number;
+  activated_at?: string;
   account?: {
     login: string;
   };
