@@ -372,6 +372,8 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         return "outline";
       case "swapped":
         return "swapped" as any;
+      case "stored":
+        return "secondary";
       default:
         return "outline";
     }
