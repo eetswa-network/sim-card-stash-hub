@@ -1497,6 +1497,36 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
           phoneNumber={shareModalCard.phone_number}
         />
       )}
+
+      {/* Recharge Dialog */}
+      {rechargeCard && (
+        <AlertDialog open={!!rechargeCard} onOpenChange={(open) => { if (!open) { setRechargeCard(null); setRechargeAmount(""); } }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Recharge SIM Card</AlertDialogTitle>
+              <AlertDialogDescription>
+                Add credit to {rechargeCard.phone_number}. Current value: ${(rechargeCard.value || 0).toFixed(2)}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="py-4">
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="Recharge amount ($)"
+                value={rechargeAmount}
+                onChange={(e) => setRechargeAmount(e.target.value)}
+              />
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => { setRechargeCard(null); setRechargeAmount(""); }}>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleRecharge} disabled={!rechargeAmount || parseFloat(rechargeAmount) <= 0}>
+                Recharge
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
     </TooltipProvider>
   );
