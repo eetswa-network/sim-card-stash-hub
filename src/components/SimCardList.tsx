@@ -510,7 +510,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     try {
       const { error } = await supabase
         .from("sim_cards")
-        .update({ status: "active", updated_at: new Date().toISOString() })
+        .update({ status: "active", updated_at: new Date().toISOString(), activated_at: new Date().toISOString() })
         .eq("id", card.id);
 
       if (error) throw error;
@@ -532,6 +532,44 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
     } catch (error) {
       console.error("Error activating SIM card:", error);
       toast({ title: "Error", description: "Failed to activate SIM card.", variant: "destructive" });
+    }
+  };
+
+  const handleRecharge = async () => {
+    if (!rechargeCard || !rechargeAmount) return;
+    const amount = parseFloat(rechargeAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast({ title: "Invalid amount", variant: "destructive" });
+      return;
+    }
+    try {
+      const newValue = (rechargeCard.value || 0) + amount;
+      const { error } = await supabase
+        .from("sim_cards")
+        .update({ value: newValue, updated_at: new Date().toISOString() })
+        .eq("id", rechargeCard.id);
+
+      if (error) throw error;
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await supabase.from("sim_card_history").insert({
+          sim_card_id: rechargeCard.id,
+          event_type: "recharge",
+          old_value: (rechargeCard.value || 0).toString(),
+          new_value: newValue.toString(),
+          changed_by: session.user.id,
+          notes: `Recharged $${amount.toFixed(2)} (total now $${newValue.toFixed(2)})`,
+        });
+      }
+
+      toast({ title: "Recharge Successful", description: `Added $${amount.toFixed(2)} to ${rechargeCard.phone_number}` });
+      setRechargeCard(null);
+      setRechargeAmount("");
+      fetchSimCards();
+    } catch (error) {
+      console.error("Error recharging:", error);
+      toast({ title: "Error", description: "Failed to recharge.", variant: "destructive" });
     }
   };
 
