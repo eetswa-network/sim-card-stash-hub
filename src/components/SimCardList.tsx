@@ -499,6 +499,38 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
   const filteredSimCards = filteredAndSortedCards;
 
+  // Stored SIM cards (shown in separate collapsible section)
+  const storedSimCards = simCards.filter(card => card.status === 'stored' && !card.isShared);
+
+  const handleActivateStored = async (card: SimCard) => {
+    try {
+      const { error } = await supabase
+        .from("sim_cards")
+        .update({ status: "active", updated_at: new Date().toISOString() })
+        .eq("id", card.id);
+
+      if (error) throw error;
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await supabase.from("sim_card_history").insert({
+          sim_card_id: card.id,
+          event_type: "status_change",
+          old_value: "stored",
+          new_value: "active",
+          changed_by: session.user.id,
+          notes: "Activated from stored",
+        });
+      }
+
+      toast({ title: "SIM Card Activated", description: `${card.phone_number} is now active.` });
+      fetchSimCards();
+    } catch (error) {
+      console.error("Error activating SIM card:", error);
+      toast({ title: "Error", description: "Failed to activate SIM card.", variant: "destructive" });
+    }
+  };
+
   // Find the replacement card for a swapped SIM (same phone_number, created after)
   const navigateToSwappedCard = (card: SimCard) => {
     const replacement = simCards.find(
