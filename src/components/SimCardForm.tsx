@@ -482,13 +482,13 @@ export function SimCardForm({ onSuccess, editingCard, onCancel }: SimCardFormPro
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="phone_number">Phone Number *</Label>
+              <Label htmlFor="phone_number">Phone Number {formData.status !== 'stored' ? '*' : '(optional)'}</Label>
               <Input
                 id="phone_number"
                 value={formData.phone_number}
                 onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
                 placeholder="Enter phone number"
-                required
+                required={formData.status !== 'stored'}
                 className={isMobile ? "min-h-[44px]" : ""}
               />
             </div>
