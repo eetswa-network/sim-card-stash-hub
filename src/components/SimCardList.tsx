@@ -776,6 +776,32 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
                   onUsageUpdate={handleUsageUpdate}
                 />
 
+                {card.value != null && (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <TooltipIcon icon={DollarSign} tooltip="Value" />
+                      <span className="text-sm font-medium">${card.value.toFixed(2)}</span>
+                    </div>
+                    {!card.isShared && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => { e.stopPropagation(); setRechargeCard(card); }}
+                        className="h-7 text-xs"
+                      >
+                        <BatteryCharging className="h-3 w-3 mr-1" />
+                        Recharge
+                      </Button>
+                    )}
+                  </div>
+                )}
+
+                {card.activated_at && (
+                  <div className="flex items-center gap-2">
+                    <TooltipIcon icon={Zap} tooltip="Activated" className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Activated: {new Date(card.activated_at).toLocaleDateString()}</span>
+                  </div>
+                )}
 
                 {(card.login || card.account?.login) && (
                   <div className="flex items-center gap-2">
