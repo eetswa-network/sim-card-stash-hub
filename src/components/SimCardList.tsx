@@ -1283,6 +1283,86 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
         </Card>
       )}
 
+      {/* Stored SIM Cards Section */}
+      {storedSimCards.length > 0 && !searchQuery && (
+        <Card className="border-dashed">
+          <CardHeader 
+            className="cursor-pointer pb-3" 
+            onClick={() => setShowStoredSection(!showStoredSection)}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Package className="h-5 w-5 text-muted-foreground" />
+                <CardTitle className="text-base">Stored SIM Cards</CardTitle>
+                <Badge variant="secondary" className="text-xs">{storedSimCards.length}</Badge>
+              </div>
+              {showStoredSection ? (
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Pre-registered SIM cards ready to be activated
+            </p>
+          </CardHeader>
+          {showStoredSection && (
+            <CardContent className="pt-0">
+              <div className="space-y-2">
+                {storedSimCards.map((card) => (
+                  <div 
+                    key={card.id}
+                    className="flex items-center justify-between p-3 rounded-md border bg-muted/30"
+                  >
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="flex items-center gap-2 min-w-0">
+                        {card.sim_type === 'eSIM' ? (
+                          <Smartphone className="h-4 w-4 text-muted-foreground shrink-0" />
+                        ) : (
+                          <IdCard className="h-4 w-4 text-muted-foreground shrink-0" />
+                        )}
+                        <div className="min-w-0">
+                          <div className="font-medium text-sm truncate">{card.phone_number}</div>
+                          <div className="text-xs text-muted-foreground font-mono truncate">{card.sim_number}</div>
+                        </div>
+                      </div>
+                      {card.carrier && (
+                        <span className="text-xs text-muted-foreground hidden sm:inline">{card.carrier}</span>
+                      )}
+                      {card.location && (
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground hidden sm:flex">
+                          <MapPin className="h-3 w-3" />
+                          {card.location}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onEdit(card)}
+                        className="h-8"
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => handleActivateStored(card)}
+                        className="h-8"
+                      >
+                        <Zap className="h-3 w-3 mr-1" />
+                        Activate
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          )}
+        </Card>
+      )}
+
       {/* History Modal */}
       {historyModalCard && (
         <SimCardHistoryModal
