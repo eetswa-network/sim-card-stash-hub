@@ -552,18 +552,6 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
 
       if (error) throw error;
 
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        await supabase.from("sim_card_history").insert({
-          sim_card_id: rechargeCard.id,
-          event_type: "recharge",
-          old_value: (rechargeCard.value || 0).toString(),
-          new_value: newValue.toString(),
-          changed_by: session.user.id,
-          notes: `Recharged $${amount.toFixed(2)} (total now $${newValue.toFixed(2)})`,
-        });
-      }
-
       toast({ title: "Recharge Successful", description: `Added $${amount.toFixed(2)} to ${rechargeCard.phone_number}` });
       setRechargeCard(null);
       setRechargeAmount("");
