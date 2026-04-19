@@ -289,7 +289,7 @@ export function SimCardList({ onEdit, refreshTrigger, viewMode, onViewModeChange
       // Create a new card with the same data but empty sim_number
 
       const newCard = {
-        sim_number: "", // Empty sim number for new card
+        sim_number: "XXXXXXXXXXXXX", // Placeholder to bypass unique index; user fills in real number via edit form
         phone_number: card.phone_number,
         carrier: card.carrier,
         status: "active",
